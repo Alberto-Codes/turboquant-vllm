@@ -1,0 +1,25 @@
+FROM docker.io/rocm/pytorch:rocm7.1_ubuntu24.04_py3.12_pytorch_release_2.8.0
+
+# gfx1150 (Radeon 890M) requires spoofing as gfx1100
+ENV HSA_OVERRIDE_GFX_VERSION=11.0.0
+
+# Install uv for fast dependency management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Install project dependencies (without dev group — add manually if needed)
+# scipy and einops are runtime deps not bundled in the base image
+RUN pip install --quiet scipy einops accelerate einops transformers molmo-utils && \
+    pip install --quiet pytest pytest-asyncio pytest-mock pytest-randomly pytest-cov && \
+    rm -rf /root/.cache/pip
+
+WORKDIR /workspace
+
+# Project source mounted at runtime via -v
+# Usage:
+#   podman build -t turboquant-rocm -f infra/Containerfile.rocm .
+#   podman run --rm -it \
+#     --device=/dev/kfd --device=/dev/dri \
+#     --group-add=video \
+#     --security-opt=label=disable \
+#     -v ~/Projects/turboquant-consumer:/workspace:z \
+#     turboquant-rocm
