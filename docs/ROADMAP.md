@@ -104,6 +104,72 @@ on consumer GPUs (RTX 4090, 24 GB VRAM) with Molmo2 vision-language models.
 
 ## Future Work
 
+### P7: AMD ROCm platform support (Radeon 890M / gfx1150)
+
+**Goal:** Enable TurboQuant development and validation on AMD integrated GPUs, starting with Radeon 890M (RDNA 3.5, gfx1150) on a Ryzen AI 9 HX 370 laptop running Bazzite (immutable Fedora).
+
+**Context:** gfx1150 lacks official ROCm support as of March 2026. The `HSA_OVERRIDE_GFX_VERSION=11.0.0` workaround enables PyTorch GPU detection in containerized environments. Core algorithm is device-agnostic and works on CPU without modification.
+
+**Research:** See `_bmad-output/planning-artifacts/research/technical-rocm-amd-igpu-pytorch-inference-research-2026-03-26.md` for full feasibility assessment.
+
+#### Phase 0 — Smoke Test
+
+| Step | Action | Success Criteria |
+|------|--------|-----------------|
+| 0.1 | Pull ROCm PyTorch container via Podman | Container runs |
+| 0.2 | Set `HSA_OVERRIDE_GFX_VERSION=11.0.0` | `torch.cuda.is_available()` → True |
+| 0.3 | Run `torch.cuda.get_device_name(0)` | Returns Radeon 890M identifier |
+| 0.4 | Run simple matmul on GPU | Correct result, no crash |
+| 0.5 | Run test suite on CPU inside container | All 62 tests pass |
+| 0.6 | Run test suite on GPU inside container | Assess pass rate |
+
+#### Phase 1 — Dev Environment
+
+| Step | Action | Depends On |
+|------|--------|-----------|
+| 1.1 | Create `Containerfile` for dev environment (ROCm + project deps) | Phase 0 |
+| 1.2 | Mount project sources as volumes | 1.1 |
+| 1.3 | Add cross-device validation test fixtures (CPU vs GPU) | 1.1 |
+| 1.4 | Verify `uv sync` works inside container with ROCm PyTorch | 1.1 |
+
+#### Phase 2 — Core Algorithm on AMD
+
+| Work Stream | GPU Required? | Priority |
+|------------|--------------|----------|
+| Improve codebook solver convergence | No | High |
+| Extend test coverage beyond 85% | No | High |
+| Add support for additional bit widths (2-bit, 5-bit) | No | Medium |
+| Benchmark CompressedDynamicCache API ergonomics | No | Medium |
+| Explore `torch.compile(mode="default")` on ROCm | Yes | Medium |
+
+#### Phase 3 — End-to-End Validation (if GPU works)
+
+| Step | Action | Notes |
+|------|--------|-------|
+| 3.1 | Download Molmo2-4B weights (~8 GB) | HuggingFace auth required |
+| 3.2 | Run baseline inference (no compression) on GPU | Correctness baseline |
+| 3.3 | Run TQ4 compressed inference on GPU | Compare output quality |
+| 3.4 | Cross-validate: same inputs on CPU vs GPU | Catch HSA override precision issues |
+| 3.5 | Benchmark actual throughput on 890M | Establish performance baseline |
+
+**Known limitations:**
+- ~11-16x slower than RTX 4090 (DDR5 ~90 GB/s vs GDDR6X ~1 TB/s)
+- `torch.compile` `reduce-overhead` mode broken on ROCm — must use `mode="default"`
+- Fused Triton kernel (P3b/P5) is NVIDIA-only; requires porting or alternative approach
+- `hipMallocManaged()` not supported on gfx1150 as of ROCm 7.2
+
+**Decision framework:**
+```
+Phase 0 Smoke Test
+       │
+       ├─ GPU detected + tests pass → Phase 1 → Phase 2 + 3
+       │
+       └─ GPU NOT detected → CPU-only development (still valuable)
+                               └─ Monitor ROCm releases for gfx1150 support
+```
+
+---
+
 ### P4: Molmo2-8B validation
 
 **Goal:** Confirm CompressedDynamicCache works with the larger model. The 8B model recognizes character names (e.g., "Elaine", "Kramer") which 4B cannot.
@@ -138,6 +204,8 @@ on consumer GPUs (RTX 4090, 24 GB VRAM) with Molmo2 vision-language models.
 
 ## Hardware Context
 
+### Primary — Desktop (RTX 4090)
+
 | Component | Spec | Relevance |
 |-----------|------|-----------|
 | GPU | NVIDIA RTX 4090 (24 GB GDDR6X) | All benchmarks run here |
@@ -146,6 +214,18 @@ on consumer GPUs (RTX 4090, 24 GB VRAM) with Molmo2 vision-language models.
 | Target model | Molmo2-4B (experiments) / 8B (future) | Vision-language model for video analysis |
 | Target workload | Seinfeld clip analysis | 11K+ visual tokens at 2fps |
 | Production stack | vLLM in Podman (CDI GPU) | Currently FP8 KV cache |
+
+### Secondary — Laptop (Radeon 890M iGPU)
+
+| Component | Spec | Relevance |
+|-----------|------|-----------|
+| GPU | AMD Radeon 890M (32 GB shared VRAM, gfx1150 RDNA 3.5) | ROCm via HSA override (P7) |
+| CPU | AMD Ryzen AI 9 HX 370 (12C/24T, 5.16 GHz) | Algorithm dev, CPU-path testing |
+| NPU | AMD XDNA (Strix) | Future exploration (incompatible with custom cache ops) |
+| RAM | 64 GB DDR5 | Shared with iGPU VRAM |
+| OS | Bazzite 43 (immutable Fedora) | Podman-native, no system package installs |
+| Dev environment | Podman + ROCm container | `HSA_OVERRIDE_GFX_VERSION=11.0.0` |
+| Bandwidth | ~90 GB/s (DDR5) vs ~1 TB/s (4090 GDDR6X) | 11-16x slower end-to-end |
 
 ---
 
