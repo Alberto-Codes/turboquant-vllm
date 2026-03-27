@@ -15,8 +15,8 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.tq4_compress`: Phase 3c.9 fused compress.
-    :mod:`turboquant_consumer.triton.tq4_decompress`: Phase 3c.8 fused decompress.
+    :mod:`turboquant_vllm.triton.tq4_compress`: Phase 3c.9 fused compress.
+    :mod:`turboquant_vllm.triton.tq4_decompress`: Phase 3c.8 fused decompress.
     ``experiments/experiment_015_profile_tq4_cache_bottleneck.py``: Pre-Triton baseline.
 """
 
@@ -30,9 +30,9 @@ from typing import Any
 
 import torch
 
-from turboquant_consumer.quantizer import TurboQuantMSE
-from turboquant_consumer.triton.tq4_compress import tq4_compress
-from turboquant_consumer.triton.tq4_decompress import tq4_decompress
+from turboquant_vllm.quantizer import TurboQuantMSE
+from turboquant_vllm.triton.tq4_compress import tq4_compress
+from turboquant_vllm.triton.tq4_decompress import tq4_decompress
 
 # ---------------------------------------------------------------------------
 # Constants

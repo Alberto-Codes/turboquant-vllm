@@ -6,15 +6,15 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.fused_qk_attention`: Kernel implementation.
+    :mod:`turboquant_vllm.triton.fused_qk_attention`: Kernel implementation.
 """
 
 import time
 
 import torch
 
-from turboquant_consumer import solve_lloyd_max
-from turboquant_consumer.triton.fused_qk_attention import fused_qk_scores
+from turboquant_vllm import solve_lloyd_max
+from turboquant_vllm.triton.fused_qk_attention import fused_qk_scores
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(

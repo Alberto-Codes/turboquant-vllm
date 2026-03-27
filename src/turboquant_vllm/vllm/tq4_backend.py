@@ -35,9 +35,9 @@ from vllm.v1.attention.backends.registry import (
 )
 from vllm.v1.kv_cache_interface import FullAttentionSpec
 
-from turboquant_consumer.quantizer import TurboQuantMSE
-from turboquant_consumer.triton.tq4_compress import tq4_compress
-from turboquant_consumer.triton.tq4_decompress import tq4_decompress
+from turboquant_vllm.quantizer import TurboQuantMSE
+from turboquant_vllm.triton.tq4_compress import tq4_compress
+from turboquant_vllm.triton.tq4_decompress import tq4_decompress
 
 if TYPE_CHECKING:
     from vllm.v1.attention.backend import AttentionImplBase, AttentionMetadataBuilder
@@ -522,7 +522,7 @@ def register_tq4_backend() -> None:
     Called automatically by the ``vllm.general_plugins`` entry point,
     or manually before starting vLLM::
 
-        from turboquant_consumer.vllm import register_tq4_backend
+        from turboquant_vllm.vllm import register_tq4_backend
 
         register_tq4_backend()
         # then start vLLM with --attention-backend CUSTOM
@@ -531,7 +531,7 @@ def register_tq4_backend() -> None:
 
     register_backend(
         AttentionBackendEnum.CUSTOM,
-        "turboquant_consumer.vllm.tq4_backend.TQ4AttentionBackend",
+        "turboquant_vllm.vllm.tq4_backend.TQ4AttentionBackend",
     )
 
     # Register TQ4FullAttentionSpec in the KV cache manager mapping.

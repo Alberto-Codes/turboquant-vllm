@@ -12,7 +12,7 @@ import pytest
 import torch
 import torch.nn.functional as F
 
-from turboquant_consumer.triton.flash_attention import triton_flash_attention
+from turboquant_vllm.triton.flash_attention import triton_flash_attention
 
 # ---------------------------------------------------------------------------
 # Fixtures

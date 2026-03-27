@@ -23,7 +23,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.quantizer`: TurboQuantProd.estimate_inner_product.
+    :mod:`turboquant_vllm.quantizer`: TurboQuantProd.estimate_inner_product.
 """
 
 import argparse
@@ -125,7 +125,7 @@ def run_experiment(
         DynamicCache,
     )
 
-    from turboquant_consumer.kv_cache import CompressedDynamicCache
+    from turboquant_vllm.kv_cache import CompressedDynamicCache
 
     results: dict[str, Any] = {
         "experiment": "012-turboquantprod-quality",
@@ -193,7 +193,7 @@ def run_experiment(
     from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS
 
     # Create shared quantizer
-    from turboquant_consumer.quantizer import TurboQuantProd
+    from turboquant_vllm.quantizer import TurboQuantProd
 
     prod_quantizer = TurboQuantProd(head_dim, bits=bits, seed=42)
 

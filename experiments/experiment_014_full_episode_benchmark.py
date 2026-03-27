@@ -31,7 +31,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.kv_cache`: CompressedDynamicCache implementation.
+    :mod:`turboquant_vllm.kv_cache`: CompressedDynamicCache implementation.
     docs/ROADMAP.md: P9 Phase 2 requirements and success criteria.
 """
 
@@ -312,7 +312,7 @@ def _run_tq4(
         DynamicCache,
     )
 
-    from turboquant_consumer.kv_cache import CompressedDynamicCache
+    from turboquant_vllm.kv_cache import CompressedDynamicCache
 
     print("  Loading model and processor...")
     load_start = time.perf_counter()

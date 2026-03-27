@@ -14,7 +14,7 @@ Attributes:
 
 Examples:
     ```python
-    from turboquant_consumer.triton.flash_attention_tq4 import (
+    from turboquant_vllm.triton.flash_attention_tq4 import (
         triton_flash_attention_tq4,
     )
 
@@ -29,8 +29,8 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.flash_attention`: Phase 1 vanilla kernel.
-    :mod:`turboquant_consumer.quantizer`: TurboQuantMSE rotation + quantization.
+    :mod:`turboquant_vllm.triton.flash_attention`: Phase 1 vanilla kernel.
+    :mod:`turboquant_vllm.quantizer`: TurboQuantMSE rotation + quantization.
 """
 
 from __future__ import annotations

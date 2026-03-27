@@ -16,7 +16,7 @@ Attributes:
 
 Examples:
     ```python
-    from turboquant_consumer.triton.tq4_decompress import tq4_decompress
+    from turboquant_vllm.triton.tq4_decompress import tq4_decompress
 
     # packed: (N, H, D//2) uint8, norms: (N, H, 1) fp32
     out = tq4_decompress(packed, norms, centroids, dtype=torch.float16)
@@ -24,8 +24,8 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.flash_attention_tq4`: Phase 2 fused FA+K kernel.
-    :mod:`turboquant_consumer.vllm.tq4_backend`: vLLM backend that calls this kernel.
+    :mod:`turboquant_vllm.triton.flash_attention_tq4`: Phase 2 fused FA+K kernel.
+    :mod:`turboquant_vllm.vllm.tq4_backend`: vLLM backend that calls this kernel.
 """
 
 from __future__ import annotations

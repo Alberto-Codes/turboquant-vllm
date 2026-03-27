@@ -26,14 +26,14 @@ Attributes:
 
 Examples:
     ```python
-    from turboquant_consumer.triton.flash_attention import triton_flash_attention
+    from turboquant_vllm.triton.flash_attention import triton_flash_attention
 
     out = triton_flash_attention(q, k, v)  # non-causal
     out = triton_flash_attention(q, k, v, is_causal=True)  # prefill
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.attention_interface`:
+    :mod:`turboquant_vllm.triton.attention_interface`:
         HuggingFace AttentionInterface registration.
 """
 

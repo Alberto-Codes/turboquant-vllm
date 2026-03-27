@@ -17,11 +17,11 @@ mode) KV cache compression statistics.
 Usage:
     ```bash
     # Accuracy-only mode
-    python -m turboquant_consumer.benchmark \
+    python -m turboquant_vllm.benchmark \
         --model allenai/Molmo2-4B --bits 3
 
     # Compressed mode (real VRAM savings)
-    python -m turboquant_consumer.benchmark \
+    python -m turboquant_vllm.benchmark \
         --model allenai/Molmo2-4B --bits 3 --compressed \
         --video /path/to/clip.mp4
     ```
@@ -30,13 +30,13 @@ Requires GPU with sufficient VRAM for the chosen model.
 
 Examples:
     ```python
-    from turboquant_consumer.benchmark import run_benchmark
+    from turboquant_vllm.benchmark import run_benchmark
     results = run_benchmark("allenai/Molmo2-4B", "Describe the scene.", bits=3)
     ```
 
 See Also:
-    :class:`turboquant_consumer.TurboQuantKVCache`: Accuracy-only cache wrapper.
-    :class:`turboquant_consumer.CompressedDynamicCache`: Compressed cache with VRAM savings.
+    :class:`turboquant_vllm.TurboQuantKVCache`: Accuracy-only cache wrapper.
+    :class:`turboquant_vllm.CompressedDynamicCache`: Compressed cache with VRAM savings.
 """
 
 import argparse
@@ -250,7 +250,7 @@ def run_benchmark(
     """
     from transformers import DynamicCache
 
-    from turboquant_consumer.kv_cache import (
+    from turboquant_vllm.kv_cache import (
         CompressedDynamicCache,
         TurboQuantKVCache,
     )

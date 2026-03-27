@@ -34,7 +34,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.vllm.tq4_backend`: TQ4 attention backend.
+    :mod:`turboquant_vllm.vllm.tq4_backend`: TQ4 attention backend.
     ``docs/ROADMAP.md``: Phase 3c.7.
     ``experiments/experiment_014_full_episode_benchmark.py``: Prior vLLM benchmark.
 """
@@ -49,7 +49,7 @@ from typing import Any
 
 import torch
 
-from turboquant_consumer.quantizer import TurboQuantMSE
+from turboquant_vllm.quantizer import TurboQuantMSE
 
 # ---------------------------------------------------------------------------
 # TQ4 constants (must match tq4_backend.py)

@@ -22,7 +22,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.flash_attention_tq4_kv`: P5 fused kernel.
+    :mod:`turboquant_vllm.triton.flash_attention_tq4_kv`: P5 fused kernel.
 """
 
 import argparse
@@ -161,8 +161,8 @@ def run_experiment(
         DynamicCache,
     )
 
-    from turboquant_consumer.kv_cache import CompressedDynamicCache
-    from turboquant_consumer.triton.attention_interface import (
+    from turboquant_vllm.kv_cache import CompressedDynamicCache
+    from turboquant_vllm.triton.attention_interface import (
         install_fused_tq4_kv,
         uninstall_fused_tq4_kv,
     )

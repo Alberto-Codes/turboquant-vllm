@@ -25,7 +25,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.attention_interface`: install_fused_tq4_kv.
+    :mod:`turboquant_vllm.triton.attention_interface`: install_fused_tq4_kv.
 """
 
 import argparse
@@ -201,8 +201,8 @@ def run_experiment(
         DynamicCache,
     )
 
-    from turboquant_consumer.kv_cache import CompressedDynamicCache
-    from turboquant_consumer.triton.attention_interface import (
+    from turboquant_vllm.kv_cache import CompressedDynamicCache
+    from turboquant_vllm.triton.attention_interface import (
         install_fused_tq4_kv,
         uninstall_fused_tq4_kv,
     )

@@ -25,7 +25,7 @@ Examples:
     Direct kernel usage:
 
     ```python
-    from turboquant_consumer.triton import triton_flash_attention
+    from turboquant_vllm.triton import triton_flash_attention
 
     out = triton_flash_attention(q, k, v)
     ```
@@ -33,17 +33,17 @@ Examples:
     HuggingFace integration:
 
     ```python
-    from turboquant_consumer.triton import install_triton_fa
+    from turboquant_vllm.triton import install_triton_fa
 
     install_triton_fa(model)
     output = model.generate(...)
     ```
 
 See Also:
-    :mod:`turboquant_consumer.kv_cache`: CompressedDynamicCache storage layer.
+    :mod:`turboquant_vllm.kv_cache`: CompressedDynamicCache storage layer.
 """
 
-from turboquant_consumer.triton.attention_interface import (
+from turboquant_vllm.triton.attention_interface import (
     install_fused_tq4_kv,
     install_triton_fa,
     register_triton_fa,
@@ -51,14 +51,14 @@ from turboquant_consumer.triton.attention_interface import (
     triton_fa_tq4_kv_forward,
     uninstall_fused_tq4_kv,
 )
-from turboquant_consumer.triton.flash_attention import triton_flash_attention
-from turboquant_consumer.triton.flash_attention_tq4 import triton_flash_attention_tq4
-from turboquant_consumer.triton.flash_attention_tq4_kv import (
+from turboquant_vllm.triton.flash_attention import triton_flash_attention
+from turboquant_vllm.triton.flash_attention_tq4 import triton_flash_attention_tq4
+from turboquant_vllm.triton.flash_attention_tq4_kv import (
     triton_flash_attention_tq4_kv,
 )
-from turboquant_consumer.triton.fused_qk_attention import fused_qk_scores
-from turboquant_consumer.triton.tq4_compress import tq4_compress
-from turboquant_consumer.triton.tq4_decompress import tq4_decompress
+from turboquant_vllm.triton.fused_qk_attention import fused_qk_scores
+from turboquant_vllm.triton.tq4_compress import tq4_compress
+from turboquant_vllm.triton.tq4_decompress import tq4_decompress
 
 __all__ = [
     "triton_flash_attention",

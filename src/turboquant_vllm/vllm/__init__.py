@@ -10,7 +10,7 @@ Attributes:
     register_tq4_backend: Callable to register the backend manually.
 
 See Also:
-    :mod:`turboquant_consumer.kv_cache`: CompressedDynamicCache for HF transformers.
+    :mod:`turboquant_vllm.kv_cache`: CompressedDynamicCache for HF transformers.
 
 Usage:
     The backend registers automatically via the ``vllm.general_plugins``
@@ -22,12 +22,12 @@ Usage:
 
     Or register manually before starting vLLM::
 
-        from turboquant_consumer.vllm import register_tq4_backend
+        from turboquant_vllm.vllm import register_tq4_backend
 
         register_tq4_backend()
 """
 
-from turboquant_consumer.vllm.tq4_backend import (
+from turboquant_vllm.vllm.tq4_backend import (
     TQ4AttentionBackend,
     TQ4AttentionImpl,
     TQ4FullAttentionSpec,

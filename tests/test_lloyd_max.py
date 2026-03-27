@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from turboquant_consumer.lloyd_max import LloydMaxCodebook, _beta_pdf, solve_lloyd_max
+from turboquant_vllm.lloyd_max import LloydMaxCodebook, _beta_pdf, solve_lloyd_max
 
 from .conftest import BITS, DIM
 

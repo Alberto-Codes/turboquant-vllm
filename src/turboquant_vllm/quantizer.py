@@ -33,14 +33,14 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.lloyd_max`: Lloyd-Max codebook solver.
+    :mod:`turboquant_vllm.lloyd_max`: Lloyd-Max codebook solver.
 """
 
 import math
 
 import torch
 
-from turboquant_consumer.lloyd_max import LloydMaxCodebook, solve_lloyd_max
+from turboquant_vllm.lloyd_max import LloydMaxCodebook, solve_lloyd_max
 
 
 def _generate_rotation_matrix(dim: int, seed: int = 42) -> torch.Tensor:

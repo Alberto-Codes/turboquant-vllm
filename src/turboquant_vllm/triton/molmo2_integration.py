@@ -23,8 +23,8 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.fused_qk_attention`: The Triton kernel.
-    :mod:`turboquant_consumer.kv_cache`: Unfused CompressedDynamicCache.
+    :mod:`turboquant_vllm.triton.fused_qk_attention`: The Triton kernel.
+    :mod:`turboquant_vllm.kv_cache`: Unfused CompressedDynamicCache.
 """
 
 from __future__ import annotations
@@ -36,8 +36,8 @@ import torch
 from torch import nn
 from transformers import DynamicCache
 
-from turboquant_consumer.quantizer import TurboQuantMSE
-from turboquant_consumer.triton.fused_qk_attention import fused_qk_scores
+from turboquant_vllm.quantizer import TurboQuantMSE
+from turboquant_vllm.triton.fused_qk_attention import fused_qk_scores
 
 
 class CompressedKVStore(DynamicCache):

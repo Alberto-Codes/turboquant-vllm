@@ -26,8 +26,8 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.benchmark`: Production benchmark harness.
-    :mod:`turboquant_consumer.kv_cache`: CompressedDynamicCache implementation.
+    :mod:`turboquant_vllm.benchmark`: Production benchmark harness.
+    :mod:`turboquant_vllm.kv_cache`: CompressedDynamicCache implementation.
 """
 
 import argparse
@@ -226,7 +226,7 @@ def step_3_3_gpu_compressed(
     """
     from transformers import DynamicCache
 
-    from turboquant_consumer.kv_cache import CompressedDynamicCache
+    from turboquant_vllm.kv_cache import CompressedDynamicCache
 
     print("\n" + "=" * 60)
     print(f"STEP 3.3 — GPU TQ{bits} compressed inference")

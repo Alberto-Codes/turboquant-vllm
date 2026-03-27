@@ -19,23 +19,23 @@ Attributes:
 
 Examples:
     ```python
-    from turboquant_consumer import TurboQuantKVCache
+    from turboquant_vllm import TurboQuantKVCache
 
     wrapper = TurboQuantKVCache(cache, head_dim=128, bits=3)
     ```
 
 See Also:
-    :mod:`turboquant_consumer.benchmark`: CLI harness for benchmarking.
-    :mod:`turboquant_consumer.lloyd_max`: Lloyd-Max codebook solver.
+    :mod:`turboquant_vllm.benchmark`: CLI harness for benchmarking.
+    :mod:`turboquant_vllm.lloyd_max`: Lloyd-Max codebook solver.
 """
 
-from turboquant_consumer.compressors import (
+from turboquant_vllm.compressors import (
     TurboQuantCompressorMSE,
     TurboQuantCompressorV2,
 )
-from turboquant_consumer.kv_cache import CompressedDynamicCache, TurboQuantKVCache
-from turboquant_consumer.lloyd_max import LloydMaxCodebook, solve_lloyd_max
-from turboquant_consumer.quantizer import TurboQuantMSE, TurboQuantProd
+from turboquant_vllm.kv_cache import CompressedDynamicCache, TurboQuantKVCache
+from turboquant_vllm.lloyd_max import LloydMaxCodebook, solve_lloyd_max
+from turboquant_vllm.quantizer import TurboQuantMSE, TurboQuantProd
 
 __all__ = [
     "CompressedDynamicCache",

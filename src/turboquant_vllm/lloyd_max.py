@@ -12,7 +12,7 @@ Reference: Section 3.1 of arXiv 2504.19874.
 
 Examples:
     ```python
-    from turboquant_consumer.lloyd_max import solve_lloyd_max, LloydMaxCodebook
+    from turboquant_vllm.lloyd_max import solve_lloyd_max, LloydMaxCodebook
 
     centroids, boundaries = solve_lloyd_max(d=128, bits=3)
     codebook = LloydMaxCodebook(centroids, boundaries, bits=3, dim=128)

@@ -25,8 +25,8 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.flash_attention`: The Triton FA kernel.
-    :mod:`turboquant_consumer.triton.attention_interface`: HF registration.
+    :mod:`turboquant_vllm.triton.flash_attention`: The Triton FA kernel.
+    :mod:`turboquant_vllm.triton.attention_interface`: HF registration.
 """
 
 import argparse
@@ -268,7 +268,7 @@ def step_1_text_only(
     Returns:
         Dict with baseline, experimental, and comparison results.
     """
-    from turboquant_consumer.triton.attention_interface import install_triton_fa
+    from turboquant_vllm.triton.attention_interface import install_triton_fa
 
     print("\n" + "=" * 60)
     print("STEP 1 — Text-only: SDPA vs Triton FA")
@@ -308,7 +308,7 @@ def step_2_image(
     Returns:
         Dict with baseline, experimental, comparison, and frame metadata.
     """
-    from turboquant_consumer.triton.attention_interface import install_triton_fa
+    from turboquant_vllm.triton.attention_interface import install_triton_fa
 
     print("\n" + "=" * 60)
     print("STEP 2 — Image: SDPA vs Triton FA (Seinfeld clip01 frame)")

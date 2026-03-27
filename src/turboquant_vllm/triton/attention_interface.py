@@ -18,16 +18,16 @@ Attributes:
 
 Examples:
     ```python
-    from turboquant_consumer.triton.attention_interface import install_fused_tq4_kv
+    from turboquant_vllm.triton.attention_interface import install_fused_tq4_kv
 
     install_fused_tq4_kv(model, compressed_cache)
     output = model.generate(inputs)
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.flash_attention`: Phase 1 kernel.
-    :mod:`turboquant_consumer.triton.flash_attention_tq4_kv`: Phase 3 kernel.
-    :mod:`turboquant_consumer.kv_cache`: CompressedDynamicCache storage.
+    :mod:`turboquant_vllm.triton.flash_attention`: Phase 1 kernel.
+    :mod:`turboquant_vllm.triton.flash_attention_tq4_kv`: Phase 3 kernel.
+    :mod:`turboquant_vllm.kv_cache`: CompressedDynamicCache storage.
 """
 
 from __future__ import annotations
@@ -37,13 +37,13 @@ from typing import TYPE_CHECKING, Optional
 import torch
 from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS
 
-from turboquant_consumer.triton.flash_attention import triton_flash_attention
-from turboquant_consumer.triton.flash_attention_tq4_kv import (
+from turboquant_vllm.triton.flash_attention import triton_flash_attention
+from turboquant_vllm.triton.flash_attention_tq4_kv import (
     triton_flash_attention_tq4_kv,
 )
 
 if TYPE_CHECKING:
-    from turboquant_consumer.kv_cache import CompressedDynamicCache
+    from turboquant_vllm.kv_cache import CompressedDynamicCache
 
 
 def triton_fa_forward(

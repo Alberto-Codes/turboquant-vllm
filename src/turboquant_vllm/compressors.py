@@ -26,14 +26,14 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.quantizer`: Core TurboQuantProd and TurboQuantMSE algorithms.
+    :mod:`turboquant_vllm.quantizer`: Core TurboQuantProd and TurboQuantMSE algorithms.
 """
 
 from dataclasses import dataclass
 
 import torch
 
-from turboquant_consumer.quantizer import TurboQuantMSE, TurboQuantProd
+from turboquant_vllm.quantizer import TurboQuantMSE, TurboQuantProd
 
 
 @dataclass

@@ -12,10 +12,10 @@ import pytest
 import torch
 import torch.nn.functional as F
 
-from turboquant_consumer.kv_cache import CompressedDynamicCache
-from turboquant_consumer.quantizer import TurboQuantMSE
-from turboquant_consumer.triton.flash_attention import triton_flash_attention
-from turboquant_consumer.triton.flash_attention_tq4_kv import (
+from turboquant_vllm.kv_cache import CompressedDynamicCache
+from turboquant_vllm.quantizer import TurboQuantMSE
+from turboquant_vllm.triton.flash_attention import triton_flash_attention
+from turboquant_vllm.triton.flash_attention_tq4_kv import (
     triton_flash_attention_tq4_kv,
 )
 

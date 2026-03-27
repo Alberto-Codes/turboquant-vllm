@@ -4,7 +4,7 @@ import pytest
 import torch
 import torch.nn.functional as F
 
-from turboquant_consumer.kv_cache import CompressedDynamicCache, TurboQuantKVCache
+from turboquant_vllm.kv_cache import CompressedDynamicCache, TurboQuantKVCache
 
 from .conftest import BITS, DIM
 

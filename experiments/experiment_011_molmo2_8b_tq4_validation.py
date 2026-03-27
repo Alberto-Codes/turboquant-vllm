@@ -22,7 +22,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.kv_cache`: CompressedDynamicCache.
+    :mod:`turboquant_vllm.kv_cache`: CompressedDynamicCache.
 """
 
 import argparse
@@ -165,7 +165,7 @@ def run_experiment(
         DynamicCache,
     )
 
-    from turboquant_consumer.kv_cache import CompressedDynamicCache
+    from turboquant_vllm.kv_cache import CompressedDynamicCache
 
     results: dict[str, Any] = {
         "experiment": "011-molmo2-8b-tq4-validation",

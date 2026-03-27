@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from turboquant_consumer.compressors import (
+from turboquant_vllm.compressors import (
     TurboQuantCompressorMSE,
     TurboQuantCompressorV2,
 )

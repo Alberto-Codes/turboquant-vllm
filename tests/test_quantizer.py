@@ -5,7 +5,7 @@ import math
 import pytest
 import torch
 
-from turboquant_consumer.quantizer import TurboQuantMSE, TurboQuantProd
+from turboquant_vllm.quantizer import TurboQuantMSE, TurboQuantProd
 
 from .conftest import BITS, DIM, N_PAIRS, N_SAMPLES
 

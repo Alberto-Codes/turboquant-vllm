@@ -7,12 +7,12 @@ instances to eliminate redundant computation and ensure reproducibility.
 import pytest
 import torch
 
-from turboquant_consumer.compressors import (
+from turboquant_vllm.compressors import (
     TurboQuantCompressorMSE,
     TurboQuantCompressorV2,
 )
-from turboquant_consumer.lloyd_max import LloydMaxCodebook, solve_lloyd_max
-from turboquant_consumer.quantizer import TurboQuantMSE, TurboQuantProd
+from turboquant_vllm.lloyd_max import LloydMaxCodebook, solve_lloyd_max
+from turboquant_vllm.quantizer import TurboQuantMSE, TurboQuantProd
 
 # ---------------------------------------------------------------------------
 # Constants shared across test modules

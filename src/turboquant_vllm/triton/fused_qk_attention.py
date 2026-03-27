@@ -34,7 +34,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.kv_cache`: CompressedDynamicCache that produces
+    :mod:`turboquant_vllm.kv_cache`: CompressedDynamicCache that produces
         the nibble-packed indices and fp32 norms consumed by this kernel.
     `Dejan.ai TurboQuant blog <https://dejan.ai/blog/turboquant/>`_:
         Original Triton kernel reference.

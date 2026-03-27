@@ -36,7 +36,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.compressors`: TurboQuantCompressorMSE and CompressedValues.
+    :mod:`turboquant_vllm.compressors`: TurboQuantCompressorMSE and CompressedValues.
     arXiv 2504.19874, Section 5.2: TurboQuant algorithm reference.
 """
 
@@ -47,7 +47,7 @@ from typing import Any
 
 import torch
 
-from turboquant_consumer.compressors import CompressedValues, TurboQuantCompressorMSE
+from turboquant_vllm.compressors import CompressedValues, TurboQuantCompressorMSE
 
 
 class TurboQuantKVCache:

@@ -20,7 +20,7 @@ from vllm.v1.attention.backends.flash_attn import (  # noqa: E402
 from vllm.v1.attention.backends.registry import AttentionBackendEnum  # noqa: E402
 from vllm.v1.kv_cache_interface import FullAttentionSpec  # noqa: E402
 
-from turboquant_consumer.vllm.tq4_backend import (  # noqa: E402
+from turboquant_vllm.vllm.tq4_backend import (  # noqa: E402
     TQ4AttentionBackend,
     TQ4AttentionImpl,
     TQ4FullAttentionSpec,
@@ -236,8 +236,8 @@ class TestTQ4PackedCacheRoundTrip:
         impl.head_size = self.HEAD_SIZE
         impl.num_kv_heads = self.NUM_KV_HEADS
 
-        from turboquant_consumer.quantizer import TurboQuantMSE
-        from turboquant_consumer.vllm.tq4_backend import (
+        from turboquant_vllm.quantizer import TurboQuantMSE
+        from turboquant_vllm.vllm.tq4_backend import (
             TQ4_BITS,
             TQ4_NORM_BYTES,
             TQ4_SEED,
@@ -454,8 +454,8 @@ class TestTritonPyTorchEquivalence:
     @pytest.fixture(autouse=True)
     def _setup(self):
         """Set up quantizer primitives for both paths."""
-        from turboquant_consumer.quantizer import TurboQuantMSE
-        from turboquant_consumer.vllm.tq4_backend import TQ4_BITS, TQ4_SEED
+        from turboquant_vllm.quantizer import TurboQuantMSE
+        from turboquant_vllm.vllm.tq4_backend import TQ4_BITS, TQ4_SEED
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         quantizer = TurboQuantMSE(self.HEAD_DIM, TQ4_BITS, seed=TQ4_SEED)
@@ -498,7 +498,7 @@ class TestTritonPyTorchEquivalence:
 
     def test_compress_packed_match(self):
         """Triton compress produces identical packed bytes as PyTorch."""
-        from turboquant_consumer.triton.tq4_compress import tq4_compress
+        from turboquant_vllm.triton.tq4_compress import tq4_compress
 
         x = torch.randn(
             4,
@@ -518,7 +518,7 @@ class TestTritonPyTorchEquivalence:
 
     def test_compress_norms_match(self):
         """Triton compress produces identical norms as PyTorch."""
-        from turboquant_consumer.triton.tq4_compress import tq4_compress
+        from turboquant_vllm.triton.tq4_compress import tq4_compress
 
         x = torch.randn(
             4,
@@ -538,7 +538,7 @@ class TestTritonPyTorchEquivalence:
 
     def test_compress_single_token(self):
         """Triton compress matches PyTorch for a single token (decode case)."""
-        from turboquant_consumer.triton.tq4_compress import tq4_compress
+        from turboquant_vllm.triton.tq4_compress import tq4_compress
 
         x = torch.randn(
             1,
@@ -561,7 +561,7 @@ class TestTritonPyTorchEquivalence:
 
     def test_decompress_with_rotation_matches_pytorch(self):
         """Triton decompress + rotation matches old PyTorch decompress."""
-        from turboquant_consumer.triton.tq4_decompress import tq4_decompress
+        from turboquant_vllm.triton.tq4_decompress import tq4_decompress
 
         packed = torch.randint(
             0,
@@ -593,7 +593,7 @@ class TestTritonPyTorchEquivalence:
 
     def test_decompress_no_rotation_stays_in_rotated_space(self):
         """Triton decompress without rotation is NOT close to original data."""
-        from turboquant_consumer.triton.tq4_decompress import tq4_decompress
+        from turboquant_vllm.triton.tq4_decompress import tq4_decompress
 
         x = torch.randn(
             1,
@@ -628,7 +628,7 @@ class TestTritonPyTorchEquivalence:
 
         from vllm.vllm_flash_attn import flash_attn_varlen_func
 
-        from turboquant_consumer.triton.tq4_decompress import tq4_decompress
+        from turboquant_vllm.triton.tq4_decompress import tq4_decompress
 
         seq_len = 64
         packed = torch.randint(
@@ -699,8 +699,8 @@ class TestTritonPyTorchEquivalence:
         Triton compress → Triton decompress + rotation should produce the
         same reconstructed vectors as PyTorch compress → PyTorch decompress.
         """
-        from turboquant_consumer.triton.tq4_compress import tq4_compress
-        from turboquant_consumer.triton.tq4_decompress import tq4_decompress
+        from turboquant_vllm.triton.tq4_compress import tq4_compress
+        from turboquant_vllm.triton.tq4_decompress import tq4_decompress
 
         x = torch.randn(
             4,

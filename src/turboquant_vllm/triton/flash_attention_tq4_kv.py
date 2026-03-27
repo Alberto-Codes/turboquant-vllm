@@ -11,7 +11,7 @@ Attributes:
 
 Examples:
     ```python
-    from turboquant_consumer.triton.flash_attention_tq4_kv import (
+    from turboquant_vllm.triton.flash_attention_tq4_kv import (
         triton_flash_attention_tq4_kv,
     )
 
@@ -28,7 +28,7 @@ Examples:
     ```
 
 See Also:
-    :mod:`turboquant_consumer.triton.flash_attention_tq4`: Phase 2 (K-only).
+    :mod:`turboquant_vllm.triton.flash_attention_tq4`: Phase 2 (K-only).
 """
 
 from __future__ import annotations
