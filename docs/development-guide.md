@@ -4,7 +4,7 @@
 
 | Requirement | Version | Notes |
 |-------------|---------|-------|
-| Python | >=3.12, <3.14 | Required by pyproject.toml |
+| Python | >=3.12 | Required by pyproject.toml |
 | uv | Latest | Package manager and build tool |
 | CUDA GPU | Optional | Required for Triton kernels and GPU tests |
 | AMD ROCm | Optional | Supported via container (gfx1150/RDNA 3.5) |

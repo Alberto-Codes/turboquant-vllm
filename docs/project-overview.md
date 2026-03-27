@@ -28,7 +28,7 @@ First open-source TurboQuant implementation — paper to working vLLM plugin in 
 
 | Category | Technology | Version | Notes |
 |----------|-----------|---------|-------|
-| **Language** | Python | >=3.12, <3.14 | Type hints, `from __future__ import annotations` |
+| **Language** | Python | >=3.12 | Type hints, `from __future__ import annotations` |
 | **Build System** | uv (uv_build) | >=0.11.1 | Lockfile: `uv.lock` |
 | **Deep Learning** | PyTorch | >=2.6 | Core tensor ops, CUDA/ROCm |
 | **GPU Kernels** | Triton | (via PyTorch) | Fused Flash Attention, TQ4 compress/decompress |

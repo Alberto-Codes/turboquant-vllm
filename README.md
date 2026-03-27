@@ -6,7 +6,7 @@
 
 # turboquant-vllm
 
-TurboQuant KV cache compression as a drop-in vLLM plugin. **3.76x compression, near-identical output quality, one env var to enable.**
+TurboQuant KV cache compression as a drop-in vLLM plugin. **3.76x compression, near-identical output quality, one CLI flag to enable.**
 
 > First open-source TurboQuant implementation — paper to working vLLM plugin in 72 hours.
 
