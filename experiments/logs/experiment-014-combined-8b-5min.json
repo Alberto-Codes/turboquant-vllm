@@ -1,0 +1,1068 @@
+{
+  "experiment": "014-full-episode-benchmark-5min",
+  "date": "2026-03-26 23:12:49",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 256,
+  "episode": "Seinfeld - S07E06 - The Soup Nazi - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1369.6,
+  "segment_duration_s": 300.0,
+  "baseline_clip_duration_s": 5,
+  "tq4_clip_duration_s": 19,
+  "baseline": {
+    "clips": [
+      {
+        "clip": "clip_0000.mp4",
+        "elapsed_s": 9.67,
+        "output_text": "This scene from Seinfeld opens on a completely black screen before transitioning to a comedy club setting. Jerry Seinfeld makes his entrance in the dimly lit club, walking across the stage in a dark suit with a light blue shirt and dark tie. He approaches a table containing a glass of water and picks up a microphone to address the audience.\n\nThe stage is dramatically lit, with the spotlight illuminating Seinfeld against a backdrop featuring a red curtain complemented by a brown wooden panel. This creates a classic comedy club atmosphere typical of the Seinfeld opening sequence. The audience is seated in typical?'90s-inspired attire\u2014jeans, flannel shirts, and plaid patterns are visible from behind\u2014many in a mix of suits and casual wear.\n\nThroughout his performance, Seinfeld uses a combination of classic stand-up gestures and comic delivery. He occasionally glances to his right while speaking, suggesting he may be addressing something offstage or thinking through a bit. His animated hand gestures and expressive body movements help convey the comedic energy and pacing characteristic of his act.\n\nThe camera framing focuses on Seinfeld as the main character, with the audience visible but largely in silhouette or partial darkness. This composition emphasizes the performer on stage while maintaining the sense of engagement with his live audience. The overall",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 1
+        }
+      },
+      {
+        "clip": "clip_0001.mp4",
+        "elapsed_s": 4.19,
+        "output_text": "I apologize, but I don't see anything specific happening in this video clip that I can describe in detail. The current frame only shows part of the right side of the screen with a spot of grey coloring and some black. There are no characters visible, no setting to describe, and no actions or dialogue that I can identify. This appears to be incomplete footage or an unexpected frame that doesn't contain any meaningful content. If there's additional context or information you'd like me to consider about the overall video, please let me know.",
+        "input_tokens": 2854,
+        "output_tokens": 108,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0002.mp4",
+        "elapsed_s": 7.32,
+        "output_text": "A man stands centered on stage under bright spotlight, wearing a dark blue suit jacket over a light blue collared shirt with a dark blue tie. With a microphone in his right hand and his left hand raised to waist level, he's making direct eye contact with the audience while speaking.\n\nThe stage has vertical red-and-white striped curtains throughout the background, creating a strong visual contrast and theatrical atmosphere. The overall tone is dramatic, with the performer taking center stage amid this bold striped backdrop.\n\nIn the foreground, we can see the backs of audience members' heads, including someone wearing a plaid shirt, an older man with a white headband, and a woman in a black suit. The setting appears to be a comedy club or live performance venue where spectators are intently watching the stand-up act unfold.\n\nAt the bottom left of the image, bold white capital letters display the name \"MICHAEL RICHARDS.\" This on-screen text identifies the speaker, who is presumably performing a stand-up routine given the setup and his engagement with the audience.",
+        "input_tokens": 2854,
+        "output_tokens": 211,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0003.mp4",
+        "elapsed_s": 7.89,
+        "output_text": "A stand-up comedy bit unfolds in the style of a classic 1980s Tonight Show special with Jason Alexander as George Costanza, the beloved \"Seinfeld\" character. Alexander appears on stage wearing a dark blue suit with a light blue shirt and blue tie that features a gold pattern, his curly brown hair framing a wide, enthusiastic smile. He engages the audience with animated facial expressions and direct address.\n\nThe stage is dramatically lit, with red and dark shadows contrasting against a brown curtain backdrop. Alexander holds a black microphone in his left hand at shoulder level while turning slightly to his right, giving the impression he's connecting with different sections of the audience. He looks directly out at the camera and the crowd simultaneously, demonstrating the performance's energetic delivery.\n\nToward the close of the segment, he delivers his lines with surge and intensity, culminating in a wide, satisfied smile that reveals his upper teeth as the performance concludes. His expressive facial movements and shifting delivery style evoke the gritty, self-referential comedy style of \"Seinfeld\" while capturing the often plaintive, exasperated middle-class character that audiences found so relatable.",
+        "input_tokens": 2854,
+        "output_tokens": 231,
+        "characters": {
+          "george": 1
+        }
+      },
+      {
+        "clip": "clip_0004.mp4",
+        "elapsed_s": 7.64,
+        "output_text": "This clip features an Arkansas native comedian performing stand-up comedy at a dimly lit comedy club. The performer has long, wavy brown hair parted to the side and is wearing a dark blue suit jacket over a light blue collared shirt with a dark tie.\n\nThe comedy club setting includes:\n- A black curtain backdrop\n- A brown curtain with vertical stripes hanging behind the performer\n- A wooden stool\n- Multiple red candles arranged on tables\n- Empty tables arranged in a semicircle for the audience\n- A standing microphone present for the performance\n- A dimly lit room with a mood lighting setup\n\nThe performer is engaging with an audience, speaking to them while gripping a black microphone. He gestures animatedly during his routine. As he delivers his material, white text appears on screen displaying \"Co-Producer Carol Leifer.\"\n\nThe performance takes place entirely within this intimate comedy club environment, which is set up for showcasing stand-up comedy acts. The performer is seated on a stool between the tables, reading from his notes and interacting with the audience in his characteristic Arkansas-style comedic style.",
+        "input_tokens": 2854,
+        "output_tokens": 220,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0005.mp4",
+        "elapsed_s": 5.31,
+        "output_text": "This clip shows an end credit sequence from the TV show Friends with a single performer on stage. A man with long brown hair wearing a blue suit jacket, blue shirt, and tie is performing stand-up comedy while holding a microphone, speaking to an audience that's not visible. Credit text appears on screen during the performance, with the first card reading \"Produced by Tim Kaiser.\" The performer continues his routine as the credit sequence progresses through the complete rolling credits listing the cast, creative team, and crew, all while he remains on stage delivering his stand-up performance to the unseen audience. The scene maintains the comedy stage format throughout, with the performer using the microphone as he goes through the full set of production credits.",
+        "input_tokens": 2854,
+        "output_tokens": 144,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0006.mp4",
+        "elapsed_s": 8.8,
+        "output_text": "This clip appears to be from Saturday Night Live. It starts with the credits that identify the supervising producers as Tom Gamill and Max Pross, then returns to the stage where a man dressed in a suit is performing. He's holding a microphone in his left hand while gesturing and pointing with his right hand. He has \"long brown hair amidst his 5 o'clock shadow.\" While he seems comfortable and at ease with his own talents, he appears unprepared for dealing with unsolicited advice.\n\nThe scene shifts to show the audience, though only one individual is visible. On the right side of the frame, a man with short brown hair in a black shirt is seated in the front row. The camera captures his very first laugh, which sets an enthusiastic tone for the performance.\n\nThe segment then cuts to an exterior shot of a brick building with architectural features visible. A white wrought iron balcony extends from the upper right portion of the structure and is supported by a white ladder leaning against the building. This part of the building has a contrasting white brick base. Outdoors, there's some greenery with leaves and darker plants visible, and at the bottom of the frame, a black object is present in the foreground.\n\nThe camera work includes a slow pan, providing a lingering",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0007.mp4",
+        "elapsed_s": 7.28,
+        "output_text": "The video opens with a title card that reads \"Created by Larry David and Jerry Seinfeld\" before transitioning to a scene in a kitchen, likely from Seinfeld. Jerry Seinfeld stands in the foreground looking up at Elaine Benes, who is seated in a chair, both appearing to be talking with serious facial expressions. Elaine wears a black top, while Jerry is dressed in a blue shirt and khaki pants. Brooklyn Decker appears as Elaine Benes.\n\nThe kitchen setting is visible in the background, featuring gray cabinets, a toaster on the countertop, and a small refrigerator covered in magnets. George Costanza is present as well, kneeling on the floor with a newspaper in hand\u2014his signature front-page-bending that shows a sign of stress or focus. Monica Geller, played by Jennifer Aniston, is shown alongside Friends characters.\n\nLater, we see Jerry hugging a blonde woman who is seated, with other friends around them. The setting shifts to Jerry's apartment, where a brown and light brown couch is present.",
+        "input_tokens": 2854,
+        "output_tokens": 208,
+        "characters": {
+          "jerry": 5,
+          "george": 1,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0008.mp4",
+        "elapsed_s": 8.31,
+        "output_text": "A cheerful man in a blue collared shirt and a woman with long blonde hair in a black top are sharing a playful, flirtatious moment in a well-stocked kitchen. A headline reads \"First Spread,\" and several grocery store ads are visible, including a notable one for \"SkitzBarButtoners: Sip, Save, Savor!\"\n\nThe man places his arm around her, and she smiles broadly while resting her head near his. Around them, everyday household items fill the space\u2014boxed Honey Comb cereal stands out, a green bottle is visible, and a roll of paper towels hangs nearby. An open cabinet reveals coffee, and another shelf holds what appear to be sauces and gravy.\n\nA man with brown hair in a gray shirt is partially visible at one point, observing the interaction.\n\nThe woman then shifts into a passionate pose, wrapping her arms around his neck with her head tilted back as he smiles warmly at her. Later, she leans her head sideways against his shoulder with her eyes closed in contentment, while he continues smiling down at her. The light-hearted, affectionate atmosphere suggests a playful, flirtatious exchange between friends or a couple among their familiar surroundings.",
+        "input_tokens": 2854,
+        "output_tokens": 239,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0009.mp4",
+        "elapsed_s": 6.84,
+        "output_text": "In this scene, we see Jerry Seinfeld sitting in a gray chair at his desk in his apartment, appearing bored and disinterested. He's wearing his signature mix of a brown and green button-down shirt with glasses and is glancing down toward his computer, growing increasingly irritated, likely due to the lack of an engaging task or conversation. The set shows Jerry's apartment, with white walls and framed pictures on the wall behind and to his right. To his left, there's a window with blinds. A desk with a computer sits off to one side of the frame, consistent with Jerry's office-style workspace. The restrained color palette includes the gray of Jerry's desk and chair, the browns and greens of his clothes, and blacks, whites, and grays throughout the room. This moment captures a classic stretch of what made Seinfeld appealing \u2013 a seemingly ordinary, mundane moment that gains its comedy through the way Jerry perceives and reacts to it.",
+        "input_tokens": 2854,
+        "output_tokens": 193,
+        "characters": {
+          "jerry": 5
+        }
+      },
+      {
+        "clip": "clip_0010.mp4",
+        "elapsed_s": 8.77,
+        "output_text": "In this scene from Seinfeld, we see George Costanza in his apartment watching a TV broadcast featuring another Seinfeld character. The kitchen serves as the setting, with its characteristic gray walls, white cabinets, and oven mitt hanging on the wall. A refrigerator covered in magnets and signs stands as a backdrop, with a hot dog roll visible on top and a keychain hanging from its handle.\n\nJerry Seinfeld is shown leaning slightly backward, with his arms wrapped around a blonde woman who appears to be Elaine, smiling and looking down at him with a gentle expression while he speaks to her and periodically glances at the camera.\n\nMeanwhile, George is sitting at a brown table with a green object visible in the corner, focused intently on the TV broadcast. His expression indicates he's surprised and possibly intrigued by what he's seeing. The receding hairline and glasses that are iconic to his character are clearly visible.\n\nThis scene captures a typical blend of humor and character interaction, characteristic of the show. While Jerry and Elaine maintain their warm connection in the foreground, George's reaction to the TV broadcast suggests an unexpected or amusing moment related to his character's current situation. It's a great example of how Seinfeld often juxtaposes personal relationships with quirky character moments happening simultaneously.",
+        "input_tokens": 2854,
+        "output_tokens": 254,
+        "characters": {
+          "jerry": 2,
+          "george": 3,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0011.mp4",
+        "elapsed_s": 8.8,
+        "output_text": "In this scene from the TV show Friends, George Costanza and Elaine Benes are the main focus, demonstrating their evolving relationship through several close embraces in different settings.\n\nThe first moment shows George embraced by a dark-haired woman, with one hand resting near the back of her neck. They appear in what looks like a kitchen or dining area, characterized by gray cabinets on the left and a white countertop on the right. George is wearing a gray shirt, while the other person is dressed in black. This intimate stance sets the tone for their growing closeness.\n\nThe scene then transitions to George with a blonde-haired woman, both viewed from behind. George still has short brown hair and is wearing a blue shirt. The woman, now in a black sweater, has a ring visible on one of her fingers. In the background, colorful posters on white walls and a window with a black frame can be seen. Notably, the text \"Directed by Andy Ackerman\" appears in white on screen.\n\nDuring this sequence, the woman with the blonde hair talks to George while remaining visibly close to him. Their body language suggests ongoing conversation rather than a static moment.\n\nThe setting changes to a different kitchen area of the apartment, marked by a gray countertop with a blue stool in front of",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "george": 6,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0012.mp4",
+        "elapsed_s": 8.9,
+        "output_text": "This clip is from the TV show Friends, directed by Andy Ackerman. The scene takes place in the living room and kitchen area of apartments 1 and 2, which makes up the entire setting for this moment.\n\nThe group consists of five main characters assembled together:\n\n- Phoebe, wearing a black top with blonde hair\n- Ross, dressed in a blue button-up shirt\n\nThe other three characters (Chandler, Monica, and Joey) are positioned on the left side of the room. They're all engaged in a moment of shared attention and communication.\n\nThe characters are standing and conversing, with the camera capturing the full group in the apartment's familiar layout. You can tell this is Friends based on the distinctive gray cabinets with glass doors, the white subway tile backsplash, the paper towel holder, and the refrigerator covered with paper.\n\nThe characters are interacting naturally, exchanging glances and communicating with each other. The overall atmosphere is casual and typical of the show's style, showing the group dynamic as they talk and share the space.\n\nMonica is wearing a brown jacket and has long brown hair\nJoey is wearing a gray long-sleeve shirt and green pants\nChandler is wearing a dark gray shirt\n\nThe scene includes text displaying \"Directed by",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0013.mp4",
+        "elapsed_s": 8.75,
+        "output_text": "In this scene from Seinfeld, we see a classic moment set in the living room of Jerry's apartment. The camera first focuses on the kitchen, where Jerry is wearing his navy blue button-down shirt. He's looking down at Elaine and they share a kiss, with the refrigerator filled with magnets visible in the background.\n\nAfter this brief moment, the camera pans further left to reveal the rest of the group. Elaine is present and Happy Gilmore is standing nearby. There's also an unidentified woman with curly brown hair wearing a brown leather jacket who has just joined the group.\n\nThe main focus shifts to three people in the foreground: George Costanza, Elaine's ex-boyfriend, recognizable by his receding hairline, wire-rimmed glasses, and the dimpled smile he uses to hide his insecurity. One of his eyebrows is also noticeably higher than the other, a signature quirk of his character.\n\nThe exchange between these characters appears to be the comedy focus of the scene. The set maintains its typical look with the classic gray walls and famous can opener on the wall. The camera work creates a seamless transition from the intimate kiss in the kitchen to the wider group dynamic in the living room.\n\nThis scene encapsulates the show's characteristic blend of everyday small talk and awkward relationships",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 2,
+          "george": 1,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0014.mp4",
+        "elapsed_s": 7.12,
+        "output_text": "The clip takes place in Jerry's apartment from Seinfeld. It opens with Elaine facing him in a friendly, calm interaction. She wears her brown leather jacket, and he's in his casual attire, both engaged in a relaxed back-and-forth. The scene eases into a standard sitcom rhythm, showing them at ease with each other and their surroundings.\n\nAs the scene progresses, the setting moves through different areas of the apartment, maintaining the homey, lived-in atmosphere. A bookshelf filled with books, a desk with a lamp, and a table with newspapers provide familiar details that ground the space.\n\nTowards the end, the tone shifts. Kenny enters from off-screen and begins gesturing animatedly, his back to the camera. Elaine, who was facing him earlier, turns to walk away, creating a noticeable distance between the characters. These final moments capture the show's blend of everyday interactions and small comedic beats, with the shifting dynamics highlighting both the characters' relationships and the personal space within the apartment.",
+        "input_tokens": 2854,
+        "output_tokens": 203,
+        "characters": {
+          "jerry": 1,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0015.mp4",
+        "elapsed_s": 7.66,
+        "output_text": "The video opens on Jerry entering the bustling apartment living room in his blue button-down shirt and jeans, holding a brown leather jacket in his hands. He looks distracted and confused, glancing around the space as he navigates through the crowded room. While he moves around the apartment, Elaine faces the wall without reacting to him at first, visibly angry and frustrated with him. This sets a charged atmosphere as Jerry continues his confused movements through the room.\n\nThe scene shifts to a different living space featuring a light orange wall with a vertical brown stripe. A man with long brown hair wearing a blue shirt is centered in the frame, captured in a close-up shot. He holds the brown leather jacket in one hand while pulling off a different red jacket with the other. As he removes more of his clothing, he also holds a brown sweater. His mouth is open, revealing his teeth, his eyebrows are furrowed, and he appears deeply focused on his task while looking slightly to the right. The composition is a horizontal rectangle, with the man and his clothing dominating the frame against the carefully detailed background.",
+        "input_tokens": 2854,
+        "output_tokens": 220,
+        "characters": {
+          "jerry": 2,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0016.mp4",
+        "elapsed_s": 7.68,
+        "output_text": "The scene opens in an apartment hallway with a gray wall and a brown door behind George Costanza. He raises his right hand to grip the doorknob with his pointer finger and thumb placed slightly apart, while his other fingers are bent inward. He wears glasses that are pushed up on his head, revealing more of his forehead and part of his right ear. His facial expression conveys confusion. He's dressed in a gray sweater buttoned up over a white shirt with dark-colored stripes.\n\nStanding to his left is Elaine Benes, visible only from the chest up, with her shoulder-length curly brown hair and signature brown leather jacket. Leaning into the foreground, she places herself between George and the door. She gazes intently at him with a strained, focused expression as she begins speaking to him.\n\nAs the moment unfolds, George starts to unstifledly fidget with his sweater, pulling it off in a nervous, restless motion. Then the scene abruptly switches to a different part of the apartment, where Jerry Seinfeld is getting dressed in front of a window with blinds.",
+        "input_tokens": 2854,
+        "output_tokens": 219,
+        "characters": {
+          "jerry": 1,
+          "george": 3,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0017.mp4",
+        "elapsed_s": 8.82,
+        "output_text": "The clip is from the sitcom Friends and takes place in a living room. A man in a brown jacket and blue shirt with short brown hair stands in front of a white wall decorated with framed pictures. Behind him is a window with blinds next to a door with glass panes. To his right sits a black bookshelf filled with books and other items, including a visible framed picture. He appears relaxed and engaged in conversation, looking slightly to the right with his mouth open as if speaking and raising both hands, palms up, as he explains something animatedly.\n\nThe scene then cuts to three characters in another room with white walls and a door featuring a gold handle and a gold plaque. A refrigerator with colorful magnets, including one of Superman and yellow and red stickers, is visible. On the left stands a woman with curly brown hair wearing a brown leather jacket over a black shirt, looking up and to the right with her arms crossed. To her right is a balding man with glasses and a receding hairline in a red jacket over a black-and-white checkerboard shirt, arms also crossed and looking up and to the right. Standing to his right is a man in a brown jacket over a black shirt seen from behind, looking in the same direction with his arms crossed.\n\n",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0018.mp4",
+        "elapsed_s": 5.75,
+        "output_text": "The clip shows Jerry Seinfeld seated in his apartment wearing a brown jacket over a blue button-up shirt, gesturing animatedly with his right hand raised. The scene transitions to show a man with curly brown hair wearing a brown shirt, speaking to Kramer dressed in a red jacket and gray shirt against a white wall with blue trim. A Superman figurine is visible on the right side. The setting then shifts to Frank Costanza emerging from the apartment wearing a red shirt and gray jacket, looking off to the side while Jerry remains in view. The scene concludes with a wider kitchen shot featuring a refrigerator covered in magnets and pictures, with the door partially open to reveal a bicycle. A gray-haired man stands before the refrigerator looking at Jerry, who is now at a table in the foreground.",
+        "input_tokens": 2854,
+        "output_tokens": 158,
+        "characters": {
+          "jerry": 3,
+          "kramer": 1
+        }
+      },
+      {
+        "clip": "clip_0019.mp4",
+        "elapsed_s": 6.54,
+        "output_text": "The scene takes place in a familiar New York apartment, focused on the lower level. Jerome, the housekeeper with curly hair dressed in a tan cardigan over a blue button-down shirt, is the central figure as he gestures animatedly while speaking, leaning toward the other characters with excitement.\n\nThe kitchen background features silver and white appliances, including a closed freezer and refrigerator with an ice maker. Behind Jerome stand George, the balding man with glasses wearing a red jacket, and Elaine, the dark-haired woman in a brown jacket. Their attention is fixed on Jerome as he delivers his passionate monologue.\n\nOn the kitchen counter before them sits a cutting board with a newspaper, with additional items scattered on the countertop and a pot visible nearby. A shield and Superman posters are mounted on the refrigerator. George and Elaine maintain serious expressions as they watch Jerome's dramatic delivery unfold in this classic New York City apartment setting.",
+        "input_tokens": 2854,
+        "output_tokens": 183,
+        "characters": {
+          "george": 2,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0020.mp4",
+        "elapsed_s": 8.8,
+        "output_text": "The scene takes place in the communal living space of a New York apartment, with the three main characters standing near the kitchen area. Jerry is positioned at the center, flanked by Elaine on one side and George on the other. A bicycle is visible in the background, characteristic of the East Coast apartment setting.\n\nJerry is the focal point, speaking animatedly while raising his right arm with a confident gesture. His mouth is open mid-sentence as he addresses George, who is shown wearing glasses, a red jacket over a gray shirt, and a brown belt with a silver buckle.\n\nElaine is present in the conversation as well. She is wearing a brown leather jacket over a black shirt, with either a purse or a brown bag slung over her shoulder. She has curly brown hair pulled back, is wearing either a white strap or a nose ring. Like Jerry, her mouth is open as if she's engaged in the discussion, looking toward George.\n\nThe setting features the apartment's interior with a gray and yellow refrigerator covered in various magnets, papers, and other items. Overhead, there are blue and gray cabinets typical of 1990s residential design.\n\nThroughout the conversation, the characters maintain an animated and engaged posture, suggesting they're having a passionate or humorous",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 3,
+          "george": 3,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0021.mp4",
+        "elapsed_s": 8.8,
+        "output_text": "This clip is from the iconic sitcom Friends, featuring three of the main cast members in what appears to be the familiar apartment setting, with the recognizable green bicycle in the background.\n\nThe scene opens with a woman gesturing upwards with her hand, talking to two men. One of the men is Artie Umberger, who stands out with his distinctive appearance\u2014he's wearing glasses and a red jacket. The other man is wearing a blue shirt paired with a brown jacket that has yellow accents.\n\nThe woman has long curly brown hair and is dressed in a brown jacket over a black shirt. She's carrying a brown purse with a strap over her shoulder.\n\nAfter smiling at the woman, Artie begins to speak directly to her, establishing a moment of interaction between them. This is followed by a comedic beat where Jerry Seinfeld delivers a visible smug expression to the camera, adding a humorous element to the exchange.\n\nThe setting throughout this sequence appears consistent with the Friends apartment\u2014clearly identifiable by the green bicycle visible in the background, which serves as a familiar visual anchor for the long-running show.\n\nTina Fey's character is voices the discussion happening between the three, further connecting this clip to the sitcom's format where off-screen dialogue drives the conversation. The interaction between Artie, the",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 1
+        }
+      },
+      {
+        "clip": "clip_0022.mp4",
+        "elapsed_s": 8.74,
+        "output_text": "This is a scene from the classic 1990s sitcom Seinfeld in Jerry's apartment. Jerry Seinfeld is standing in the kitchen, facing George Costanza. Jerry is wearing his brown jacket over his blue button-down shirt, while George is in his iconic red jacket. They're positioned near a stainless steel refrigerator, with kitchen cabinets, open shelving with jars, and a paper towel holder visible in the background.\n\nJerry is the focal point of the conversation, gesturing with his free hand while addressing George. George appears to be partially off-screen, with only a small portion of his balding head visible.\n\nThe scene captures a typical moment of their dynamic\u2014the searching, conversational energy Seinfeld is known for. It's set in a domestic setting, which is characteristic of the show's numerous apartment-based episodes.\n\nLater in the scene, the setting expands to reveal more of Jerry's apartment. The door to the apartment is open, and Jerry is now shown walking through it followed by George. They enter a hallway where Elaine Benes is waiting for them. Elaine is standing with her arms crossed, looking serious and somewhat frustrated.\n\nThis exchange appears to be a moment of confrontation or tension, with Elaine holding onto Jerry and George while the two go to discuss something with",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 7,
+          "george": 6,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0023.mp4",
+        "elapsed_s": 8.65,
+        "output_text": "The video opens in a gray-walled apartment-like room featuring Quagmire, Chris Griffin, and Stewie Griffin from Family Guy. Quagmire stands beside the door holding Stewie's bag, waiting as Chris holds it open for an unseen roommate. The door closes behind them, but not before we see the living room\u2014complete with the bathroom to the left\u2014that the three characters are entering.\n\nThis transitions to an outdoor nighttime sidewalk scene where the setting is a busy urban area with storefronts and street decorations, including a tree with red leaves and a neon sign. A gray car is visible on the left side of the scene.\n\nOn the sidewalk, Stewie, Lois, and Brian are together. Brian, the talking dog, carries a platter of food and is blonde in this appearance. The scene focuses on Stewie and Brian working on a problem, with Brian actively engaged in explaining something to Stewie while Lois watches the interaction. The trio appears to be moving along or pausing on this street corner.\n\nThe urban setting is clearly an active commercial district, with the storefronts and signage contributing to the lively nighttime atmosphere as the Family Guy characters carry out their sidewalk activities in this temporary departure from their apartment.",
+        "input_tokens": 2854,
+        "output_tokens": 252,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0024.mp4",
+        "elapsed_s": 8.87,
+        "output_text": "The scene takes place on a busy city block in daytime with the recognizable \"Seinfeld\" set. George Costanza appears as a man in a brown jacket and blue shirt gesturing with his hands, likely offering a suggestion or advice to another man in a red jacket and glasses who holds a bag. Elaine is present nearby in a tan jacket, a black top or scarf, and dark jeans, positioned between the two men and following their conversation with interest.\n\nThe location features typical New York street elements - buildings with green and purple facades, a red door, car windows, a green door, and a store with a illuminated \"OPEN\" sign. A leafy tree and parked cars, including one with a black top, line the curb, framing the sidewalk scene.\n\nAs the group moves, Jerry Seinfeld joins them. A yellow taxi and a red pole are visible in the background, characteristic of the Manhattan street setting, with the mix of colors including blue, brown, red, tan, green, purple, yellow, and gray creating a vibrant urban atmosphere.\n\nThe group's posture and positioning suggest they're engaged in an animated, possibly comedic situation - George's gesturing indicates he's explaining something, while the others appear to be reacting or considering his words. Elaine's position",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 1,
+          "george": 2,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0025.mp4",
+        "elapsed_s": 7.94,
+        "output_text": "The video clip takes place on a busy street with graffiti-covered walls, parking meters, and a tree visible in the urban setting. George is walking alongside woman who is holding a brown shoulder bag and gestures with it while George makes hand gestures to show that he sees something interesting that is to their left. They continue walking down the street, passing a yellow taxi cab and supporting business doors. Elaine appears in the background wearing a black suit jacket and white shirt, while Cosmo passes by in the distance. Throughout the walk, George occasionally glances sideways toward a point to their left, keeping his attention on something off-frame. The woman initially appears to be walking with George and Cosmo, but becomes visibly annoyed as she turns to face Cosmo.Matching George's gesture, she also directs her own attention toward the specific point to their left. The man in the black suit and the man in the blue suit continue walking along the sidewalk behind them as they observe the scene. By the end of the clip, George is looking intently to the side, his attention firmly fixed on whatever has caught their collective interest near the tree-lined street corner.",
+        "input_tokens": 2854,
+        "output_tokens": 229,
+        "characters": {
+          "george": 6,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0026.mp4",
+        "elapsed_s": 7.78,
+        "output_text": "Three main characters stand on the bustling city street having an animated conversation. Jerry Seinfeld, on the right, is wearing a brown jacket over a blue button-down shirt and appears to be the one speaking, gesturing toward Elaine with emphatic hand movements. Elaine, in a brown jacket over a black shirt with a purse strap going over her shoulder, stands beside him listening intently. In the middle is George Costanza in his signature orange-red jacket over a gray shirt with glasses and a slightly balding head. The setting includes a man in a black suit jacket carrying a brown bag walking by, a sign with red lettering on a building wall, people moving through the crowd, and glimpses of a blue car through the windows. \n\nThe scene's energy and body language convey territorial argument territory. Jerry's animated gestures and assertive stance suggest he's giving instructions or pointing something out, while Elaine's attentive posture indicates she's engaged in the exchange. The street setting, complete with shopfronts, signage, and other pedestrians, frames the charged interaction between the three friends as they navigate an urban environment.",
+        "input_tokens": 2854,
+        "output_tokens": 224,
+        "characters": {
+          "jerry": 2,
+          "george": 1,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0027.mp4",
+        "elapsed_s": 7.6,
+        "output_text": "In this scene, a female narrator with curly hair appears in the foreground, wearing a brown leather jacket, black shirt, and brown pants, carrying a purse over her shoulder. She gently pats a stuffed animal\u2014possibly a teddy bear or monkey\u2014while standing with her back to a green door with a vertical white stripe and a green wall beside it.\n\nJohn O'LBL, dressed as a soldier in a blue button-up shirt under a brown jacket, stands near a large brown wooden armoire marked \"FOR SALE.\" A man in a gray shirt and blue jeans sits on a bench reading a newspaper in front of the armoire.\n\nIn the background, a large window showcases several bicycles, and a red sports car is visible in a showroom setting. A green wall with a white picture frame hangs nearby, and Franklin Roosevelt (a man with curly hair wearing a blue shirt, black pants, and brown shoes) is looking at a man in red rubber pants.\n\nJennifer Aniston and her male friend from Brooklyn walk across the scene, talking as they pass by the store area.",
+        "input_tokens": 2854,
+        "output_tokens": 216,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0028.mp4",
+        "elapsed_s": 8.76,
+        "output_text": "The video clip takes place on a busy city street with storefronts across the way adorned with bicycles in their windows, creating an urban backdrop. A brown muscle car is parked on the street. In front of the car stands a woman in a brown leather jacket with curly black hair, a brown purse slung over her shoulder. Near the driver's side, a man in a red jacket over glasses sits looking down, wrapped in what appears to be a weekly newspaper he keeps reading throughout the scene.\n\nBehind them, three men stand grouped together: one in a red jacket, one in a brown jacket, and one in a gray sweater. They observe the woman and the man seated beside her. The three men display\u660e\u986f anger and are attacking the seated man angrily while the woman motherly protects the man and tries to reason with the angry group, pointing to him and attempting to dissuade them.\n\nAs the scene progresses, the woman shifts from standing in front of the car to sitting on the hood of the vehicle, still oriented with her back to the men in red and brown jackets. The trio behind her continues to look at her in an angry way. She now holds a piece of paper and appears to be reading or examining it while still seated on the car.\n\nThe woman then",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0029.mp4",
+        "elapsed_s": 6.67,
+        "output_text": "In this scene from Seinfeld taking place on a New York City street lined with colorful storefronts, Jerry and George appear on the left side in front of a telephone pole with a bicycle hanging from it. Jerry is playing quarterback in a children's football game in the background while George, a balding with glasses Caucasian man in a red jacket over a green plaid shirt, watches. A woman in a brown leather jacket is present, appearing to have just yelled at George. The camera angle shifts lower as the mood becomes tense and confrontational, revealing a brunette woman in a brown leather jacket over a black shirt with a brown strap across her shoulder speaking seriously and leaning slightly forward. Behind her, George remains in his red jacket while a man in a brown jacket with a blue shirt and black tie stands beside him, conversing. A brown wooden wall with a white curtain and a green wall form the background, suggesting a shop setting.",
+        "input_tokens": 2854,
+        "output_tokens": 188,
+        "characters": {
+          "jerry": 2,
+          "george": 4
+        }
+      },
+      {
+        "clip": "clip_0030.mp4",
+        "elapsed_s": 8.76,
+        "output_text": "In the first half of the video, three characters are walking down a street in an urban setting. From left to right, we see someone in an orange jacket and blue shirt, followed by a man with short brown curls wearing a brown jacket. On the right is a larger woman with curly brown hair and black hair. They are engaged in conversation, with the woman on the right speaking to the man in the center. They appear to be having a casual discussion while moving together.\n\nThe second half transitions to a completely different scene indoors. A man with short brown hair sits on a wooden bench, wearing a gray jacket over a blue shirt, with a white paper on his lap. Around the bench are pieces of furniture\u2014a large brown wooden dresser, a brown wooden chest, and another small brown wooden table. To his left is a brown wooden cabinet with a white rope hanging from it. Behind him stands a person in a gray jacket. The background features a green wall with a window that has a white frame. The indoor setting has a cluttered appearance, with a patterned carpet in shades of gray and white and a purse with a brown strap visible on the bench. This indoor scene depicts a more solemn or contemplative moment compared to the casual street conversation in the first half.",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0031.mp4",
+        "elapsed_s": 5.24,
+        "output_text": "In the cluttered antiques shop setting of Seinfeld, Elaine stands against a large wooden cabinet with a white sign featuring red lettering. Dressed in a brown leather jacket over a black shirt, she adjusts a strap on her shoulder. A bicycle is visible through the window, adding to the shop's cluttered atmosphere. Elaine turns her head to the side and speaks while Joey and George\u2014wearing glasses and a red jacket\u2014look in her direction. As the focus shifts, klasses remain with the other two male characters positioned to the left while Elaine continues speaking slightly away from their line of sight with her usual animated expression, adding to the colorful mix of interactions in this memorable Seinfeld moment.",
+        "input_tokens": 2854,
+        "output_tokens": 142,
+        "characters": {
+          "george": 1,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0032.mp4",
+        "elapsed_s": 8.8,
+        "output_text": "The video clip shows a street scene from what appears to be a New York setting, with three recognizable characters from the classic sitcom Seinfeld. On the left, Jerry Seinfeld, wearing his signature glasses and checkered shirt with a red jacket, stands next to Elaine Benes, who has long, curly brown hair and is wearing a brown leather jacket. George Costanza is also present in the group.\n\nThe three are having a conversation with a Black man who approaches them. This man has on a suit with a white shirt and a red tie, and he appears to be selling something. After speaking with the characters, he turns and walks away, and George looks at him as he leaves.\n\nThe original man who stepped forward introduces himself as rollerskating. While explaining his offer, he gives one of the characters an example of what he wants to sell by mimicking the sound of a small toy gun. He demonstrates this action by shaking his fist, which causes it to shake visibly. This playful demonstration seems that while pretend. \n\nThe characters are all gathered in the street, stationary during the exchange, with buildings in the background creating an urban atmosphere. The setting captures a typical moment of banter and quirky interactions between these iconic characters during their day on the streets of New York",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 1,
+          "george": 2,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0033.mp4",
+        "elapsed_s": 8.81,
+        "output_text": "The scene takes place on a city street outside what appears to be a restaurant. Oscar and Stella are standing together, with Oscar positioned in front in his red jacket. He exchanges a few words with Stella, lifting his left eyebrow and briefly raising his left hand, his curly brown hair clearly visible. An African American man walks past in a dark gray suit as they continue their conversation.\n\nThe background features distinctive urban elements: yellow and pink buildings, a bicycle parked against a yellow wall, and a doorway with a yellow frame leading into a building with white siding. The street setting conveys a typical city atmosphere with its varied building fa\u00e7ades and everyday pedestrians.\n\nThis appears to be a moment where Oscar and Stella are casually interacting on one of their walks through the city. The exchange between them suggests they might be talking about something related to their surroundings or each other, though no specific dialogue is clearly recognizable from what's visible.\n\nThe scene then shifts to show a group gathered in front of a storefront called \"Versing.\" A sign above reads \"Hot Soup,\" positioned next to a bicycle rack. The group consists of seven people, including five white individuals and two Hispanic individuals. One Hispanic woman, in a yellow shirt, is leaning against the \"Hot Soup\" sign. Another Hispanic man,",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0034.mp4",
+        "elapsed_s": 7.13,
+        "output_text": "The scene takes place at Wally's Pizzeria, as shown by the restaurant's sign visible in the background. Jerry stands at the front of a line of customers, talking with the customer directly behind him. Elaine, George, and Kramer are also present in the queue behind them.\n\nThe storefront features a gray counter with a brown display of pasta, and a window with a sign that reads \"hot sour.\" People can be seen waiting nearby, including a woman in a black suit and another person in a white shirt.\n\nThe characters appear casually conversing while standing in line, engaging in typical restaurant waits together. Jerry's interaction with the person behind him at the front of the line is the focal point of the scene, setting up what seems to be their encounter at the pizzeria.\n\nThis moment captures friends meeting at their usual gathering spot, Wally's Pizzeria, establishing the setting and sparking what will likely be a conversation and potentially a humorous situation based on Jerry's comments or actions.",
+        "input_tokens": 2854,
+        "output_tokens": 202,
+        "characters": {
+          "jerry": 3,
+          "george": 1,
+          "kramer": 1,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0035.mp4",
+        "elapsed_s": 8.8,
+        "output_text": "In this Friends scene, we see the familiar kitchen background from Central Perk with a red brick wall, white upper wall, hanging pots, and signage, setting up a typical coffee shop environment. Jerry Seinfeld, Steve Urkel, and Cosmo Kramer are the main characters present, later joined by Elaine, George, and Cosmo. While there is a brief moment where John Travolta and Teri Polo appear amid this gathering, they don't seem to be part of an ongoing conversation or are more incidental to the scene.\n\nThe interaction primarily focuses on Jerry and George, who are having what appears to be a lighthearted exchange. Jerry, his characteristic pensive expression intact, and the other male characters, including a man in a brown leather jacket over a blue shirt with a receding hairline who makes eye contact with Jerry, contribute to the casual coffee shop atmosphere. Elaine, wearing a gray coat and sporting her distinctive red hair, stands nearby. George also appears in the scene wearing his usual plaid shirt.\n\nThe setting remains consistent throughout - Central Perk's interior with its signature d\u00e9cor serves as the backdrop for this brief moment of everyday conversation among the group, capturing the show's trademark blend of character interactions set within the communal space of their favorite coffee shop",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 4,
+          "george": 3,
+          "kramer": 1,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0036.mp4",
+        "elapsed_s": 5.94,
+        "output_text": "In the 1993 TV sitcom \"Seinfeld,\" Jerry Seinfeld (Jerry) and George Costanza (George) are in front of a store. Jerry stands on the left wearing a brown jacket over a blue shirt, talking to George on the right, who's in a red jacket with glasses and a plaid shirt, looking back at Jerry. Behind them, Elaine Benes (Elaine) appears with a surprised look, and a woman with blonde hair is also visible.\n\nThe scene then shifts to Jerry's apartment in New York City. Jerry and George have just returned from a date and are having a humorous conversation about the encounter. Jerry walks in with a confused expression on his face, clearly perplexed by what transpired. George stands by the door, observing Jerry as he talks.",
+        "input_tokens": 2854,
+        "output_tokens": 163,
+        "characters": {
+          "jerry": 8,
+          "george": 5,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0037.mp4",
+        "elapsed_s": 8.8,
+        "output_text": "The scene takes place outside a store in an outdoor city setting with a woman in a jacket walking past in the distance. Jerry and Elaine are in the shot. Jerry is facing Elaine sideways while giving her a friendly, knowing look. Elaine is wearing a yellow-gray coat and a purple scarf with her curly red hair visible, and she's moving to the left.\n\nThe two characters then face each other directly and share a warm, casual exchange. Jerry wears a brown jacket with blue jeans, his arms slightly outstretched and using hand gestures as they talk. Elaine is now in a blue jacket. They appear to be having a comfortable conversation in what looks like a public area.\n\nA woman with short, curly brown hair wearing a gray jacket enters from the left and walks toward the camera between them. As she passes, Jerry and Elaine continue their conversation with their eyes following her movement.\n\nNotable locations and elements include:\n- A building with a sign that reads \"Quality Florist\"\n- A green awning with the word \"FLORENCE\" written on it\n- A sign that reads \"Rostrum Hall Banquet Room\"\n- A flowering tree in the area\n- The lamp post visible on the lower right, showing the fourth, not the third, of its",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 4,
+          "elaine": 5
+        }
+      },
+      {
+        "clip": "clip_0038.mp4",
+        "elapsed_s": 4.61,
+        "output_text": "This scene takes place as Jerry and Elaine walk into a store. Jerry is walking on the left side of Elaine, who is on the right side. You can see Jerry and Elaine just at the edge of the frame in this scene. They both notice George by the storefront behind them with Elaine's ex Matthew. They both talk to George, and he comes back talking about how Elaine's ex is apparently stuck at the store getting balloons for his child's birthday. Elaine talks about the weather and how hot it is, gesturing out the window to cosmic rays and Lucy transmitting heat beams throughout the planet.",
+        "input_tokens": 2854,
+        "output_tokens": 121,
+        "characters": {
+          "jerry": 3,
+          "george": 2,
+          "elaine": 6
+        }
+      },
+      {
+        "clip": "clip_0039.mp4",
+        "elapsed_s": 5.93,
+        "output_text": "The video opens with Whatley and Joey standing outside in front of a storefront, having just purchased tickets. Whatley treats his friend to a celebratory meal at an A&W restaurant, with his eyes fixed on the drink in front of them. Joey expresses skepticism about their presumed success at nabbing good seats, warning there's no guarantee they will. His practical, possibly humorous tone catches Whatley off guard, causing him to fumble.\n\nAs Joey's question hangs in the air, the setting transitions to a different scene that focuses solely on Jerry Seinfeld and Elaine Benes. These two iconic characters are standing together with their friend George Costanza, engaging in conversation. The casual nature of their interaction contrasts with the earlier scene outside the restaurant, highlighting different interactions between the characters as the video progresses through multiple settings.",
+        "input_tokens": 2854,
+        "output_tokens": 164,
+        "characters": {
+          "jerry": 1,
+          "george": 1,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0040.mp4",
+        "elapsed_s": 7.49,
+        "output_text": "The video clip takes place in a cafeteria setting. Seinfeld stands near a brick wall, looking off to the side, as Elaine enters through a door on the right and heads toward a buffet-style food counter with various dishes. Behind Elaine, Jerry follows closely, and George appears behind both of them. In the foreground, Cosmo Kramer, dressed in a gray suit jacket and a red shirt, approaches the counter.\n\nThe counter is set up with trays of food, and Jerry stands behind it. To his left sits a man in a red jacket, and on the right side of the counter is a person in a white coat. A sign on the wall and a bulletin board displaying \"MENU\" add to the cafeteria atmosphere.\n\nThe group then gathers by the food display, with Elaine positioned slightly ahead of the others as they examine the options. The setting is clearly a typical cafeteria space, with the buffet area serving as the centerpiece of their brief interaction. The characters' positioning suggests another moment from the show's familiar dynamic, with them clustered together in this common public space.",
+        "input_tokens": 2854,
+        "output_tokens": 215,
+        "characters": {
+          "jerry": 2,
+          "george": 1,
+          "kramer": 1,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0041.mp4",
+        "elapsed_s": 3.33,
+        "output_text": "In the cafeteria scene from Seinfeld, Jerry Seinfeld and George Costanza are at the food counter. There is a chalkboard with all day specials and soup options written on it behind the chef who is standing next to the counter. George appears tired and a bit frustrated, and has just returned from making a call. He leans forward and rests his arms on the counter in front of him.",
+        "input_tokens": 2854,
+        "output_tokens": 80,
+        "characters": {
+          "jerry": 1,
+          "george": 2
+        }
+      },
+      {
+        "clip": "clip_0042.mp4",
+        "elapsed_s": 7.61,
+        "output_text": "The video shows three male characters in a working cafeteria setting with multiple counters and food items. The man in the red jacket and glasses stands near a silver counter with a menu board to his left and a white hand holding an item to his right. Behind him are a brick wall, gray wall sections, a brown door with a glass window, and a shelf with a basket of fruits and vegetables. The setting transitions to a restaurant scene at a buffet-style food counter with a glass front and metal bottom, containing various food trays including soup and salad. The same three men are present, with a chef in a white coat standing behind the counter facing them and a menu in the background listing hot dogs, chili, French fries, and tuna salad alongside utensil rental information. A \"line forming\" sign is visible. A Black woman with black hair appears at the counter in what seems to be a casual everyday environment, possibly in the presence of co-workers or familiar acquaintances. The scene captures a moment of interaction in a busy lunch or meal service setting with multiple food displays and prominent signage.",
+        "input_tokens": 2854,
+        "output_tokens": 218,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0043.mp4",
+        "elapsed_s": 8.78,
+        "output_text": "The video unfolds in two distinct locations that showcase different aspects of the same setting. It opens with a casual gathering at a work table covered by a metal countertop with a glass top, laid out with food-serving items and a bowl. Two individuals are seated here engaged in a conversation. One is Frankie as the unseen person chats with him in a relaxed manner. On the right side of the hallway stands a door labeled \"Fire Escape,\" and signs mounted on the wall read \"ALL CHEESE DISHES $0.49\" and \"No Smoking.\" A photograph of a male dressed in a white long-sleeve shirt is visible on the left side of the doorway.\n\nThe scene then transitions to a bustling kitchen environment with a brown counter and a shelf stocked with white cups and paper bags. Monks with glasses and black hair are present, along with another individual wearing a glove and working in this area. On the wall, there is a white sign partially covering a light on the opposite side, and a red fire alarm is mounted nearby. A person in a white shirt surrounded by cups stands nearby. At the bottom right of the screen, a mustached person is visible, and on the far left side of the kitchen area, another person is present.",
+        "input_tokens": 2854,
+        "output_tokens": 255,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0044.mp4",
+        "elapsed_s": 5.56,
+        "output_text": "In this Friends scene set at the Password Sub Shop, three male restaurant workers stand poolside with two clients picking up their food. Joey and George are among the customers, with Joey describing to George that the Italian dishwasher will no longer be available. The setting is a gray set with a board listing subs marked $3.99 or $5.99. Elaine, who says her feelings for Jerry have faded, is present and looking sadly at Jerry, who is wearing a red jacket and appears distracted in an interview-like conversation. George is shown at a window near a fire alarm and a sign, handling a couple of dollars as he looks down, concentrating on cashing. The scene captures the familiar, slightly awkward restaurant environment and character interactions.",
+        "input_tokens": 2854,
+        "output_tokens": 151,
+        "characters": {
+          "jerry": 2,
+          "george": 3,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0045.mp4",
+        "elapsed_s": 8.8,
+        "output_text": "The video shows a recognizable scene set in a convenience store. Joey and George from the popular sitcom Seinfeld are standing at the counter behind a glass protective barrier, observing while looking at the order form or menu in front of them.\n\nThe store features brick walls on the left side, which add to the authentic convenience store atmosphere typically shown in the show. Joey has on a brown jacket over a blue shirt, while George is wearing his signature red jacket. Their positioning behind the counter suggests they're working or assisting at this location.\n\nOn the counter in front of them, there are clearly visible folded pieces of paper and a leaflet, likely part of the items being discussed or ordered. The camera captures their body language and engagement with these objects, capturing that characteristic Seinfeld-style atmosphere of casual observation and subdued interaction.\n\nThe men's reactions appear engaged as they stare down at the documents, embodying the show's focus on everyday interactions and minor observations that form the basis of their comedic situations. While there is no audio in this particular clip, their body movements and gazes convey the scene's tone effectively.\n\nThis snapshot feels like it could be from a typical episode where Joey and George are pulled into a store-based scenario, possibly trying to place an order or getting caught up in something humorous",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "george": 3
+        }
+      },
+      {
+        "clip": "clip_0046.mp4",
+        "elapsed_s": 8.83,
+        "output_text": "The scene takes place inside the Central Perk coffee shop, the iconic setting of Friends. The camera is positioned behind the left side of the bar, offering a view of the counter and the gray brick wall in the background.\n\nJerry Seinfeld stands at the bar in the foreground, wearing his signature brown vest over a blue button-down shirt. He appears to be in conversation, his mouth slightly open as if speaking to someone. George Costanza is seated to his right behind the bar, wearing his red jacket and glasses. He's holding a brown paper bag in his hands, likely containing food, and speaking while Jerry looks at him, possibly listening intently.\n\nOn the left side of the background, Elaine Benes is visible behind a woman, indicating she's also present at the bar. The caf\u00e9 environment is clearly established with various signs on the wall and a fire alarm visible in the space.\n\nThe camera then shifts to a different interior area within the same building\u2014a takeout restaurant kitchen. The shot frames a workspace with a gray table in the foreground and a white wall behind it. On the left side, part of a black telephone is visible. A metal shelf runs from left to right behind the table, stocked with stacks of white styrofoam cups and white bags with",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 2,
+          "george": 1,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0047.mp4",
+        "elapsed_s": 8.79,
+        "output_text": "The video clip takes place in a restaurant setting with two parallel scenes.\n\nIn the first scene, we see George Costanza from \"Seinfeld\" wearing a red jacket over a plaid shirt and wire-rimmed glasses. He's standing in front of a white wall with various signage, including a partially visible sign that reads \"We reserve the right to refuse service\" and a red fire alarm box labeled \" FIRE.\" George is reacting with visible disgust and animosity, crumpling a paper bag in one hand while seemingly spraying something with his other hand. There's a hint of another person standing to his left, and light is coming from the right side of the frame, creating contrast in the scene.\n\nThe second scene takes place in a kitchen, likely in Cheers. A chef in a white uniform and white hairnet appears to be serving or preparing food, standing in front of neatly organized stacks of plastic cups on metal shelves. The room has a stainless steel backsplash, emphasizing its commercial kitchen environment. Light from the left side creates a sharp contrast on the chef and prep area.\n\nThe juxtaposition of George Costanza's disgusted reaction in what appears to be a restaurant setting, responding to the \"We reserve the right to refuse service\" sign while crumpling a paper",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "george": 3
+        }
+      },
+      {
+        "clip": "clip_0048.mp4",
+        "elapsed_s": 5.41,
+        "output_text": "In a diner restaurant, George Costanza stands at the counter. He's wearing his red hoodie with the collar turned up and a gray collared shirt underneath. He has a bald spot on the top of his head and thick, gold-framed glasses. Across from him at the counter is a woman in a maroon turtleneck sweater. She has short curly black hair and is holding a brown paper bag. On the counter in front of her lies a piece of paper. The diner has a white wall with a blackboard hanging on it displaying a food and drink menu. A glass door with a metal frame is visible on one side. The overall setting has the casual, everyday atmosphere of a busy eatery.",
+        "input_tokens": 2854,
+        "output_tokens": 145,
+        "characters": {
+          "george": 1
+        }
+      },
+      {
+        "clip": "clip_0049.mp4",
+        "elapsed_s": 6.89,
+        "output_text": "In this scene from Seinfeld, Jerry Seinfeld and George Costanza are standing together at a bank counter facingidentification sign, arrive at a bank teller. Jerry is dressed in his signature brown outer layer over a blue button-up shirt, while George wears a red jacket over a gray and black plaid shirt. The setting appears to be an interior bank space with institutional details including a counter in front of them, a white wall, a fire alarm, and wall-mounted signs that provide identification.\n\nThe two men exchange a brief, slightly awkward conversation. George appears somewhat confused or uncertain during their exchange. The overall atmosphere is casual and friendly as they interact at the counter. Behind they're stand in a line, a black woman with glasses is visible.\n\nThis interaction seems to be a typical moment from their relationship, showcasing their characteristic dynamic and Jerry's observational style of presentation. The scene captures a small slice of their everyday interactions as they are seen to enter the bank.",
+        "input_tokens": 2854,
+        "output_tokens": 194,
+        "characters": {
+          "jerry": 3,
+          "george": 3
+        }
+      },
+      {
+        "clip": "clip_0050.mp4",
+        "elapsed_s": 7.54,
+        "output_text": "The scene takes place on a sidewalk in front of a library. Jerry Seinfeld stands on the left in a brown jacket over a blue button-down shirt, facing George Costanza on the right in a red jacket and plaid shirt. A window sign reads \"We reserve the right to refuse service to anyone,\" and another sign says \"Single file, one at a time\" above a fire alarm and bricked wall.\n\nThe spots of another queue, an African woman wearing glasses and light.\"\n\nA man with short brown hair in a brown jacket walks away from the group to the right, passing a woman waiting in line wearing a black shirt with a white design and sunglasses. Behind them, a woman with curly hair and a brown jacket holds a blue jacket in her right hand beside a staircase and potted plant.\n\nIn another view, a woman with long, curly brown hair in a brown leather jacket over a black shirt speaks to a tall African American man in a gray leather jacket and gray pants standing in front of a brown building, with a white limo interior visible nearby.",
+        "input_tokens": 2854,
+        "output_tokens": 216,
+        "characters": {
+          "jerry": 1,
+          "george": 1
+        }
+      },
+      {
+        "clip": "clip_0051.mp4",
+        "elapsed_s": 8.83,
+        "output_text": "In this scene from the television show Community, we see a hallway with gray walls and a wooden door frame leading into an apartment, with the group assembled in the doorway. To the left, the wooden hutch cabinet is positioned nearby, while a tree stands off to the right.\n\nFour characters are present in this doorway setting:\n\n- An African-American man wearing a gray jacket\n- A woman with long curly brown hair in a brown leather jacket\n- The basement-dwelling wealthy white man who is tall and balding, wearing a fine blue button-down shirt and a thick gray obi-style waistcoat\n- A gray-haired woman with glasses who appears to be in her forties\n\nThe African-American man is speaking, his mouth moving as he addresses the group. His gray jacket catches light as he gestures, the fabric subtly shifting.\n\nThe woman with curly hair stands with her back partially visible, showing her brown leather jacket and black shirt while tilting her head slightly toward the speaking man. She maintains her attentive posture, focused on the conversation unfolding in the doorway.\n\nThe tall, balding white man in the expensive blue shirt and gray waistcoat remains composed and stationary. The gray-haired woman in glasses stands close to him and also observes the dialogue with a serious expression.\n\nThe",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0052.mp4",
+        "elapsed_s": 8.61,
+        "output_text": "The scene is set on the steps outside a brick building with a railing at what appears to be a residential location. Jennifer Aniston's character is on the left side of the frame, a woman with long dark hair wearing a leather jacket. She's visibly distressed, speaking rapidly with an anxious and intense demeanor while looking off to the side. Her hands are raised and gesturing, capturing her agitation.\n\nBehind her stands a man in a long-sleeved blue shirt with short brown hair, appearing to watch her intently with a concerned expression. The wooden furniture or hutch visible in the background, along with the brick wall and railing, creates a domestic atmosphere.\n\nThe interaction suggests an intense conversation taking place between Aniston's character and someone off-screen to her left, though we don't see that person directly. The man's posture and gaze indicate he's paying close attention to what she's saying and expressing genuine concern.\n\nThe clipped nature of the video\u2014with its abrupt ending and lack of visible dialogue\u2014creates a sense of tension and potential drama. This appears to be an emotional moment from the TV show Friends, showing Aniston dealing with what sounds like a significant issue while another onlooker observes, possibly trying to offer support.",
+        "input_tokens": 2854,
+        "output_tokens": 248,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0053.mp4",
+        "elapsed_s": 8.74,
+        "output_text": "The video features Elaine Benes, a recognizable character from the TV show \"Seinfeld.\" She's standing in what appears to be a residential apartment setting, with a red brick wall featuring a white column and doorframe visible behind her, as well as a thin green tree.\n\nElaine is wearing a brown leather jacket over a black top and has her mouth open, seemingly mid-speech as she reacts to something happening off-screen. She's looking up and slightly to her right towards Jerry Seinfeld, who is wearing a black jacket and positioned near a window and doorframe. Jerry appears to be standing behind a brown cabinet, which has a decorative red and brown design that adds visual interest to the apartment interior.\n\nOn one side of Elaine, there's another man in a blue shirt with light brown hair. His presence in the scene contributes to the ongoing interaction taking place.\n\nThe combination of these elements\u2014the iconic character Elaine Benes, Jerry Seinfeld, the apartment setting with its distinctive features including the red brick walls and decorative cabinet, and the group dynamics captured in this moment\u2014all point to this being from the comedy series \"Seinfeld.\" The scene presents what looks like an intense exchange, possibly a confrontation or heated discussion, given Elaine's open-mouthed expression and upward gaze. The",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 3,
+          "elaine": 5
+        }
+      },
+      {
+        "clip": "clip_0054.mp4",
+        "elapsed_s": 7.03,
+        "output_text": "The scene takes place outside a red brick building during daytime, with a white wall, glass window, and a green bush visible in the background. Firefighter Tommy McGrath, wearing his blue uniform top, is standing in front of a wooden cabinet secured with a piece of plastic.\n\nHe is engaged in conversation with a woman who has shoulder-length curly hair. She's wearing a brown leather jacket over a black shirt and anchors the center of the interaction.\n\nAt one point, she extends her right arm outward as she speaks to him, making clear this is a heated confrontation rather than a casual exchange. The fact that he's in uniform and she appears upset suggests they are addressing an issue related to his work.\n\nThis setting and conflict appear to be taking place during their downtime or after a shift, giving what would typically be a volatile situation a more concerning undertone. The presence of the plastic-wrapped cabinet in the sightline adds an element of anticipation, as if something significant might happen next.",
+        "input_tokens": 2854,
+        "output_tokens": 199,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0055.mp4",
+        "elapsed_s": 7.32,
+        "output_text": "The video opens outside on a sunlit urban street. A woman with shoulder-length curly hair wearing a brown leather jacket over a black shirt stands animatedly gesturing, passionately explaining her point in front of a large dark brown wooden cabinet secured with a piece of blue tape. Behind her is a red brick building with a gray lower section, a silver metal railing to the left, a white flower pot with a green plant below it, and two windows visible high on the facade. Green plants can be seen in the building's windows and one at the top of the stairs. Trees filter light into the outdoor scene.\n\nThe action then shifts indoors to a gray-walled office or bedroom. A man with short brown hair sits at a desk eating ice cream from a white cup with a red stripe, using a silver spoon. On the desk are a black plastic container filled with pens and pencils. A gray poster with a black background is on the wall, featuring a white building with windows, with a white radiator visible at the bottom left.",
+        "input_tokens": 2854,
+        "output_tokens": 207,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0056.mp4",
+        "elapsed_s": 7.67,
+        "output_text": "The video opens in an apartment lounge/office area with George Costanza sitting at a desk, eating cereal or soup from a white cup with a red stripe. He's wearing a blue button-up shirt and holding a spoon while looking down with an appalled expression. The background features gray walls with a window and blinds, an air conditioner, a radiator, a desk with a telephone, a printer, and a black basket filled with pens and pencils.\n\nLater, Cliff Huxtable appears in a comic book shop or retail store setting. He's a heavyset man with a balding head and glasses, wearing a gray button-up shirt. He's looking down intently at a box he's holding, which appears to be filled with cereal bars or cookies. The scene takes place in front of a sizable white door with gold hardware, where a red jacket hangs prominently. To the side, there's a white wall with a decorative scroll piece and other items on display, creating a cluttered, shop-like atmosphere. Cliff seems focused and contemplative as he examines the contents of the box.",
+        "input_tokens": 2854,
+        "output_tokens": 219,
+        "characters": {
+          "george": 1
+        }
+      },
+      {
+        "clip": "clip_0057.mp4",
+        "elapsed_s": 6.5,
+        "output_text": "In a warmly lit apartment at 9:57 a.m., a generous breakfast unfolds between two friends. George Costanza, wearing his signature gray plaid shirt and glasses, stands at the kitchen counter reading from a small food box while balancing a spork in his right hand. Kramer, casually holding a white cup, sits across the wooden table from him. The kitchen features a desk with a lamp, and a bookshelf filled with books and records adds to the cozy feel. By 9:59 a.m., the relaxed scene continues\u2014George remains focused on examining the food box while Kramer holds a white cup and converses with him. They share spoonfuls of what appears to be hot cereal or grits, pausing in between to talk. A spoon rises from George's bowl as they continue their light-hearted exchange, trading remarks in the comfortable, familiar atmosphere of their apartment.",
+        "input_tokens": 2854,
+        "output_tokens": 182,
+        "characters": {
+          "george": 3,
+          "kramer": 2
+        }
+      },
+      {
+        "clip": "clip_0058.mp4",
+        "elapsed_s": 8.79,
+        "output_text": "In a living room setting, George Costanza stands at a wooden table while Jerry Seinfeld sits at it in his apartment. George wears his signature gray plaid shirt and green pants or shorts, and Jerry is in his long-sleeved blue button-up shirt. The cozy space features a bookshelf filled with books and a red TV tray, with a window visible and the familiar decor creating a warm domestic atmosphere.\n\nAt the table, George eats a cereal snack from a box while Jerry holds a white cup with a red stripe in his right hand and eats cereal from a container with a white spoon in his left. They share small talk and smile during their casual breakfast-style conversation, their body language relaxed and cheerful.\n\nThe scene ultimately shows George alone in this quieter moment, looking to his right with a slightly worried expression. He's wearing a brown long-sleeved shirt and glasses, holding a box of cereal as if about to eat. The setting reveals more details: a white wall with a calendar, a red jacket hanging on the wall, a silver door with a gold handle and lock, and a green-and-white couch. A red bowl with a black lid sits on a table, and there are two white hooks\u2014one holding a tan object with a red design and another empty",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 3,
+          "george": 4
+        }
+      },
+      {
+        "clip": "clip_0059.mp4",
+        "elapsed_s": 7.68,
+        "output_text": "The video clip shows Jerry Seinfeld sitting at a table, eating ice cream from a white styrofoam cup with a red stripe around it. He's holding a spoon in his left hand and is mid-bite, with his mouth open in surprise.\n\nJerry is wearing his typical blue button-up shirt and has his signature short, curly brown hair. He looks directly at the camera with an expression of shock or disbelief as he cracks open the ice cream cup. His eyebrows are raised and his mouth is moving, as if he's saying something to someone off-screen.\n\nThe setting appears to be in Jerry's apartment. There's a radiator visible to the left of Jerry, and a desk with a computer monitor and a cup filled with pens can be seen behind him against gray walls with partially open window blinds.\n\nThis scene takes place in what's known as \"the ice cream fight\" episode of Seinfeld. Jerry and Elaine are having a disagreement, and Jerry has just cracked open Elaine's ice cream container in front of her. This abrupt action has clearly caught Jerry off guard, as evidenced by his surprised expression and demeanor.",
+        "input_tokens": 302,
+        "output_tokens": 226,
+        "characters": {
+          "jerry": 7,
+          "elaine": 2
+        }
+      }
+    ],
+    "total_elapsed_s": 457.63,
+    "num_clips": 60,
+    "total_output_tokens": 13079,
+    "total_input_tokens": 168688
+  },
+  "tq4": {
+    "clips": [
+      {
+        "clip": "clip_0000.mp4",
+        "elapsed_s": 14.46,
+        "output_text": "The video clip shows a stand-up comedy performance featuring Jerry Seinfeld on stage. He's wearing a dark blue suit jacket over a light blue collared shirt with a dark tie that has a subtle pattern. Seinfeld has his characteristic short, curly brown hair and is holding a black microphone in his right hand while gesturing with his left as he performs.\n\nThe stage is dimly lit with a spotlight illuminating Seinfeld against a backdrop of red curtains with vertical lines. A small table with a glass of water is visible behind him. The audience is seated in front of the stage, with some members visible in the foreground, including a man in a plaid shirt and a woman with long brown hair.\n\nThroughout the performance, Seinfeld is animated and expressive, using his hands to emphasize his points as he delivers his material. The camera alternates between wider shots showing the full stage and audience, and closer shots focusing on Seinfeld's face and upper body as he speaks.\n\nThe performance has a classic stand-up comedy feel, with Seinfeld engaging with the audience and using his trademark comedic style. The setting is a typical comedy club or theater venue, with the intimate stage setup and attentive audience creating the atmosphere for a stand-up routine.\n\nWhile no specific dialogue is mentioned, the visual",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 17.71,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 1
+        }
+      },
+      {
+        "clip": "clip_0001.mp4",
+        "elapsed_s": 11.69,
+        "output_text": "The video clip shows a stand-up comedy performance featuring a man with long, curly brown hair wearing a blue suit jacket, light blue shirt, and patterned tie. He's performing on stage under a spotlight, holding a microphone in his left hand and gesturing with his right hand as he speaks to an audience seated at round tables with red candles.\n\nThe setting is a dimly lit comedy club with a red curtain backdrop. The performer is animated and expressive, using his hands to emphasize his points while addressing the audience. The atmosphere appears lively and engaging, with the audience watching attentively.\n\nAs the performer continues his routine, white text appears on screen displaying production credits, including \"Producer Peter Mehlman,\" \"Producer Marjorie Gross,\" \"Co-Producer Carol Leifer,\" \"Producer Tim Kaiser,\" \"Produced by Susie Mamann Greenberg,\" and \"Supervising Producers Tom Gamill and Max Pross.\"\n\nThe scene then transitions to an exterior shot of a large, old brick building with a red brick facade. The building has multiple windows, some with white frames, and features a white balcony with intricate carvings. A white ladder is propped against the balcony, and there are trees with green leaves in the foreground. The building appears to",
+        "input_tokens": 3486,
+        "output_tokens": 256,
+        "tok_per_s": 21.9,
+        "vram_peak_mib": 19220.3,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 3741,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 139.739501953125,
+          "baseline_mib": 526.078125,
+          "compression_ratio": 3.76,
+          "savings_mib": 386.338623046875
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0002.mp4",
+        "elapsed_s": 11.75,
+        "output_text": "The video clip is from the TV show Seinfeld, set in Jerry Seinfeld's apartment. The scene takes place in the kitchen, which has gray walls, a gray door, and gray cabinets. A white refrigerator covered with magnets and papers stands in the background, with a loaf of bread and a bag of chips on top. There's a white microwave, a stove with a black pot, and a wooden cutting board on the counter.\n\nJerry Seinfeld is present in the scene, wearing a blue button-down shirt and brown pants. He's standing with Elaine Benes, who has long blonde hair and is wearing a black sweater. They're engaged in a warm, affectionate moment, with Elaine wrapping her arms around Jerry's neck and smiling up at him. Jerry is smiling back at her, and they're both laughing together.\n\nGeorge Costanza is also in the scene, wearing a gray and white checkered button-down shirt and glasses. He's sitting at the kitchen table, reading a newspaper. As he reads, he glances up at Jerry and Elaine, who are still embracing and laughing. George then looks down at his newspaper again, continuing to read.\n\nThe setting is clearly Jerry's apartment, with its characteristic gray color scheme and typical kitchen appliances. The scene captures",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.78,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 6,
+          "george": 2,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0003.mp4",
+        "elapsed_s": 11.53,
+        "output_text": "The video clip is from the TV show Friends and takes place in the Central Perk coffee shop, specifically in the kitchen area.\n\nThe scene opens with a man and a woman embracing in the kitchen. The man is wearing a blue button-down shirt and has short brown hair. The woman has long blonde hair and is wearing a black turtleneck. They're standing in front of a white microwave with a brown container on top of it. Behind them are gray cabinets with glass doors, revealing various food items inside.\n\nAs they're embracing, the man is speaking to the woman. She responds with a smile and a nod, showing she's engaged in the conversation. The camera then pulls back to reveal two more people entering through a doorway. One is a man wearing a gray button-down shirt and gray pants, with glasses and a receding hairline. The other is a woman with long curly brown hair, wearing a brown leather jacket over a black shirt.\n\nThe woman in the brown leather jacket speaks to the man in the blue shirt, who turns to face her. The man in the blue shirt then turns back to the woman in the black turtleneck and speaks to her. The woman in the black turtleneck responds with a smile and a nod.\n\nThe man in",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 22.2,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0004.mp4",
+        "elapsed_s": 11.64,
+        "output_text": "The scene takes place in the apartment from Seinfeld, specifically in the living room area. The setting features the familiar white walls, a window with blinds, and a bookshelf filled with books and board games. A green bicycle is mounted on the wall, and there's a refrigerator covered with magnets and pictures, including a Superman magnet.\n\nJerry Seinfeld is the main focus of the scene. He's wearing a blue button-down shirt and has his characteristic short brown hair. He's holding a brown jacket and appears to be in the middle of dressing or getting ready. His body language suggests he's engaged in conversation with someone off-camera, and he's gesturing with his hands as he speaks.\n\nGeorge Costanza is also present in the scene. He's wearing a gray button-down shirt and has his signature bald spot. George is putting on a red jacket, and he's looking at Jerry with a somewhat confused expression on his face. His body language indicates he's reacting to something Jerry has said or done.\n\nElaine Benes is standing nearby, wearing a brown leather jacket over a black shirt. She has a purse slung over her shoulder and is watching the interaction between Jerry and George with a concerned look on her face. Her presence adds to the dynamic of the conversation taking",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 22.0,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 4,
+          "george": 3,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0005.mp4",
+        "elapsed_s": 11.06,
+        "output_text": "The scene takes place in the kitchen of the apartment, with the familiar cluttered and lived-in setting. The refrigerator is covered with magnets and papers, and there's a cutting board and newspaper on the counter. A stove with a pot is visible, and a bicycle can be seen in the background.\n\nJerry Seinfeld is the main focus, wearing his brown jacket over a blue shirt. He's animated and energetic, gesturing with his hands as he speaks. He picks up a wallet and shows it to the others, then continues talking with enthusiasm.\n\nKramer is present, wearing his red jacket over a gray shirt and blue jeans. He's standing nearby, watching Jerry with a somewhat confused expression.\n\nElaine is also in the kitchen, wearing her brown leather jacket over a black shirt with a purse over her shoulder. She's looking at Jerry with a concerned expression, clearly trying to follow the conversation.\n\nThe dynamic between the characters is typical of the show - Jerry is being his usual animated self, Kramer is trying to keep up, and Elaine is trying to make sense of what's happening. The kitchen setting, with its everyday objects and the bicycle in the background, adds to the authentic, relatable atmosphere of the scene.",
+        "input_tokens": 2863,
+        "output_tokens": 247,
+        "tok_per_s": 22.33,
+        "vram_peak_mib": 18738.2,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 3109,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 116.132080078125,
+          "baseline_mib": 437.203125,
+          "compression_ratio": 3.76,
+          "savings_mib": 321.071044921875
+        },
+        "characters": {
+          "jerry": 4,
+          "kramer": 2,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0006.mp4",
+        "elapsed_s": 11.71,
+        "output_text": "The video clip is from the TV show Seinfeld, featuring Jerry Seinfeld, Elaine Benes, and George Costanza.\n\nThe scene opens in Jerry's apartment, where the three characters are gathered in the kitchen. Jerry is wearing his signature brown jacket over a blue shirt, and Elaine is dressed in a brown leather jacket with a black shirt. George is in his usual red jacket. The kitchen has a gray door, a gray wall, and a refrigerator covered with magnets. A gray and white curtain is visible in the background.\n\nThe conversation begins with Jerry and George talking to Elaine. Jerry is animated, gesturing with his hands as he speaks. Elaine is holding a purse and appears to be listening attentively. George is standing between Jerry and Elaine, looking at Jerry as he talks.\n\nThe discussion continues with Jerry and George talking to Elaine. Jerry is gesturing with his hands as he speaks, while George is looking at Jerry. Elaine is holding her purse and looking at Jerry as well. The setting remains the same, with the gray door, gray wall, and refrigerator with magnets visible in the background.\n\nThe scene then transitions to an outdoor setting, where the three characters are walking down a city street. Jerry is still wearing his brown jacket over a blue shirt, and George",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.86,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 12,
+          "george": 7,
+          "elaine": 7
+        }
+      },
+      {
+        "clip": "clip_0007.mp4",
+        "elapsed_s": 11.78,
+        "output_text": "The scene takes place on a bustling city street lined with colorful storefronts in red, yellow, and green. Three people are walking together: a woman with long curly brown hair wearing a brown leather jacket over a black shirt, a man in a red jacket over a gray shirt, and another man in a brown jacket over a blue shirt. They're talking as they move through the crowd, with the woman gesturing animatedly while the man in the brown jacket over the blue shirt points toward her.\n\nThe setting is a lively urban environment with pedestrians passing by, including a man in a gray suit and another in a blue suit. The group continues walking until they reach a furniture store, where a large wooden cabinet is displayed with a \"For Sale\" sign. A man in a gray shirt and blue jeans is seated on a stool in front of the cabinet, reading a piece of paper.\n\nThe woman approaches the cabinet and touches it, examining it closely. The man in the brown jacket over the blue shirt and the man in the red jacket over the gray shirt stand nearby, watching her closely. The woman then turns to speak to the seated man, who looks up from his paper and begins to talk to her. The man in the brown jacket over the blue shirt continues to observe",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.73,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0008.mp4",
+        "elapsed_s": 11.78,
+        "output_text": "The scene takes place on a bustling city street outside a furniture store, with a green wall and a large wooden cabinet visible in the background. A man with short brown hair wearing a gray jacket and blue jeans is seated on a bench, holding a newspaper and looking up with a confused expression. He's surrounded by various pieces of furniture, including a wooden chest with gold accents and a small wooden table.\n\nThe camera then shifts to three people standing together on the sidewalk. On the left is a man with glasses and a receding hairline wearing a red jacket over a green shirt. In the middle is a man with short brown hair wearing a brown jacket over a blue shirt. On the right is a woman with long curly brown hair wearing a brown leather jacket over a black shirt. They're engaged in conversation, with the woman gesturing animatedly as she speaks. The man in the middle is looking down at her, while the man in the red jacket is watching her intently.\n\nThe woman continues talking, and the man in the brown jacket responds. The man in the red jacket then walks away from the group. The woman turns to the man in the brown jacket and speaks to him, and he replies. The woman then looks down at the ground, appearing to be deep",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.74,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0009.mp4",
+        "elapsed_s": 11.8,
+        "output_text": "The scene takes place on a busy city street outside a hot soup shop with a red brick facade and a gray storefront. A yellow sign on the wall reads \"Single file, no talking, no cell phones,\" and a window displays the words \"Hot Soup\" in red letters. A silver car is parked nearby, and a woman in a brown jacket and white pants stands in line at the counter.\n\nJerry Seinfeld, wearing a brown jacket over a blue button-down shirt, is standing in line with his friend George Costanza, who is dressed in a red jacket and glasses. The two are engaged in conversation, with George gesturing as he speaks. A woman in a brown jacket and blue jeans is also waiting in line behind them.\n\nAs the scene progresses, Elaine Benes walks up to Jerry and George. She's wearing a gray jacket and has a black scarf around her neck. She joins the conversation, and the three friends begin talking together. Elaine is smiling and laughing as she interacts with Jerry and George.\n\nThe setting is clearly a bustling urban environment, with other people visible in the background. A man in a brown jacket and purple shirt, wearing khaki pants, is walking by and looking at the group. A woman with short brown hair in a gray jacket is",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.69,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 3,
+          "george": 4,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0010.mp4",
+        "elapsed_s": 8.19,
+        "output_text": "The video clip shows a scene from the TV show Seinfeld set in a cafeteria. Jerry Seinfeld and Elaine Benes are standing in line at the food counter, waiting to order. Jerry is wearing his signature brown jacket over a blue shirt, while Elaine has on a blue jacket with a brown collar and brown pants. They're both looking down at a menu board that lists various soups and other food items.\n\nThe cafeteria has a typical 1990s aesthetic, with a brick wall in the background and a window displaying some fruits and vegetables. A man in a red jacket is also visible in the line behind Jerry and Elaine.\n\nThe scene captures a moment of everyday life in the show, with Jerry and Elaine engaged in their usual routine of getting food. The setting and their casual attire are characteristic of Seinfeld's depiction of New York City and its everyday experiences.",
+        "input_tokens": 2863,
+        "output_tokens": 177,
+        "tok_per_s": 21.61,
+        "vram_peak_mib": 18738.2,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 3039,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 113.517333984375,
+          "baseline_mib": 427.359375,
+          "compression_ratio": 3.76,
+          "savings_mib": 313.842041015625
+        },
+        "characters": {
+          "jerry": 4,
+          "elaine": 4
+        }
+      },
+      {
+        "clip": "clip_0011.mp4",
+        "elapsed_s": 11.79,
+        "output_text": "The video clip takes place in a cafeteria setting, likely from the TV show \"Seinfeld.\" The scene features Jerry Seinfeld and George Costanza standing at a food counter, waiting in line to order. The counter is staffed by a chef in a white uniform with a white scarf, who is serving food from large metal trays behind a glass sneeze guard.\n\nThe setting is a typical cafeteria with a brick wall in the background and a menu board listing various soups and their prices. A woman in a red shirt is visible behind the counter, and there's a \"No Smoking\" sign on the wall.\n\nThe characters are dressed casually for the cafeteria setting. Jerry is wearing a brown jacket over a blue shirt, while George is in a red jacket. They appear to be engaged in conversation as they wait for their food. The camera alternates between close-ups of the chef preparing food and wider shots of the characters in line.\n\nThe scene captures the mundane, everyday interactions that are characteristic of \"Seinfeld.\" The characters are simply going about their routine of ordering food in a cafeteria, which is a common occurrence in the show. The focus on the food preparation and the characters' casual demeanor reflects the show's often humorous take on ordinary situations.\n\nThe clip ends with the",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.71,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 2,
+          "george": 2
+        }
+      },
+      {
+        "clip": "clip_0012.mp4",
+        "elapsed_s": 11.79,
+        "output_text": "The video clip takes place in a bustling restaurant kitchen, where two men are standing at the counter. One man is wearing a brown jacket over a blue shirt, while the other is dressed in a red jacket with a gray shirt underneath. The man in the red jacket is counting money on the counter, and a chef in a white uniform with a white scarf is standing nearby, looking down at something in his hands.\n\nThe kitchen is clearly active, with a shelf behind the chef holding stacks of white cups and white boxes with red writing. A black telephone with a cord is mounted on the wall, and a red fire alarm is visible. Another man in a white shirt is standing with his back to the camera, and a third person in a white shirt is partially visible at the edge of the frame.\n\nThe man in the red jacket is holding a brown paper bag and appears to be speaking to the chef. The chef looks up and responds, and the man in the red jacket continues talking. The chef then turns to look at the man in the brown jacket, who is watching the interaction. The chef gestures with his hand as he speaks, and the man in the red jacket nods in response.\n\nThe scene captures the typical hustle and bustle of a restaurant kitchen, with the characters",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.72,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0013.mp4",
+        "elapsed_s": 11.77,
+        "output_text": "The video clip is from the TV show \"Seinfeld\" and takes place in two different locations.\n\nThe first scene is set inside a store. Jerry Seinfeld, played by Jason Alexander, is standing on the left side of the frame wearing a brown jacket over a blue button-down shirt. He's engaged in conversation with George Costanza, played by Jason Alexander, who is on the right side wearing a red jacket over a gray shirt. George is holding a box in his hands and appears to be explaining something to Jerry. Behind George, there's a black woman with curly hair and glasses wearing a black shirt and a white scarf. The store has a gray wall with a red fire alarm and a white sign that reads \"We reserve the right to refuse service to anyone.\" There's also a gray door with a glass window and a gray countertop visible in the scene.\n\nThe second scene shifts to an outdoor setting in front of a red brick building with white-framed windows. Elaine Benes, played by Julia Louis-Dreyfus, is standing in the center wearing a brown leather jacket over a black shirt and black pants. She's talking to a bald Black man wearing a gray jacket and gray pants who is standing next to a parking meter. A staircase with a black",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.76,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 2,
+          "george": 3,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0014.mp4",
+        "elapsed_s": 11.83,
+        "output_text": "The video clip is from the TV show Seinfeld and takes place in two distinct settings.\n\nThe first scene occurs outside an apartment building. A woman with long, curly brown hair wearing a brown leather jacket over a black shirt is standing on the sidewalk. She's engaged in an animated conversation with a bald Black man who is wearing a gray jacket over a green shirt. The man has his right hand in his pocket and his left hand extended outward as he speaks. Behind them is a large brown wooden cabinet with a decorative design on the front, secured with a blue strap. The setting includes a red brick building with white-framed windows, a metal railing, and a small tree. The woman appears to be explaining something, gesturing with her left hand as she talks.\n\nThe second scene takes place indoors in what appears to be a kitchen or dining area. A man with short brown hair wearing a blue button-down shirt is seated at a table, eating from a white styrofoam cup with a red stripe. He's holding a spoon in his left hand and has a watch on his left wrist. The room has gray walls and a window with blinds. A black desk with a computer monitor, keyboard, and a black basket filled with pens and pencils is visible in the background",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.64,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0015.mp4",
+        "elapsed_s": 8.39,
+        "output_text": "In a cozy apartment living room, two men share a quiet moment at a small round wooden table. On the left, a man with short brown hair wearing a blue button-down shirt sits in a brown chair, holding a white cup in his right hand and a spoon in his left. On the right, a man with a receding hairline and glasses, dressed in a gray button-down shirt and gray pants, stands holding a box of cereal in his left hand and a spoon in his right. Behind them, a white wall is adorned with a picture frame and a window with blinds. To the right, a bookshelf filled with books and a red drawer stands beside a desk with a lamp and a microwave. The floor is brown, and a blue napkin rests on the table. The man in the blue shirt speaks while eating, and the man in the gray shirt listens attentively, creating a warm, intimate atmosphere.",
+        "input_tokens": 2151,
+        "output_tokens": 187,
+        "tok_per_s": 22.3,
+        "vram_peak_mib": 18194.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 2337,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 87.295166015625,
+          "baseline_mib": 328.640625,
+          "compression_ratio": 3.76,
+          "savings_mib": 241.345458984375
+        },
+        "characters": {}
+      }
+    ],
+    "total_elapsed_s": 182.95,
+    "model_load_s": 7.66,
+    "num_clips": 16,
+    "total_output_tokens": 3939,
+    "total_input_tokens": 56399
+  },
+  "comparison": {
+    "baseline_total_s": 457.63,
+    "tq4_total_s": 182.95,
+    "speedup": 2.5,
+    "baseline_clips": 60,
+    "tq4_clips": 16,
+    "clip_ratio": 3.75,
+    "baseline_total_input_tokens": 168688,
+    "tq4_total_input_tokens": 56399,
+    "token_ratio": 2.99,
+    "baseline_total_output_tokens": 13079,
+    "tq4_total_output_tokens": 3939,
+    "baseline_characters": {
+      "jerry": 86,
+      "george": 80,
+      "elaine": 59,
+      "kramer": 6
+    },
+    "tq4_characters": {
+      "jerry": 38,
+      "george": 21,
+      "elaine": 20,
+      "kramer": 2
+    }
+  }
+}

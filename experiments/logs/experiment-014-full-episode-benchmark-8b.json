@@ -1,0 +1,118 @@
+{
+  "experiment": "014-full-episode-benchmark",
+  "date": "2026-03-26 22:50:41",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 256,
+  "episode": "Seinfeld - S07E06 - The Soup Nazi - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1369.6,
+  "segment_duration_s": 60.0,
+  "baseline_clip_duration_s": 5,
+  "tq4_clip_duration_s": 19,
+  "tq4": {
+    "clips": [
+      {
+        "clip": "clip_0000.mp4",
+        "elapsed_s": 14.39,
+        "output_text": "The video clip shows a stand-up comedy performance featuring Jerry Seinfeld on stage. He's wearing a dark blue suit jacket over a light blue collared shirt with a dark tie that has a subtle pattern. Seinfeld has his characteristic short, curly brown hair and is holding a black microphone in his right hand while gesturing with his left as he performs.\n\nThe stage is dimly lit with a spotlight illuminating Seinfeld against a backdrop of red curtains with vertical lines. A small table with a glass of water is visible behind him. The audience is seated in front of the stage, with some members visible in the foreground, including a man in a plaid shirt and a woman with long brown hair.\n\nThroughout the performance, Seinfeld is animated and expressive, using his hands to emphasize his points as he delivers his material. The camera alternates between wider shots showing the full stage and audience, and closer shots focusing on Seinfeld's face and upper body as he speaks.\n\nThe performance has a classic stand-up comedy feel, with Seinfeld engaging with the audience and using his trademark comedic style. The setting is a typical comedy club or theater venue, with the intimate stage setup and attentive audience creating the atmosphere for a stand-up routine.\n\nWhile no specific dialogue is mentioned, the visual",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 17.79,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 1
+        }
+      },
+      {
+        "clip": "clip_0001.mp4",
+        "elapsed_s": 11.54,
+        "output_text": "The video clip shows a stand-up comedy performance featuring a man with long, curly brown hair wearing a blue suit jacket, light blue shirt, and patterned tie. He's performing on stage under a spotlight, holding a microphone in his left hand and gesturing with his right hand as he speaks to an audience seated at round tables with red candles.\n\nThe setting is a dimly lit comedy club with a red curtain backdrop. The performer is animated and expressive, using his hands to emphasize his points while addressing the audience. The atmosphere appears lively and engaging, with the audience watching attentively.\n\nAs the performer continues his routine, white text appears on screen displaying production credits, including \"Producer Peter Mehlman,\" \"Producer Marjorie Gross,\" \"Co-Producer Carol Leifer,\" \"Producer Tim Kaiser,\" \"Produced by Susie Mamann Greenberg,\" and \"Supervising Producers Tom Gamill and Max Pross.\"\n\nThe scene then transitions to an exterior shot of a large, old brick building with a red brick facade. The building has multiple windows, some with white frames, and features a white balcony with intricate carvings. A white ladder is propped against the balcony, and there are trees with green leaves in the foreground. The building appears to",
+        "input_tokens": 3486,
+        "output_tokens": 256,
+        "tok_per_s": 22.18,
+        "vram_peak_mib": 19938.0,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 3741,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 139.739501953125,
+          "baseline_mib": 526.078125,
+          "compression_ratio": 3.76,
+          "savings_mib": 386.338623046875
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0002.mp4",
+        "elapsed_s": 11.67,
+        "output_text": "The video clip is from the TV show Seinfeld, set in Jerry Seinfeld's apartment. The scene takes place in the kitchen, which has gray walls, a gray door, and gray cabinets. A white refrigerator covered with magnets and papers stands in the background, with a loaf of bread and a bag of chips on top. There's a white microwave, a stove with a black pot, and a wooden cutting board on the counter.\n\nJerry Seinfeld is present in the scene, wearing a blue button-down shirt and brown pants. He's standing with Elaine Benes, who has long blonde hair and is wearing a black sweater. They're engaged in a warm, affectionate moment, with Elaine wrapping her arms around Jerry's neck and smiling up at him. Jerry is smiling back at her, and they're both laughing together.\n\nGeorge Costanza is also in the scene, wearing a gray and white checkered button-down shirt and glasses. He's sitting at the kitchen table, reading a newspaper. As he reads, he glances up at Jerry and Elaine, who are still embracing and laughing. George then looks down at his newspaper again, continuing to read.\n\nThe setting is clearly Jerry's apartment, with its characteristic gray color scheme and typical kitchen appliances. The scene captures",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.94,
+        "vram_peak_mib": 20812.7,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 6,
+          "george": 2,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0003.mp4",
+        "elapsed_s": 8.42,
+        "output_text": "The video clip shows a scene from the TV show Friends. It takes place in the kitchen of the Central Perk coffee shop, which is the main setting for many of the show's episodes.\n\nIn the scene, we see Joey Tribbiani and Phoebe Buffay embracing. Joey is wearing a blue shirt, while Phoebe is in a black shirt. They're standing in front of the kitchen counter, with the microwave visible behind them.\n\nThe kitchen has gray cabinets with glass doors, allowing a view of the contents inside. On the counter, there's a knife block with black-handled knives and a blue mug.\n\nJoey and Phoebe are smiling at each other, creating a warm and friendly atmosphere. This scene likely represents a moment of camaraderie between the two characters, which is typical of their relationship in the show.\n\nThe setting of Central Perk's kitchen is iconic to Friends, serving as a backdrop for many memorable moments and conversations throughout the series.",
+        "input_tokens": 387,
+        "output_tokens": 199,
+        "tok_per_s": 23.64,
+        "vram_peak_mib": 19840.3,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 585,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 21.851806640625,
+          "baseline_mib": 82.265625,
+          "compression_ratio": 3.76,
+          "savings_mib": 60.413818359375
+        },
+        "characters": {}
+      }
+    ],
+    "total_elapsed_s": 46.02,
+    "model_load_s": 7.78,
+    "num_clips": 4,
+    "total_output_tokens": 967,
+    "total_input_tokens": 11379
+  }
+}

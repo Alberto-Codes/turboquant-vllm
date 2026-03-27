@@ -1,0 +1,120 @@
+{
+  "experiment": "014-full-episode-benchmark",
+  "date": "2026-03-26 22:48:07",
+  "model_id": "allenai/Molmo2-4B",
+  "max_new_tokens": 256,
+  "episode": "Seinfeld - S07E06 - The Soup Nazi - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1369.6,
+  "segment_duration_s": 60.0,
+  "baseline_clip_duration_s": 5,
+  "tq4_clip_duration_s": 19,
+  "tq4": {
+    "clips": [
+      {
+        "clip": "clip_0000.mp4",
+        "elapsed_s": 11.47,
+        "output_text": "The video shows a stand-up comedy performance on a dimly lit stage. A man with long, curly brown hair stands under a spotlight wearing a dark blue suit jacket, light blue collared shirt, and a dark tie with a subtle pattern. He holds a black microphone in his right hand and gestures with his left hand as he speaks to an audience seated in the darkened room.\n\nThe setting features a red curtain backdrop with a brown wall visible behind it. A small table with a glass of water sits to the performer's right. The audience is seated in rows, their faces mostly obscured by shadows, though some details are visible, including a man in a plaid shirt and a woman with long hair.\n\nThroughout the performance, the comedian maintains an animated delivery, using expressive hand movements and facial expressions to engage the audience. The lighting creates a dramatic atmosphere, with the spotlight isolating him against the darker surroundings.\n\nAs the performance continues, white text appears on screen identifying the cast and crew: \"Jerry Seinfeld,\" \"Julia Louis-Dreyfus,\" \"Michael Richards,\" \"Jason Alexander as George,\" and \"Producer Peter Mehlman.\"",
+        "input_tokens": 3753,
+        "output_tokens": 232,
+        "tok_per_s": 20.23,
+        "vram_peak_mib": 12156.7,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 3984,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 148.81640625,
+          "baseline_mib": 560.25,
+          "compression_ratio": 3.76,
+          "savings_mib": 411.43359375
+        },
+        "characters": {
+          "jerry": 1,
+          "george": 1
+        }
+      },
+      {
+        "clip": "clip_0001.mp4",
+        "elapsed_s": 6.52,
+        "output_text": "The video shows a comedy performance on a dimly lit stage. A man with long brown hair wearing a blue suit, light blue shirt, and dark tie stands at a microphone, speaking to an audience seated at tables. The tables are set with plates, silverware, and red candles, and the audience members are laughing and smiling. The performer gestures with his free hand while holding the microphone in his left hand, and a watch is visible on his left wrist. Behind him is a red curtain, with a black microphone stand positioned to his left. The scene then cuts to an exterior view of a large, old brick building with a brownish-red facade, featuring a white balcony with intricate carvings and a white ladder leaning against it. The building has multiple windows with white frames and curtains, and green trees are visible in the foreground.",
+        "input_tokens": 3486,
+        "output_tokens": 170,
+        "tok_per_s": 26.08,
+        "vram_peak_mib": 12666.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 3655,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 136.527099609375,
+          "baseline_mib": 513.984375,
+          "compression_ratio": 3.76,
+          "savings_mib": 377.457275390625
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0002.mp4",
+        "elapsed_s": 9.47,
+        "output_text": "The video clip is from the TV show Seinfeld, featuring the main cast in Jerry's apartment kitchen. The scene opens with Jerry Seinfeld sitting at the kitchen counter, reading a newspaper. He's wearing his signature gray button-down shirt and glasses, with a receding hairline visible. The kitchen has gray cabinets, a white refrigerator covered in magnets and papers, and a stove with a pot on it. George Costanza is present in the room, and Elaine Benes is also in the kitchen.\n\nThe focus then shifts to Kramer and Elaine, who are standing close together in the kitchen. Kramer is wearing a blue button-down shirt and has long brown hair. Elaine is dressed in a black sweater and has long blonde hair. They're smiling at each other and appear to be in a romantic moment, with Kramer's arms around Elaine and her arms around his shoulders. Kramer is speaking to Elaine, and she's smiling back at him.\n\nGeorge is watching this interaction from across the room. He looks up from his newspaper and then down at it again, clearly uncomfortable with the scene unfolding in front of him. His expression shifts from annoyance to a more serious look as he watches Kramer and Elaine. The camera alternates between George's reactions and the couple's interaction, emphasizing George's",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 27.04,
+        "vram_peak_mib": 13526.3,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 2,
+          "george": 4,
+          "kramer": 5,
+          "elaine": 6
+        }
+      },
+      {
+        "clip": "clip_0003.mp4",
+        "elapsed_s": 0.58,
+        "output_text": "In a kitchen, a man and a woman are embracing each other.",
+        "input_tokens": 387,
+        "output_tokens": 15,
+        "tok_per_s": 25.93,
+        "vram_peak_mib": 12119.0,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 401,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 14.978759765625,
+          "baseline_mib": 56.390625,
+          "compression_ratio": 3.76,
+          "savings_mib": 41.411865234375
+        },
+        "characters": {}
+      }
+    ],
+    "total_elapsed_s": 28.03,
+    "model_load_s": 5.73,
+    "num_clips": 4,
+    "total_output_tokens": 673,
+    "total_input_tokens": 11379
+  }
+}

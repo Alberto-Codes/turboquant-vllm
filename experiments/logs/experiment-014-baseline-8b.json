@@ -1,0 +1,129 @@
+{
+  "experiment": "014-full-episode-benchmark",
+  "date": "2026-03-26 22:53:09",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 256,
+  "episode": "Seinfeld - S07E06 - The Soup Nazi - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1369.6,
+  "segment_duration_s": 60.0,
+  "baseline_clip_duration_s": 5,
+  "tq4_clip_duration_s": 19,
+  "baseline": {
+    "clips": [
+      {
+        "clip": "clip_0000.mp4",
+        "elapsed_s": 9.94,
+        "output_text": "This scene from Seinfeld opens on a completely black screen before transitioning to a comedy club setting. Jerry Seinfeld makes his entrance in the dimly lit club, walking across the stage in a dark suit with a light blue shirt and dark tie. He approaches a table containing a glass of water and picks up a microphone to address the audience.\n\nThe stage is dramatically lit, with the spotlight illuminating Seinfeld against a backdrop featuring a red curtain complemented by a brown wooden panel. This creates a classic comedy club atmosphere typical of the Seinfeld opening sequence. The audience is seated in typical?'90s-inspired attire\u2014jeans, flannel shirts, and plaid patterns are visible from behind\u2014many in a mix of suits and casual wear.\n\nThroughout his performance, Seinfeld uses a combination of classic stand-up gestures and comic delivery. He occasionally glances to his right while speaking, suggesting he may be addressing something offstage or thinking through a bit. His animated hand gestures and expressive body movements help convey the comedic energy and pacing characteristic of his act.\n\nThe camera framing focuses on Seinfeld as the main character, with the audience visible but largely in silhouette or partial darkness. This composition emphasizes the performer on stage while maintaining the sense of engagement with his live audience. The overall",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 1
+        }
+      },
+      {
+        "clip": "clip_0001.mp4",
+        "elapsed_s": 4.16,
+        "output_text": "I apologize, but I don't see anything specific happening in this video clip that I can describe in detail. The current frame only shows part of the right side of the screen with a spot of grey coloring and some black. There are no characters visible, no setting to describe, and no actions or dialogue that I can identify. This appears to be incomplete footage or an unexpected frame that doesn't contain any meaningful content. If there's additional context or information you'd like me to consider about the overall video, please let me know.",
+        "input_tokens": 2854,
+        "output_tokens": 108,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0002.mp4",
+        "elapsed_s": 7.32,
+        "output_text": "A man stands centered on stage under bright spotlight, wearing a dark blue suit jacket over a light blue collared shirt with a dark blue tie. With a microphone in his right hand and his left hand raised to waist level, he's making direct eye contact with the audience while speaking.\n\nThe stage has vertical red-and-white striped curtains throughout the background, creating a strong visual contrast and theatrical atmosphere. The overall tone is dramatic, with the performer taking center stage amid this bold striped backdrop.\n\nIn the foreground, we can see the backs of audience members' heads, including someone wearing a plaid shirt, an older man with a white headband, and a woman in a black suit. The setting appears to be a comedy club or live performance venue where spectators are intently watching the stand-up act unfold.\n\nAt the bottom left of the image, bold white capital letters display the name \"MICHAEL RICHARDS.\" This on-screen text identifies the speaker, who is presumably performing a stand-up routine given the setup and his engagement with the audience.",
+        "input_tokens": 2854,
+        "output_tokens": 211,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0003.mp4",
+        "elapsed_s": 8.06,
+        "output_text": "A stand-up comedy bit unfolds in the style of a classic 1980s Tonight Show special with Jason Alexander as George Costanza, the beloved \"Seinfeld\" character. Alexander appears on stage wearing a dark blue suit with a light blue shirt and blue tie that features a gold pattern, his curly brown hair framing a wide, enthusiastic smile. He engages the audience with animated facial expressions and direct address.\n\nThe stage is dramatically lit, with red and dark shadows contrasting against a brown curtain backdrop. Alexander holds a black microphone in his left hand at shoulder level while turning slightly to his right, giving the impression he's connecting with different sections of the audience. He looks directly out at the camera and the crowd simultaneously, demonstrating the performance's energetic delivery.\n\nToward the close of the segment, he delivers his lines with surge and intensity, culminating in a wide, satisfied smile that reveals his upper teeth as the performance concludes. His expressive facial movements and shifting delivery style evoke the gritty, self-referential comedy style of \"Seinfeld\" while capturing the often plaintive, exasperated middle-class character that audiences found so relatable.",
+        "input_tokens": 2854,
+        "output_tokens": 231,
+        "characters": {
+          "george": 1
+        }
+      },
+      {
+        "clip": "clip_0004.mp4",
+        "elapsed_s": 7.76,
+        "output_text": "This clip features an Arkansas native comedian performing stand-up comedy at a dimly lit comedy club. The performer has long, wavy brown hair parted to the side and is wearing a dark blue suit jacket over a light blue collared shirt with a dark tie.\n\nThe comedy club setting includes:\n- A black curtain backdrop\n- A brown curtain with vertical stripes hanging behind the performer\n- A wooden stool\n- Multiple red candles arranged on tables\n- Empty tables arranged in a semicircle for the audience\n- A standing microphone present for the performance\n- A dimly lit room with a mood lighting setup\n\nThe performer is engaging with an audience, speaking to them while gripping a black microphone. He gestures animatedly during his routine. As he delivers his material, white text appears on screen displaying \"Co-Producer Carol Leifer.\"\n\nThe performance takes place entirely within this intimate comedy club environment, which is set up for showcasing stand-up comedy acts. The performer is seated on a stool between the tables, reading from his notes and interacting with the audience in his characteristic Arkansas-style comedic style.",
+        "input_tokens": 2854,
+        "output_tokens": 220,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0005.mp4",
+        "elapsed_s": 5.24,
+        "output_text": "This clip shows an end credit sequence from the TV show Friends with a single performer on stage. A man with long brown hair wearing a blue suit jacket, blue shirt, and tie is performing stand-up comedy while holding a microphone, speaking to an audience that's not visible. Credit text appears on screen during the performance, with the first card reading \"Produced by Tim Kaiser.\" The performer continues his routine as the credit sequence progresses through the complete rolling credits listing the cast, creative team, and crew, all while he remains on stage delivering his stand-up performance to the unseen audience. The scene maintains the comedy stage format throughout, with the performer using the microphone as he goes through the full set of production credits.",
+        "input_tokens": 2854,
+        "output_tokens": 144,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0006.mp4",
+        "elapsed_s": 8.67,
+        "output_text": "This clip appears to be from Saturday Night Live. It starts with the credits that identify the supervising producers as Tom Gamill and Max Pross, then returns to the stage where a man dressed in a suit is performing. He's holding a microphone in his left hand while gesturing and pointing with his right hand. He has \"long brown hair amidst his 5 o'clock shadow.\" While he seems comfortable and at ease with his own talents, he appears unprepared for dealing with unsolicited advice.\n\nThe scene shifts to show the audience, though only one individual is visible. On the right side of the frame, a man with short brown hair in a black shirt is seated in the front row. The camera captures his very first laugh, which sets an enthusiastic tone for the performance.\n\nThe segment then cuts to an exterior shot of a brick building with architectural features visible. A white wrought iron balcony extends from the upper right portion of the structure and is supported by a white ladder leaning against the building. This part of the building has a contrasting white brick base. Outdoors, there's some greenery with leaves and darker plants visible, and at the bottom of the frame, a black object is present in the foreground.\n\nThe camera work includes a slow pan, providing a lingering",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0007.mp4",
+        "elapsed_s": 7.24,
+        "output_text": "The video opens with a title card that reads \"Created by Larry David and Jerry Seinfeld\" before transitioning to a scene in a kitchen, likely from Seinfeld. Jerry Seinfeld stands in the foreground looking up at Elaine Benes, who is seated in a chair, both appearing to be talking with serious facial expressions. Elaine wears a black top, while Jerry is dressed in a blue shirt and khaki pants. Brooklyn Decker appears as Elaine Benes.\n\nThe kitchen setting is visible in the background, featuring gray cabinets, a toaster on the countertop, and a small refrigerator covered in magnets. George Costanza is present as well, kneeling on the floor with a newspaper in hand\u2014his signature front-page-bending that shows a sign of stress or focus. Monica Geller, played by Jennifer Aniston, is shown alongside Friends characters.\n\nLater, we see Jerry hugging a blonde woman who is seated, with other friends around them. The setting shifts to Jerry's apartment, where a brown and light brown couch is present.",
+        "input_tokens": 2854,
+        "output_tokens": 208,
+        "characters": {
+          "jerry": 5,
+          "george": 1,
+          "elaine": 3
+        }
+      },
+      {
+        "clip": "clip_0008.mp4",
+        "elapsed_s": 8.18,
+        "output_text": "A cheerful man in a blue collared shirt and a woman with long blonde hair in a black top are sharing a playful, flirtatious moment in a well-stocked kitchen. A headline reads \"First Spread,\" and several grocery store ads are visible, including a notable one for \"SkitzBarButtoners: Sip, Save, Savor!\"\n\nThe man places his arm around her, and she smiles broadly while resting her head near his. Around them, everyday household items fill the space\u2014boxed Honey Comb cereal stands out, a green bottle is visible, and a roll of paper towels hangs nearby. An open cabinet reveals coffee, and another shelf holds what appear to be sauces and gravy.\n\nA man with brown hair in a gray shirt is partially visible at one point, observing the interaction.\n\nThe woman then shifts into a passionate pose, wrapping her arms around his neck with her head tilted back as he smiles warmly at her. Later, she leans her head sideways against his shoulder with her eyes closed in contentment, while he continues smiling down at her. The light-hearted, affectionate atmosphere suggests a playful, flirtatious exchange between friends or a couple among their familiar surroundings.",
+        "input_tokens": 2854,
+        "output_tokens": 239,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0009.mp4",
+        "elapsed_s": 6.82,
+        "output_text": "In this scene, we see Jerry Seinfeld sitting in a gray chair at his desk in his apartment, appearing bored and disinterested. He's wearing his signature mix of a brown and green button-down shirt with glasses and is glancing down toward his computer, growing increasingly irritated, likely due to the lack of an engaging task or conversation. The set shows Jerry's apartment, with white walls and framed pictures on the wall behind and to his right. To his left, there's a window with blinds. A desk with a computer sits off to one side of the frame, consistent with Jerry's office-style workspace. The restrained color palette includes the gray of Jerry's desk and chair, the browns and greens of his clothes, and blacks, whites, and grays throughout the room. This moment captures a classic stretch of what made Seinfeld appealing \u2013 a seemingly ordinary, mundane moment that gains its comedy through the way Jerry perceives and reacts to it.",
+        "input_tokens": 2854,
+        "output_tokens": 193,
+        "characters": {
+          "jerry": 5
+        }
+      },
+      {
+        "clip": "clip_0010.mp4",
+        "elapsed_s": 8.71,
+        "output_text": "In this scene from Seinfeld, we see George Costanza in his apartment watching a TV broadcast featuring another Seinfeld character. The kitchen serves as the setting, with its characteristic gray walls, white cabinets, and oven mitt hanging on the wall. A refrigerator covered in magnets and signs stands as a backdrop, with a hot dog roll visible on top and a keychain hanging from its handle.\n\nJerry Seinfeld is shown leaning slightly backward, with his arms wrapped around a blonde woman who appears to be Elaine, smiling and looking down at him with a gentle expression while he speaks to her and periodically glances at the camera.\n\nMeanwhile, George is sitting at a brown table with a green object visible in the corner, focused intently on the TV broadcast. His expression indicates he's surprised and possibly intrigued by what he's seeing. The receding hairline and glasses that are iconic to his character are clearly visible.\n\nThis scene captures a typical blend of humor and character interaction, characteristic of the show. While Jerry and Elaine maintain their warm connection in the foreground, George's reaction to the TV broadcast suggests an unexpected or amusing moment related to his character's current situation. It's a great example of how Seinfeld often juxtaposes personal relationships with quirky character moments happening simultaneously.",
+        "input_tokens": 2854,
+        "output_tokens": 254,
+        "characters": {
+          "jerry": 2,
+          "george": 3,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0011.mp4",
+        "elapsed_s": 8.52,
+        "output_text": "In this scene from the TV show Friends, we're in Phoebe and Monica's kitchen. Monica's stepbrother Joey Tribbiani is hugging Phoebe Buffay, who is Monica's friend and fellow waitress at Central Perk coffee shop. The kitchen has a cozy, lived-in feel with its blue tile backsplash and gray cabinets. There's a microwave, a spice rack, and a knife block visible in the background.\n\nJoey seems pretty happy and relaxed in this moment. Phoebe looks like she's listening intently to what Joey is saying, her arms around his shoulders in a friendly hug. If I had to guess, I'd say Joey is telling her some kind of funny story or making a goofy joke, but without actual audio, I can't be sure of the exact content of their interaction.\n\nThe kitchen setting adds a nice touch of everyday authenticity to the scene. It's not just about the characters, but the space they're in as well, giving us a glimpse into their home life between their jobs at Central Perk and their social events at the 602 Friends Apartment.\n\nThe lighting in the room is relatively dim, which creates a warm and intimate atmosphere. It makes the scene feel comfortable and familiar, like something",
+        "input_tokens": 390,
+        "output_tokens": 256,
+        "characters": {}
+      }
+    ],
+    "total_elapsed_s": 90.62,
+    "num_clips": 12,
+    "total_output_tokens": 2576,
+    "total_input_tokens": 31784
+  }
+}

@@ -465,27 +465,44 @@ The Google TurboQuant paper claims 5-6x compression and "up to 8x speedup." **Re
 
 **This means the fused kernel is NOT the path to speed.** The compression value comes from needing fewer inference calls (bigger context window), not faster attention.
 
-#### Phase 2: Full episode benchmark (NEXT — requires real experiment)
+#### Phase 2: Full episode benchmark (COMPLETE 2026-03-26)
 
-**Goal:** Process a real Seinfeld episode segment through Molmo2 with and without TQ4 compression. Measure total wall-clock time AND output quality. No more hypotheticals.
+**Goal:** Process a real Seinfeld episode segment through Molmo2 with and without TQ4 compression. Measure total wall-clock time AND output quality.
 
-**Hypothesis (unvalidated):** TQ4 gives ~1.0x total wall-clock time (3.8x fewer calls offsets 0.56x per-token speed) with qualitatively better output (19s scene context vs 5s fragments).
+**Original hypothesis:** TQ4 gives ~1.0x total wall-clock time (3.8x fewer calls offsets 0.56x per-token speed) with qualitatively better output (19s scene context vs 5s fragments).
 
-| Step | Action | Validation |
-|------|--------|------------|
-| 2.1 | Split Soup Nazi episode into clips using molmo-video-analyzer adapters | Clips at 5s (baseline) and 19s (TQ4) intervals |
-| 2.2 | Run baseline: vLLM Molmo2-4B (FP8 KV, max_model_len=6144) on 5s clips | Total time, output quality, character names |
-| 2.3 | Run TQ4: CompressedDynamicCache + SDPA on 19s clips (HF transformers) | Total time, output quality, character names |
-| 2.4 | Run 8B baseline: vLLM Molmo2-8B (FP8 KV) on 3s clips | Same metrics |
-| 2.5 | Run 8B TQ4: NF4 weights + TQ4 KV on 12s clips | Same metrics |
-| 2.6 | Compare: wall-clock time, number of calls, output coherence | Confirm or refute hypothesis |
+**Result: Hypothesis exceeded.** TQ4 is **1.97x faster** (not 1.0x), because Molmo2 subsamples video frames — 19s clips use only ~31% more input tokens than 5s clips, so 4 TQ4 clips process 2.8x fewer total tokens than 12 baseline clips.
 
-**Required infrastructure:**
-- `molmo-video-analyzer/` — video splitting adapters (ports/adapters pattern, split by seconds)
-- `bazzite-dotfiles/` — vLLM quadlet configs (4B min/maxed, 8B commented config to enable)
-- `data/tv/Seinfeld - S07E06 - The Soup Nazi*.mkv` — full episode
+| Metric | Baseline (vLLM 8B, 5s) | TQ4 (HF 8B, 19s) |
+|--------|------------------------|-------------------|
+| Clips | 12 | 4 |
+| Total time | 90.6s | 46.0s |
+| Speedup | 1.0x | **1.97x** |
+| Input tokens | 31,784 | 11,379 |
+| Output tokens | 2,576 | 967 |
+| Characters found | Jerry 13, George 5, Elaine 5 | Jerry 7, George 2, Elaine 3 |
 
-**Success criteria:** TQ4 path produces measurably better scene descriptions (character recognition, plot comprehension, temporal coherence) at comparable or better total wall-clock time.
+**Key findings:**
+
+1. **Frame subsampling is the hidden multiplier.** Molmo2 extracts a fixed number of frames regardless of clip duration (~2,854 tokens for 5s, ~3,753 for 19s). Longer clips don't proportionally increase token cost. This means fewer calls = fewer total tokens = faster.
+
+2. **Quality is dramatically better with 19s context.** TQ4's single-pass apartment scene correctly identified Jerry, George, and Elaine with coherent scene narration. Baseline's 5s fragments hallucinated "Brooklyn Decker as Elaine Benes," "Monica Geller played by Jennifer Aniston" (confusing Seinfeld with Friends), and fabricated on-screen text. 5 seconds is insufficient for confident show/character identification.
+
+3. **3.76x KV compression held at real sequence lengths** (~3,750 tokens). VRAM peak: 19-21 GiB for 8B bf16 + TQ4 on RTX 4090 (24 GiB).
+
+**Scale-up confirmation (5 minutes, 300s):**
+
+| Metric | Baseline (vLLM 8B, 5s) | TQ4 (HF 8B, 19s) |
+|--------|------------------------|-------------------|
+| Clips | 60 | 16 |
+| Total time | 457.6s | 183.0s |
+| Speedup | 1.0x | **2.50x** |
+| Input tokens | 168,688 | 56,399 |
+
+Speedup improved from 1.97x (1 min) to 2.50x (5 min) — per-call overhead (HTTP, base64, scheduling) is paid 60 times for baseline vs 16 for TQ4.
+
+**Experiment:** `experiments/experiment_014_full_episode_benchmark.py`
+**Data:** `experiments/logs/experiment-014-combined-8b.json` (1 min), `experiment-014-combined-8b-5min.json` (5 min)
 
 #### Phase 3: vLLM integration for TQ4 KV cache
 
@@ -502,11 +519,11 @@ SageAttention v2 achieves **3x faster than FA2** on RTX 4090 using INT8 for Q@K^
 ### Success Criteria (revised, evidence-based)
 
 - KV compression: >=3.5x vs FP16 (**DONE** — 3.76x)
-- Speed vs FP32 eager: >=2x at 1K+ tokens (**experiment 013 will measure**)
-- Speed vs cuDNN FA: target >0.8x at 11K tokens (**requires kernel optimization**)
+- Speed vs FP32 eager: >=2x at 1K+ tokens (**experiment 013: 0.2x at 17 tokens — attention is <5% of compute at short sequences**)
+- Speed vs cuDNN FA: target >0.8x at 11K tokens (**requires kernel optimization, deprioritized**)
 - Text quality: coherent output, character names preserved (**DONE** — Molmo2-8B validated)
 - max_model_len: 3x increase in vLLM serving (**P9 Phase 3**)
-- Total video throughput: process longer clips in fewer inference calls (**the real win**)
+- Total video throughput: process longer clips in fewer inference calls (**DONE — 1.97x faster, experiment 014**)
 
 ---
 
