@@ -649,9 +649,9 @@ Override buffer allocation to use TQ4 page size (68 bytes/token/head vs 256 FP16
 | 3c.7 | Profile: is PyTorch compress/dequant the bottleneck, or Flash Attention? | ✅ |
 | 3c.8 | Triton fused read+dequant kernel + pre/post-rotation optimization | ✅ |
 | 3c.9 | Triton fused compress kernel (norm+rotate+bucketize+pack in one launch) | ✅ |
-| 3c.10 | Validate bit-for-bit match with pure PyTorch path | |
+| 3c.10 | Validate bit-for-bit match with pure PyTorch path | ✅ |
 
-169 tests pass. All pre-commit hooks green.
+176 tests pass. All pre-commit hooks green.
 
 **Profiling result (experiment 015, 2026-03-27):** RTX 4090, D=128, Qh=32, KVh=8:
 - **Decode at 4096 cache: compress 26.0%, decompress 68.0%, Flash Attention 6.0%**
@@ -673,6 +673,14 @@ Override buffer allocation to use TQ4 page size (68 bytes/token/head vs 256 FP16
 - Pre-split rotation.T into even/odd column halves for contiguous loads + direct nibble output
 - Full decode step at 4096 cache: 0.596ms → **0.162ms** (3.7x end-to-end speedup)
 - Cost now nearly flat across cache lengths (0.133-0.162ms)
+
+**Phase 3c.10 result (2026-03-27):** 7 bit-for-bit validation tests:
+- Triton compress packed bytes == PyTorch packed bytes (exact match)
+- Triton compress norms == PyTorch norms (atol=1e-5)
+- Triton decompress + rotation == PyTorch decompress (atol=1e-4)
+- Pre/post-rotation attention output == old-path attention output (atol=5e-3)
+- Full round-trip: Triton compress→decompress == PyTorch compress→decompress
+- 176 total tests pass
 
 **Smoke test result (2026-03-27):** vLLM 0.18.0 + Molmo2-8B + `--attention-backend CUSTOM` with packed TQ4 uint8 cache:
 - Model loads, serves on port 8100 ✅
