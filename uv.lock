@@ -296,14 +296,14 @@ wheels = [
 
 [[package]]
 name = "docvet"
-version = "1.14.1"
+version = "1.15.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1c/a4/35aab7043f8fa21adf97c64ddbc5e3cbf48adf089b094fbae3e2219a9269/docvet-1.14.1.tar.gz", hash = "sha256:01ec23d5a02bc449fca6c9cbc990f8b4640fd4c5f695d253a082471279c84d93", size = 75176, upload-time = "2026-03-22T23:39:53.873Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/07/2f/e2793c5bea4c3a8184aed0f9331356118e63f09ab9fc21fdaee609617eef/docvet-1.15.0.tar.gz", hash = "sha256:c436cd22a974aa1ab026168642d22642cd6eb2e20b904d7d027cc1f1856cab6e", size = 87565, upload-time = "2026-03-27T01:15:09.654Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/9b/c4c3486308dcab8bbabc973e3966b426ab635d93a5e8777601b275cf5db1/docvet-1.14.1-py3-none-any.whl", hash = "sha256:3f61569453fca9a78dd077f7dabd363ab9eb4607d3cdcdfa2dfeb2bb101614bd", size = 83633, upload-time = "2026-03-22T23:39:52.806Z" },
+    { url = "https://files.pythonhosted.org/packages/59/3a/a7e3da74bb50001a99b894b231010d3b5aad0a4fb4dbd955210d27730bcc/docvet-1.15.0-py3-none-any.whl", hash = "sha256:b3268c7fd3b05bee692f7df8e0240f33563f23373148eed30118febfade2853d", size = 106686, upload-time = "2026-03-27T01:15:08.629Z" },
 ]
 
 [package.optional-dependencies]
