@@ -1,0 +1,90 @@
+site_name: turboquant-vllm
+site_url: https://alberto-codes.github.io/turboquant-vllm/
+site_description: TurboQuant KV cache compression as a drop-in vLLM plugin
+repo_url: https://github.com/Alberto-Codes/turboquant-vllm
+repo_name: Alberto-Codes/turboquant-vllm
+
+docs_dir: docs/site
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.instant
+    - navigation.footer
+    - search.highlight
+    - content.code.copy
+    - content.tooltips
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_root_heading: true
+            show_signature_annotations: true
+            separate_signature: true
+            signature_crossrefs: true
+            members_order: source
+            show_category_heading: true
+            merge_init_into_class: true
+            docstring_section_style: table
+            docstring_style: google
+            line_length: 88
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - def_list
+
+nav:
+  - Getting Started: index.md
+  - Usage:
+      - vLLM Plugin: usage/vllm.md
+      - HuggingFace: usage/huggingface.md
+      - Container: usage/container.md
+  - Architecture: architecture.md
+  - Development: development.md
+  - Reference: reference/
