@@ -450,33 +450,50 @@ The Google TurboQuant paper claims 5-6x compression and "up to 8x speedup." **Re
 
 **Key insight:** At 17 input tokens, attention is <5% of total inference compute. ALL attention paths are fast because the bottleneck is model weights + MLP, not KV cache reads. The paper's "8x" only applies to the attention logit micro-operation in isolation — it is invisible in end-to-end inference at short sequences. FP32 eager is only 13% slower than cuDNN Flash Attention here.
 
-**The speedup opportunity is at 5K-11K+ tokens** where attention dominates compute and the 3.76x bandwidth reduction from compressed KV reads would actually matter. This has not been measured yet.
+**The speedup opportunity is at 5K-11K+ tokens** where attention dominates compute and the 3.76x bandwidth reduction from compressed KV reads would actually matter.
 
-#### Phase 2: Profile and optimize P5 kernel (2-3 days)
+**Synthetic kernel micro-benchmark (decode mode, seq_q=1, Molmo2-4B config 32Q/8KV, RTX 4090):**
 
-| Step | Action | Target |
-|------|--------|--------|
-| 2.1 | Nsight Compute profiling: compute-bound or memory-bound? | Identify bottleneck |
-| 2.2 | Reduce autotune config space for RTX 4090 SM89 | Eliminate launch overhead |
-| 2.3 | Register pressure analysis, occupancy tuning | >50% occupancy |
-| 2.4 | Benchmark at 1K, 5K, 11K token sequences | Find bandwidth crossover |
+| KV Length | SDPA | Triton FA | Fused TQ4 | TQ4/SDPA | TQ4/FA |
+|-----------|------|-----------|-----------|----------|--------|
+| 64 | 10 us | 24 us | 79 us | 7.7x slower | 3.3x slower |
+| 1,024 | 18 us | 24 us | 205 us | 11.5x slower | 8.5x slower |
+| 4,096 | 48 us | 81 us | 728 us | 15.3x slower | 9.0x slower |
+| 16,384 | 313 us | 304 us | 2712 us | 8.7x slower | 8.9x slower |
 
-**arXiv 2511.11581 shows Triton can reach 98-106% of FA3** with GQA-aware tiling + static launch grids + autotuning. Our kernel hasn't been profiled once.
+**No bandwidth crossover.** The P5 dequant-then-dot kernel is 8-9x slower than SDPA at ALL sequence lengths. The centroid gather (random codebook lookup per index) doesn't coalesce on GPU — fundamentally slower than sequential fp16 reads. Kernel optimization cannot fix this architectural mismatch. See Key Lesson #9.
 
-#### Phase 3: Ship compression to production — vLLM integration (3-5 days)
+**This means the fused kernel is NOT the path to speed.** The compression value comes from needing fewer inference calls (bigger context window), not faster attention.
 
-Don't wait for speed parity with cuDNN. The compression value is immediate:
+#### Phase 2: Full episode benchmark (NEXT — requires real experiment)
 
-| Metric | FP8 (current vLLM) | TQ4 (target) | Improvement |
-|--------|--------------------|--------------| ------------|
-| max_model_len | 6,144 | ~23,000 | **3.7x** |
-| Video frames (2fps) | ~10 | ~38 | **~19 seconds** |
-| Per-token speed | baseline | 0.6-0.9x | Acceptable |
-| Total video throughput | 5s in 1 pass | **19s in 1 pass** | **Net faster** (fewer calls, full context) |
+**Goal:** Process a real Seinfeld episode segment through Molmo2 with and without TQ4 compression. Measure total wall-clock time AND output quality. No more hypotheticals.
 
-Even at 0.6x per-token speed, processing 19 seconds in one pass beats five 5-second passes with no cross-frame context.
+**Hypothesis (unvalidated):** TQ4 gives ~1.0x total wall-clock time (3.8x fewer calls offsets 0.56x per-token speed) with qualitatively better output (19s scene context vs 5s fragments).
 
-**vLLM integration approach:** Custom PagedAttention backend that reads TQ4 compressed KV pages. Either contribute upstream or fork vLLM's attention module.
+| Step | Action | Validation |
+|------|--------|------------|
+| 2.1 | Split Soup Nazi episode into clips using molmo-video-analyzer adapters | Clips at 5s (baseline) and 19s (TQ4) intervals |
+| 2.2 | Run baseline: vLLM Molmo2-4B (FP8 KV, max_model_len=6144) on 5s clips | Total time, output quality, character names |
+| 2.3 | Run TQ4: CompressedDynamicCache + SDPA on 19s clips (HF transformers) | Total time, output quality, character names |
+| 2.4 | Run 8B baseline: vLLM Molmo2-8B (FP8 KV) on 3s clips | Same metrics |
+| 2.5 | Run 8B TQ4: NF4 weights + TQ4 KV on 12s clips | Same metrics |
+| 2.6 | Compare: wall-clock time, number of calls, output coherence | Confirm or refute hypothesis |
+
+**Required infrastructure:**
+- `molmo-video-analyzer/` — video splitting adapters (ports/adapters pattern, split by seconds)
+- `bazzite-dotfiles/` — vLLM quadlet configs (4B min/maxed, 8B commented config to enable)
+- `data/tv/Seinfeld - S07E06 - The Soup Nazi*.mkv` — full episode
+
+**Success criteria:** TQ4 path produces measurably better scene descriptions (character recognition, plot comprehension, temporal coherence) at comparable or better total wall-clock time.
+
+#### Phase 3: vLLM integration for TQ4 KV cache
+
+**Goal:** Run TQ4 compression inside vLLM's serving stack for production deployment.
+
+**Approach:** Custom PagedAttention backend that stores compressed KV pages. Uses the unfused path (CompressedDynamicCache + SDPA) — the fused kernel is not faster than SDPA.
+
+**Prerequisite:** Phase 2 episode benchmark confirms the compression value proposition with real data.
 
 #### Phase 4: Research — SageAttention-style INT8 path (future)
 
