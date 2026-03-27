@@ -96,9 +96,12 @@ on consumer GPUs (RTX 4090, 24 GB VRAM) with Molmo2 vision-language models.
 | Fused Q@K^T Triton kernel | **Done** | Nibble unpacking + pre-rotation trick, 17.8x speedup |
 | Micro-benchmark (11K tokens) | **Done** | 1.0 cosine similarity vs unfused reference |
 | Single-layer Molmo2-4B integration | **Done** | Correct output with fused kernel |
+| AMD ROCm validation | **Done** | Triton HIP backend, 1.0 cosine, 0.31 ms/call on 890M (experiment 008) |
 | Multi-layer integration | **Blocked** | Needs Flash Attention-style fusion (see below) |
 
 **Key finding:** A fused Q@K^T-only kernel does not match SDPA precision when composed across all 36 transformer layers. The fp32 kernel scores differ from bf16 SDPA scores by 0.023 cosine per layer, which compounds into degenerate output. Full Flash Attention-style fusion (Q@K^T + online softmax + V matmul in one kernel) is required for multi-layer correctness. This is a 1-2 week project using the Triton Flash Attention tutorial as scaffold.
+
+**Cross-platform:** The Triton kernel works on both NVIDIA (CUDA) and AMD (ROCm/HIP) with zero code changes. The multi-layer precision issue is platform-independent — P5 fix applies to both.
 
 ---
 
@@ -184,20 +187,42 @@ Validated inside ROCm container on Radeon 890M (gfx1150): **84/84 tests passed**
 | 2.5 | 2-bit and 5-bit support — extend `solve_lloyd_max` and tests | No | ✅ Code already generic; added tests for bits 2-5 across quantizer, codebook, and KV cache |
 | 2.6 | CompressedDynamicCache API ergonomics review | No | ✅ API is clean — consistent constructors, well-structured exports, no sharp edges |
 
-#### Phase 3 — End-to-End Validation (if GPU works)
+#### Phase 3 — End-to-End Validation (COMPLETED 2026-03-27)
 
-| Step | Action | Notes |
-|------|--------|-------|
-| 3.1 | Download Molmo2-4B weights (~8 GB) | HuggingFace auth required |
-| 3.2 | Run baseline inference (no compression) on GPU | Correctness baseline |
-| 3.3 | Run TQ4 compressed inference on GPU | Compare output quality |
-| 3.4 | Cross-validate: same inputs on CPU vs GPU | Catch HSA override precision issues |
-| 3.5 | Benchmark actual throughput on 890M | Establish performance baseline |
+| Step | Action | Status |
+|------|--------|--------|
+| 3.1 | Verify Molmo2-4B weights accessible (~8 GB) | ✅ Model accessible, 4 shards fetched |
+| 3.2 | Run baseline inference (no compression) on GPU | ✅ 5.0 tok/s, 10,052 MiB peak, coherent output |
+| 3.3 | Run TQ4 compressed inference on GPU | ✅ 4.3 tok/s, 3.76x KV compression, coherent output |
+| 3.4 | Cross-validate: same inputs on CPU vs GPU | ✅ **16/16 tokens match** (100%) — HSA override is safe |
+| 3.5 | Benchmark actual throughput on 890M | ✅ 5.0 tok/s baseline, 0.86x TQ4 overhead |
+
+**Validation script:** `experiments/experiment_007_e2e_amd_validation.py`
+
+```bash
+# All steps in one run (inside ROCm container):
+./infra/run-rocm.sh python experiments/experiment_007_e2e_amd_validation.py
+
+# Skip slow CPU cross-validation:
+./infra/run-rocm.sh python experiments/experiment_007_e2e_amd_validation.py --skip-cross-validate
+
+# Custom settings:
+./infra/run-rocm.sh python experiments/experiment_007_e2e_amd_validation.py \
+    --model allenai/Molmo2-4B --bits 4 --max-new-tokens 64
+```
+
+Results: `experiments/logs/experiment-007-e2e-amd-validation.json`
+
+**Phase 3 key findings:**
+- HSA override (gfx1150 → gfx1100) introduces zero token-level precision errors
+- TQ4 compression overhead is only ~15% at short sequences (0.86x throughput)
+- 890M throughput (~5 tok/s) is ~10-12x slower than 4090 (~50-60 tok/s), matching bandwidth ratio prediction
+- ROCm SDPA warnings (`Mem Efficient` / `Flash Efficient` experimental) — output correct despite warnings
 
 **Known limitations:**
 - ~11-16x slower than RTX 4090 (DDR5 ~90 GB/s vs GDDR6X ~1 TB/s)
 - `torch.compile` works on ROCm 7.1 (both `default` and `reduce-overhead` modes pass with TurboQuant ops, 1.17x speedup)
-- Fused Triton kernel (P3b/P5) is NVIDIA-only; requires porting or alternative approach
+- Fused Triton kernel (P3b) works on ROCm via HIP backend (experiment 008) — multi-layer precision issue (P5) is platform-independent
 - `hipMallocManaged()` not supported on gfx1150 as of ROCm 7.2
 
 **Decision framework:**
@@ -227,6 +252,8 @@ Phase 0 Smoke Test
 **Why:** The P3b Q@K^T-only kernel achieves 17.8x on the micro-benchmark but can't maintain SDPA precision across 36 layers. A full Flash Attention-style kernel would match SDPA's online softmax behavior while reading compressed keys.
 
 **Complexity:** 1-2 weeks. Use the Triton Flash Attention tutorial as scaffold, inject centroid gather + nibble unpack into the inner tile loop.
+
+**Platform:** Triton HIP backend confirmed working for the Q@K^T kernel (experiment 008), so P5 should also work cross-platform (NVIDIA + AMD ROCm).
 
 ### P6: TQ3 bit-packing (research, nice-to-have)
 
