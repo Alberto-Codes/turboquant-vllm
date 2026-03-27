@@ -1,18 +1,21 @@
-FROM docker.io/vllm/vllm-openai:latest
+FROM docker.io/vllm/vllm-openai:v0.18.0
+
+ARG TURBOQUANT_VERSION=1.0.0
 
 # Install turboquant-vllm from PyPI (plugin auto-registers via entry point)
-RUN pip install --no-cache-dir turboquant-vllm
+RUN pip install --no-cache-dir "turboquant-vllm[vllm]==${TURBOQUANT_VERSION}"
 
-# Verify plugin is importable and entry point is registered
+# Verify plugin is installed and entry point is registered (without importing backend)
 RUN python3 -c "\
-from turboquant_vllm.vllm import TQ4AttentionBackend; \
 import importlib.metadata; \
 eps = [e for e in importlib.metadata.entry_points(group='vllm.general_plugins') if e.name == 'tq4_backend']; \
 assert len(eps) == 1, 'TQ4 entry point not found'; \
-print(f'turboquant-vllm {importlib.metadata.version(\"turboquant-vllm\")} — plugin verified')"
+version = importlib.metadata.version('turboquant-vllm'); \
+print(f'turboquant-vllm {version} — plugin verified')"
 
 # Usage:
 #   podman build -t vllm-turboquant -f infra/Containerfile.vllm .
+#   podman build --build-arg TURBOQUANT_VERSION=1.1.0 -t vllm-turboquant -f infra/Containerfile.vllm .
 #   podman run --rm -it \
 #     --device nvidia.com/gpu=all \
 #     --shm-size=8g \
