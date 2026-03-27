@@ -3,7 +3,8 @@
   "bootstrap-sha": "9750fe9b0c8ccbdbcfc2bcb3fe17fbe6b8d662a4",
   "release-type": "python",
   "include-component-in-tag": false,
-  "release-as": "1.0.0",
+  "bump-minor-pre-major": false,
+  "bump-patch-for-minor-pre-major": false,
   "changelog-sections": [
     { "type": "feat", "section": "Features" },
     { "type": "fix", "section": "Bug Fixes" },
