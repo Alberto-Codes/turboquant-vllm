@@ -646,12 +646,20 @@ Override buffer allocation to use TQ4 page size (68 bytes/token/head vs 256 FP16
 | 3c.4 | Implement `_compress_and_store()` — scatter-write TQ4 bytes to flat cache via `slot_mapping` | ✅ |
 | 3c.5 | Implement `_decompress_cache()` — read uint8 blocks, decompress to `(NB, BS, H, D)` FP16, call `flash_attn_varlen_func` directly | ✅ |
 | 3c.6 | Smoke test: `vllm serve` + Molmo2-8B with TQ4 packed cache, verify VRAM reduction | ✅ |
-| 3c.7 | Profile: is PyTorch compress/dequant the bottleneck, or Flash Attention? | |
-| 3c.8 | If bottleneck: Triton `reshape_and_cache_tq4` kernel for fused compress+write | |
-| 3c.9 | If bottleneck: Triton dequant kernel for fused read+dequant | |
+| 3c.7 | Profile: is PyTorch compress/dequant the bottleneck, or Flash Attention? | ✅ |
+| 3c.8 | Triton fused read+dequant kernel (decompress is 68% of decode at 4096 cache) | |
+| 3c.9 | Triton fused compress+write kernel (compress is 26% of decode at 4096 cache) | |
 | 3c.10 | Validate bit-for-bit match with pure PyTorch path | |
 
 169 tests pass. All pre-commit hooks green.
+
+**Profiling result (experiment 015, 2026-03-27):** RTX 4090, D=128, Qh=32, KVh=8:
+- **Decode at 4096 cache: compress 26.0%, decompress 68.0%, Flash Attention 6.0%**
+- Decompress dominates — scales linearly with cache length (0.127ms@128 → 0.405ms@4096)
+- Compress is ~constant (~0.155ms) since it always processes 1 new token
+- Flash Attention is negligible (0.022-0.036ms) — RTX 4090 tensor cores handle it instantly
+- Prefill: compress dominates at short seqlens, attention (O(n²)) takes over at 2048+
+- **Conclusion: Triton kernels (3c.8-3c.9) are absolutely worth it — 94% of decode cost is in PyTorch compress/decompress**
 
 **Smoke test result (2026-03-27):** vLLM 0.18.0 + Molmo2-8B + `--attention-backend CUSTOM` with packed TQ4 uint8 cache:
 - Model loads, serves on port 8100 ✅
