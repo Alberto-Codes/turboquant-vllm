@@ -283,42 +283,56 @@ Phase 0 Smoke Test
 - **Autotune key fix:** Original key `["N_CTX_Q", "N_CTX_KV", "HEAD_DIM"]` caused re-autotuning on every decode step (N_CTX_KV changes each token). Fixed to `["N_CTX_Q", "HEAD_DIM"]` — 100x speedup from 0.5 to 11-18 tok/s.
 - **Model config:** Molmo2-4B has 32Q/8KV (4:1 GQA), not 28Q/4KV (7:1) as initially assumed. Both ratios validated in unit tests.
 
-#### Phase 2: TQ4 K-only fusion (2-3 days)
+#### Phase 2: TQ4 K-only fusion (COMPLETE 2026-03-26)
+
+| Step | Action | Result |
+|------|--------|--------|
+| 2.1 | Pre-rotate Q outside kernel: `q_rot = query @ Pi_T` | **Done** — wrapper handles rotation |
+| 2.2 | Replace K tile load: nibble unpack → centroid gather → norm scale | **Done** — `tl.join` + `reshape` interleaves even/odd centroids |
+| 2.3 | Keep V as standard fp16 (uncompressed) | **Done** — 9 tests, all >0.998 cosine vs unfused path |
+| 2.4 | Benchmark decode throughput | Deferred to experiment 010 |
+
+**Key technique:** `tl.join(k_hi, k_lo).reshape(BLOCK_N, HEAD_DIM)` interleaves even/odd centroid values to reconstruct the full decompressed K tile without explicit loops.
+
+#### Phase 3: TQ4 K+V fusion (COMPLETE 2026-03-26)
+
+| Step | Action | Result |
+|------|--------|--------|
+| 3.1 | Add V tile decompression (same codebook and rotation as K) | **Done** — same nibble unpack + centroid gather + interleave |
+| 3.2 | Post-rotation trick: `out = acc @ Pi` outside kernel | **Done** — mirror of pre-rotation for K |
+| 3.3 | Validate fused K+V vs unfused path | **Done** — 7 tests, all >0.998 cosine |
+| 3.4 | Bandwidth measurement + decode throughput | Deferred to experiment 010 |
+
+**Key insight:** K and V share the same rotation matrix and codebook (same seed in CompressedDynamicCache). Pre-rotate Q by `Pi^T`, compute attention in rotated space, post-rotate output by `Pi`. One centroid table, zero in-kernel rotations.
+
+**NOT YET VALIDATED:** 36-layer composition (>0.93 cosine) and end-to-end Molmo2-4B text output. These require experiment 010 with model integration (see Phase 4).
+
+#### Phase 4: Model integration + E2E validation (in progress)
 
 | Step | Action | Validation |
 |------|--------|------------|
-| 2.1 | Add pre-rotation outside kernel: `q_rot = query @ Pi_T` | Rotation correctness test |
-| 2.2 | Replace K tile load: nibble unpack → centroid gather → norm scale | Single-tile output vs standard |
-| 2.3 | Keep V as standard fp16 (uncompressed) | Per-layer cosine >0.998 |
-| 2.4 | Benchmark decode throughput | >15 tok/s target |
-
-**TQ4 decompression in inner loop:**
-```
-# Replaces: k_tile = desc_k.load()
-packed = tl.load(k_packed_ptr)          # uint8 nibble-packed
-hi = packed >> 4                         # upper 4-bit index
-lo = packed & 0x0F                       # lower 4-bit index
-k_vals = tl.load(centroids_ptr + indices) # centroid gather
-k_tile = k_vals * tl.load(norms_ptr)     # norm scale
-```
-
-#### Phase 3: TQ4 K+V fusion (1-2 days)
-
-| Step | Action | Validation |
-|------|--------|------------|
-| 3.1 | Add V tile decompression (separate codebooks from K) | Same nibble unpack + centroid gather |
-| 3.2 | Validate full compressed path | Per-layer >0.998, 36-layer >0.93 cosine |
-| 3.3 | Bandwidth measurement | <6 MB/layer (vs ~25 MB unfused) |
-| 3.4 | Benchmark decode throughput | >25 tok/s target |
-
-#### Phase 4: Production hardening (1-2 days)
-
-| Step | Action | Validation |
-|------|--------|------------|
-| 4.1 | Prefill kernel variant (BLOCK_M=64) | Correct output on long prefills |
-| 4.2 | Variable sequence length support | Edge cases: empty cache, max seq |
-| 4.3 | `torch.compile` registration | No graph breaks |
+| 4.1 | Integrate fused kernel via AttentionInterface + cache side-channel | Experiment 010: 36-layer composition >0.93 cosine |
+| 4.2 | Experiment 010: E2E Molmo2-4B text + image comparison | Fused vs unfused token match, throughput measurement |
+| 4.3 | Variable sequence length + edge cases | Empty cache, max seq, prefill/decode |
 | 4.4 | Regression test suite (3 tiers) | Unit + per-layer + end-to-end |
+
+**Integration approach (decided after research — see party mode discussion 2026-03-26):**
+
+Approach B selected: **AttentionInterface + side-channel cache reference.** Evaluated four options:
+
+| Approach | Description | Verdict |
+|----------|-------------|---------|
+| A: Full forward monkey-patch | Replace entire `Molmo2Attention.forward()` | **Rejected** — fragile, must replicate 50+ lines of attention logic (QK norm, RoPE variants), breaks on transformers updates |
+| **B: AttentionInterface + cache stash** | Register via `ALL_ATTENTION_FUNCTIONS`, stash cache ref on modules | **Selected** — clean HF API, small coupling surface, graceful fallback |
+| C: Custom cache skipping decompression | Override `cache.update()` return value | **Rejected** — breaks HF cache API contract |
+| D: AttentionInterface + cache kwarg | Pass cache via `**kwargs` like `eager_paged` | **Rejected** — Molmo2 doesn't pass cache through kwargs to attention function |
+
+**Why B works:** `CompressedDynamicCache.update()` stores compressed K/V in `_compressed_keys`/`_compressed_values` (already implemented). The attention function reads compressed data from the cache, ignoring the decompressed K/V arguments. Requires:
+1. `get_compressed(layer_idx)` public method on CompressedDynamicCache
+2. `module._tq4_cache` reference stashed on each attention layer
+3. Attention function checks for stash, falls back to SDPA if absent
+
+**Known overhead:** `cache.update()` still decompresses K/V (wasted in fused path). Addressed by Phase 5 "fused-aware cache mode" (see below).
 
 #### Projected performance (RTX 4090)
 
@@ -367,6 +381,16 @@ k_tile = k_vals * tl.load(norms_ptr)     # norm scale
 - `molmo-video-analyzer/_bmad-output/planning-artifacts/research/technical-fused-turboquant-triton-kernel-research-2026-03-25.md` — Original Q@K^T-only analysis (superseded by full FA approach)
 - arXiv 2511.11581 — "Anatomy of Attention" (GQA Q-Block, Triton performance parity with FA-3)
 - arXiv 2405.02803 — "Is Flash Attention Stable?" (FA achieves 1.7x lower RMSE than SDPA)
+
+### P5b: Fused-aware cache mode (optimization, after P5 validated)
+
+**Goal:** Eliminate wasted decompression in the fused kernel path. Currently, `CompressedDynamicCache.update()` decompresses K/V on every call (for SDPA compatibility), but the fused attention function ignores the decompressed tensors and reads compressed data directly. This wastes compute proportional to cache size × layers × decode steps.
+
+**Approach:** Add a `fused_mode=True` flag to `CompressedDynamicCache` that skips the decompression step in `update()`, returning lightweight placeholders (or empty tensors) instead of full fp16 K/V. The fused attention function already reads from `_compressed_keys`/`_compressed_values`, so it doesn't need the decompressed output.
+
+**Why deferred:** Correctness first. The current approach (decompress + ignore) is wasteful but correct and simple. The fused-aware optimization removes a safety net — if the attention function falls back to SDPA for any reason, it would get garbage K/V. Only enable after the fused path is thoroughly validated end-to-end.
+
+**Expected impact:** Eliminates ~50% of the per-layer overhead during decode (the dequantize + cat operations in `_compressed_update`). This is the "1.78x overhead" from incremental dequant — the fused kernel should reduce total overhead to near 1.0x.
 
 ### P6: TQ3 bit-packing (research, nice-to-have)
 
