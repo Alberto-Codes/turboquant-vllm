@@ -49,7 +49,7 @@ jobs:
           uv venv /tmp/smoke --python 3.12
           SMOKE=/tmp/smoke/bin
           uv pip install --python "$SMOKE/python" dist/*.whl --no-deps
-          "$SMOKE/python" -c "from turboquant_consumer.quantizer import TurboQuantMSE; print('Import smoke test — OK')"
+          "$SMOKE/python" -c "from turboquant_vllm.quantizer import TurboQuantMSE; print('Import smoke test — OK')"
           echo "Wheel installs and imports correctly — OK"
 
       - name: Upload dist artifacts
