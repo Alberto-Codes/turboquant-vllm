@@ -1,0 +1,424 @@
+{
+  "experiment": "016-triton-kernel-benchmark",
+  "phase": "P9-3c.8-3c.9",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "config": {
+    "head_dim": 128,
+    "num_query_heads": 32,
+    "num_kv_heads": 8,
+    "tq4_bits": 4,
+    "warmup": 10,
+    "iters": 100
+  },
+  "decode_steps": [
+    {
+      "cache_len": 128,
+      "old": {
+        "compress": {
+          "median_ms": 0.1508,
+          "mean_ms": 0.1577,
+          "min_ms": 0.1453,
+          "max_ms": 0.2742,
+          "p95_ms": 0.207
+        },
+        "decompress": {
+          "median_ms": 0.1086,
+          "mean_ms": 0.112,
+          "min_ms": 0.1065,
+          "max_ms": 0.1732,
+          "p95_ms": 0.126
+        },
+        "attention": {
+          "median_ms": 0.0225,
+          "mean_ms": 0.0245,
+          "min_ms": 0.0215,
+          "max_ms": 0.1669,
+          "p95_ms": 0.032
+        },
+        "total_median_ms": 0.2819
+      },
+      "new": {
+        "compress": {
+          "median_ms": 0.0335,
+          "mean_ms": 0.0346,
+          "min_ms": 0.0326,
+          "max_ms": 0.0543,
+          "p95_ms": 0.0451
+        },
+        "prerotate_q": {
+          "median_ms": 0.0246,
+          "mean_ms": 0.026,
+          "min_ms": 0.0236,
+          "max_ms": 0.0481,
+          "p95_ms": 0.0349
+        },
+        "decompress": {
+          "median_ms": 0.0276,
+          "mean_ms": 0.0283,
+          "min_ms": 0.0266,
+          "max_ms": 0.0379,
+          "p95_ms": 0.0348
+        },
+        "attention": {
+          "median_ms": 0.0225,
+          "mean_ms": 0.0231,
+          "min_ms": 0.0215,
+          "max_ms": 0.03,
+          "p95_ms": 0.0257
+        },
+        "postrotate_out": {
+          "median_ms": 0.0246,
+          "mean_ms": 0.0268,
+          "min_ms": 0.0236,
+          "max_ms": 0.172,
+          "p95_ms": 0.0289
+        },
+        "total_median_ms": 0.1328
+      },
+      "speedup": 2.12,
+      "compress_speedup": 4.5,
+      "decompress_speedup": 3.93
+    },
+    {
+      "cache_len": 256,
+      "old": {
+        "compress": {
+          "median_ms": 0.1495,
+          "mean_ms": 0.1536,
+          "min_ms": 0.1453,
+          "max_ms": 0.266,
+          "p95_ms": 0.171
+        },
+        "decompress": {
+          "median_ms": 0.1137,
+          "mean_ms": 0.126,
+          "min_ms": 0.1071,
+          "max_ms": 0.2724,
+          "p95_ms": 0.1785
+        },
+        "attention": {
+          "median_ms": 0.0244,
+          "mean_ms": 0.0249,
+          "min_ms": 0.0228,
+          "max_ms": 0.0352,
+          "p95_ms": 0.0305
+        },
+        "total_median_ms": 0.2876
+      },
+      "new": {
+        "compress": {
+          "median_ms": 0.0328,
+          "mean_ms": 0.0335,
+          "min_ms": 0.0317,
+          "max_ms": 0.0531,
+          "p95_ms": 0.0389
+        },
+        "prerotate_q": {
+          "median_ms": 0.0254,
+          "mean_ms": 0.0262,
+          "min_ms": 0.0135,
+          "max_ms": 0.0689,
+          "p95_ms": 0.0317
+        },
+        "decompress": {
+          "median_ms": 0.0269,
+          "mean_ms": 0.0273,
+          "min_ms": 0.0259,
+          "max_ms": 0.034,
+          "p95_ms": 0.0294
+        },
+        "attention": {
+          "median_ms": 0.0244,
+          "mean_ms": 0.0256,
+          "min_ms": 0.0234,
+          "max_ms": 0.0923,
+          "p95_ms": 0.0326
+        },
+        "postrotate_out": {
+          "median_ms": 0.0246,
+          "mean_ms": 0.0249,
+          "min_ms": 0.0236,
+          "max_ms": 0.0296,
+          "p95_ms": 0.0273
+        },
+        "total_median_ms": 0.1341
+      },
+      "speedup": 2.14,
+      "compress_speedup": 4.56,
+      "decompress_speedup": 4.23
+    },
+    {
+      "cache_len": 512,
+      "old": {
+        "compress": {
+          "median_ms": 0.1485,
+          "mean_ms": 0.1522,
+          "min_ms": 0.1434,
+          "max_ms": 0.2532,
+          "p95_ms": 0.1649
+        },
+        "decompress": {
+          "median_ms": 0.1076,
+          "mean_ms": 0.1093,
+          "min_ms": 0.0676,
+          "max_ms": 0.1646,
+          "p95_ms": 0.1207
+        },
+        "attention": {
+          "median_ms": 0.0246,
+          "mean_ms": 0.0248,
+          "min_ms": 0.0236,
+          "max_ms": 0.0328,
+          "p95_ms": 0.0287
+        },
+        "total_median_ms": 0.2807
+      },
+      "new": {
+        "compress": {
+          "median_ms": 0.0328,
+          "mean_ms": 0.0349,
+          "min_ms": 0.0317,
+          "max_ms": 0.1731,
+          "p95_ms": 0.0392
+        },
+        "prerotate_q": {
+          "median_ms": 0.0249,
+          "mean_ms": 0.0255,
+          "min_ms": 0.0243,
+          "max_ms": 0.0358,
+          "p95_ms": 0.0287
+        },
+        "decompress": {
+          "median_ms": 0.0266,
+          "mean_ms": 0.0271,
+          "min_ms": 0.0256,
+          "max_ms": 0.0338,
+          "p95_ms": 0.0287
+        },
+        "attention": {
+          "median_ms": 0.0245,
+          "mean_ms": 0.0246,
+          "min_ms": 0.0236,
+          "max_ms": 0.0339,
+          "p95_ms": 0.0269
+        },
+        "postrotate_out": {
+          "median_ms": 0.0246,
+          "mean_ms": 0.0271,
+          "min_ms": 0.0236,
+          "max_ms": 0.171,
+          "p95_ms": 0.0331
+        },
+        "total_median_ms": 0.1334
+      },
+      "speedup": 2.1,
+      "compress_speedup": 4.53,
+      "decompress_speedup": 4.05
+    },
+    {
+      "cache_len": 1024,
+      "old": {
+        "compress": {
+          "median_ms": 0.1495,
+          "mean_ms": 0.1532,
+          "min_ms": 0.1458,
+          "max_ms": 0.2816,
+          "p95_ms": 0.1637
+        },
+        "decompress": {
+          "median_ms": 0.1188,
+          "mean_ms": 0.1221,
+          "min_ms": 0.1167,
+          "max_ms": 0.2693,
+          "p95_ms": 0.1311
+        },
+        "attention": {
+          "median_ms": 0.0249,
+          "mean_ms": 0.0254,
+          "min_ms": 0.0243,
+          "max_ms": 0.0319,
+          "p95_ms": 0.0298
+        },
+        "total_median_ms": 0.2932
+      },
+      "new": {
+        "compress": {
+          "median_ms": 0.0328,
+          "mean_ms": 0.0334,
+          "min_ms": 0.0297,
+          "max_ms": 0.044,
+          "p95_ms": 0.0366
+        },
+        "prerotate_q": {
+          "median_ms": 0.0253,
+          "mean_ms": 0.0256,
+          "min_ms": 0.0239,
+          "max_ms": 0.0339,
+          "p95_ms": 0.0294
+        },
+        "decompress": {
+          "median_ms": 0.0276,
+          "mean_ms": 0.0293,
+          "min_ms": 0.0266,
+          "max_ms": 0.1759,
+          "p95_ms": 0.032
+        },
+        "attention": {
+          "median_ms": 0.0254,
+          "mean_ms": 0.0255,
+          "min_ms": 0.0246,
+          "max_ms": 0.0321,
+          "p95_ms": 0.0286
+        },
+        "postrotate_out": {
+          "median_ms": 0.0246,
+          "mean_ms": 0.025,
+          "min_ms": 0.0236,
+          "max_ms": 0.0369,
+          "p95_ms": 0.0276
+        },
+        "total_median_ms": 0.1357
+      },
+      "speedup": 2.16,
+      "compress_speedup": 4.56,
+      "decompress_speedup": 4.3
+    },
+    {
+      "cache_len": 2048,
+      "old": {
+        "compress": {
+          "median_ms": 0.1497,
+          "mean_ms": 0.1513,
+          "min_ms": 0.0461,
+          "max_ms": 0.1862,
+          "p95_ms": 0.1679
+        },
+        "decompress": {
+          "median_ms": 0.1925,
+          "mean_ms": 0.1933,
+          "min_ms": 0.1833,
+          "max_ms": 0.2284,
+          "p95_ms": 0.1985
+        },
+        "attention": {
+          "median_ms": 0.0268,
+          "mean_ms": 0.0273,
+          "min_ms": 0.0256,
+          "max_ms": 0.0338,
+          "p95_ms": 0.0297
+        },
+        "total_median_ms": 0.369
+      },
+      "new": {
+        "compress": {
+          "median_ms": 0.0329,
+          "mean_ms": 0.0335,
+          "min_ms": 0.0307,
+          "max_ms": 0.0459,
+          "p95_ms": 0.0358
+        },
+        "prerotate_q": {
+          "median_ms": 0.0255,
+          "mean_ms": 0.0257,
+          "min_ms": 0.0244,
+          "max_ms": 0.0346,
+          "p95_ms": 0.0286
+        },
+        "decompress": {
+          "median_ms": 0.0305,
+          "mean_ms": 0.0323,
+          "min_ms": 0.0297,
+          "max_ms": 0.1874,
+          "p95_ms": 0.0358
+        },
+        "attention": {
+          "median_ms": 0.0266,
+          "mean_ms": 0.0268,
+          "min_ms": 0.0246,
+          "max_ms": 0.0338,
+          "p95_ms": 0.0305
+        },
+        "postrotate_out": {
+          "median_ms": 0.0246,
+          "mean_ms": 0.0256,
+          "min_ms": 0.0236,
+          "max_ms": 0.042,
+          "p95_ms": 0.033
+        },
+        "total_median_ms": 0.1401
+      },
+      "speedup": 2.63,
+      "compress_speedup": 4.55,
+      "decompress_speedup": 6.31
+    },
+    {
+      "cache_len": 4096,
+      "old": {
+        "compress": {
+          "median_ms": 0.1516,
+          "mean_ms": 0.1553,
+          "min_ms": 0.1475,
+          "max_ms": 0.2876,
+          "p95_ms": 0.1649
+        },
+        "decompress": {
+          "median_ms": 0.3654,
+          "mean_ms": 0.3681,
+          "min_ms": 0.3553,
+          "max_ms": 0.4168,
+          "p95_ms": 0.4012
+        },
+        "attention": {
+          "median_ms": 0.0338,
+          "mean_ms": 0.0343,
+          "min_ms": 0.0328,
+          "max_ms": 0.0522,
+          "p95_ms": 0.038
+        },
+        "total_median_ms": 0.5508
+      },
+      "new": {
+        "compress": {
+          "median_ms": 0.0327,
+          "mean_ms": 0.0332,
+          "min_ms": 0.0317,
+          "max_ms": 0.0545,
+          "p95_ms": 0.0379
+        },
+        "prerotate_q": {
+          "median_ms": 0.0249,
+          "mean_ms": 0.0302,
+          "min_ms": 0.0127,
+          "max_ms": 0.3101,
+          "p95_ms": 0.0369
+        },
+        "decompress": {
+          "median_ms": 0.044,
+          "mean_ms": 0.0441,
+          "min_ms": 0.043,
+          "max_ms": 0.0531,
+          "p95_ms": 0.0457
+        },
+        "attention": {
+          "median_ms": 0.0338,
+          "mean_ms": 0.0342,
+          "min_ms": 0.0328,
+          "max_ms": 0.0532,
+          "p95_ms": 0.0379
+        },
+        "postrotate_out": {
+          "median_ms": 0.0246,
+          "mean_ms": 0.0252,
+          "min_ms": 0.0237,
+          "max_ms": 0.0367,
+          "p95_ms": 0.0276
+        },
+        "total_median_ms": 0.16
+      },
+      "speedup": 3.44,
+      "compress_speedup": 4.64,
+      "decompress_speedup": 8.3
+    }
+  ],
+  "vram_peak_mib": 148.5
+}

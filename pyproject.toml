@@ -1,7 +1,7 @@
 [project]
-name = "turboquant-consumer"
+name = "turboquant-vllm"
 version = "0.1.0"
-description = "TurboQuant KV cache compression for consumer GPUs — benchmarked on Molmo2 with RTX 4090"
+description = "TurboQuant KV cache compression for vLLM — fused Triton kernels, 3.76x compression, 3.7x faster decode on RTX 4090"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
@@ -23,10 +23,17 @@ keywords = [
     "turboquant",
     "kv-cache",
     "inference-optimization",
+    "vllm",
+    "triton",
     "vision-language-model",
     "molmo",
     "consumer-gpu",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Alberto-Codes/turboquant-vllm"
+Repository = "https://github.com/Alberto-Codes/turboquant-vllm"
+Issues = "https://github.com/Alberto-Codes/turboquant-vllm/issues"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
@@ -43,6 +50,12 @@ classifiers = [
 bnb = [
     "bitsandbytes>=0.49.2",
 ]
+vllm = [
+    "vllm>=0.18",
+]
+
+[project.entry-points."vllm.general_plugins"]
+tq4_backend = "turboquant_consumer.vllm:register_tq4_backend"
 
 [build-system]
 requires = ["uv_build>=0.11.1,<0.12.0"]
@@ -76,7 +89,7 @@ docstring-code-line-length = "dynamic"
 
 [tool.docvet]
 fail-on = ["enrichment", "freshness", "coverage", "griffe", "presence"]
-extend-exclude = ["scripts/"]
+extend-exclude = ["scripts/", "src/turboquant_consumer/vllm/"]
 
 [tool.docvet.enrichment]
 require-init-params = true
@@ -105,6 +118,7 @@ source = ["turboquant_consumer"]
 omit = [
     "src/turboquant_consumer/benchmark.py",
     "src/turboquant_consumer/triton/*",
+    "src/turboquant_consumer/vllm/*",
 ]
 
 [tool.coverage.report]
@@ -114,6 +128,7 @@ show_missing = true
 [tool.uv-secure.vulnerability_criteria]
 ignore_vulnerabilities = [
     "GHSA-5239-wwwm-4pmq",  # Pygments 2.19.1 — ReDoS in AdlLexer. No fix available.
+    "GHSA-w8v5-vhqr-4h9v",  # diskcache 5.6.3 — transitive via vllm. No fix available.
 ]
 allow_unused_ignores = false
 

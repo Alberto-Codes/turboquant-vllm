@@ -1,0 +1,172 @@
+{
+  "experiment": "014-full-episode-benchmark",
+  "date": "2026-03-26 23:27:25",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 256,
+  "episode": "Seinfeld - S07E06 - The Soup Nazi - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1369.6,
+  "segment_duration_s": 120.0,
+  "baseline_clip_duration_s": 5,
+  "tq4_clip_duration_s": 20,
+  "tq4": {
+    "clips": [
+      {
+        "clip": "clip_0000.mp4",
+        "elapsed_s": 14.43,
+        "output_text": "The video clip shows a stand-up comedy performance featuring Jerry Seinfeld on stage. He's wearing a dark blue suit jacket over a light blue collared shirt with a dark tie that has a subtle pattern. Seinfeld has his characteristic short, curly brown hair and is holding a black microphone in his right hand while gesturing with his left as he performs.\n\nThe stage is dimly lit with a spotlight illuminating Seinfeld against a backdrop of red curtains with vertical lines. A small table with a glass of water is visible behind him. The audience is seated in front of the stage, with some members visible in the foreground, including a man in a plaid shirt and a woman with long brown hair.\n\nThroughout the performance, Seinfeld is animated and expressive, using his hands to emphasize his points as he delivers his material. The camera alternates between wider shots showing the full stage and audience, and closer shots focusing on Seinfeld's face and upper body as he speaks.\n\nThe performance has a classic stand-up comedy feel, with Seinfeld engaging with the audience and using his trademark comedic style. The setting is a typical comedy club or theater venue, with the intimate stage setup and attentive audience creating the atmosphere for a stand-up routine.\n\nWhile no specific dialogue is mentioned, the visual",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 17.74,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 1
+        }
+      },
+      {
+        "clip": "clip_0001.mp4",
+        "elapsed_s": 12.01,
+        "output_text": "The video clip shows a comedic scene from the TV show \"Seinfeld\" featuring Jerry Seinfeld performing stand-up comedy on stage. Jerry is dressed in a blue suit with a blue shirt and a blue-and-brown tie, holding a microphone in his left hand. He's wearing a silver watch on his left wrist and has a ring on his right hand. His hair is styled in a mullet, and he's animatedly gesturing with his right hand as he delivers his routine.\n\nThe stage is dimly lit with a spotlight on Jerry, and there's a red curtain visible behind him. A stool with a glass of water sits to his left. The audience is seated at round tables, with some tables set with plates of food and red candles. The crowd appears engaged, with some people laughing and others watching attentively.\n\nAs Jerry performs, white text appears on screen displaying production credits, including \"Co-Producer Carol Leifer,\" \"Producer Tim Kaiser,\" \"Produced by Susie Mamann Greenberg,\" and \"Supervising Producers Tom Gamill and Max Pross.\"\n\nThe scene then transitions to an exterior shot of a brown brick building with a white balcony and a ladder leaning against it. The building has multiple windows, and there are trees visible in",
+        "input_tokens": 4376,
+        "output_tokens": 256,
+        "tok_per_s": 21.32,
+        "vram_peak_mib": 19909.0,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4631,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 172.984130859375,
+          "baseline_mib": 651.234375,
+          "compression_ratio": 3.76,
+          "savings_mib": 478.250244140625
+        },
+        "characters": {
+          "jerry": 4
+        }
+      },
+      {
+        "clip": "clip_0002.mp4",
+        "elapsed_s": 11.72,
+        "output_text": "The video clip is from the TV show Friends and takes place in the Central Perk coffee shop's kitchen area.\n\nThe scene opens with Joey Tribbiani and Phoebe Buffay embracing in the kitchen. Joey is wearing a blue button-down shirt and has his arms wrapped around Phoebe, who is dressed in a black sweater. They're smiling at each other, with Phoebe's hands resting on Joey's shoulders. The kitchen setting is visible behind them, with a refrigerator covered in magnets and a shelf stocked with various food items.\n\nGeorge Costanza is present in the scene, sitting at a table and reading a newspaper. He's wearing a gray shirt and has his characteristic balding look with brown hair on the sides. George appears to be observing the interaction between Joey and Phoebe.\n\nThe camera then cuts to a close-up of George, showing his face as he looks down and then up, seemingly reacting to what he's seeing. The text \"Written by Spike Feresten\" appears on screen during this shot.\n\nThe scene returns to Joey and Phoebe, who continue their embrace and conversation. The camera then shows a wider shot of the kitchen, revealing more of the setting. The refrigerator is now visible with an ice maker, and there's",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.84,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "george": 3
+        }
+      },
+      {
+        "clip": "clip_0003.mp4",
+        "elapsed_s": 11.66,
+        "output_text": "The scene takes place in the apartment's kitchen, where four people are gathered. The setting features a white refrigerator covered with magnets and papers, a gray countertop with two blue stools, and gray cabinets with glass doors displaying various food items. A white tiled backsplash runs behind the sink area, which has a roll of paper towels and a bottle of dish soap visible.\n\nThe group consists of two couples. One couple is a man with short brown hair wearing a blue button-down shirt and blue jeans, and a woman with long blonde hair in a black shirt. The other couple is a man with a receding hairline and glasses wearing a gray button-down shirt and gray pants, and a woman with long curly brown hair wearing a brown leather jacket over a black shirt.\n\nThe blonde woman and the man in the blue shirt are engaged in a passionate kiss, with her hands on his shoulders and his arms around her waist. They break apart and begin talking to each other. The woman in the brown leather jacket then turns to the man in the gray shirt and speaks to him, while he looks at her with a somewhat confused expression.\n\nAs the conversation continues, the man in the blue shirt walks away from the group and heads toward the living room area. He picks up a brown jacket",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.95,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0004.mp4",
+        "elapsed_s": 11.68,
+        "output_text": "The video clip is from the TV show Seinfeld, set in Jerry Seinfeld's apartment. The scene takes place in the kitchen, which features a white refrigerator covered with magnets and pictures, a gray door with a gold handle, and a window with blinds. A black bookshelf filled with books and a red box is visible in the background.\n\nThe main characters present are Jerry Seinfeld, Elaine Benes, and George Costanza. Jerry is wearing a brown jacket over a blue button-down shirt, while Elaine is dressed in a brown leather jacket over a black shirt with a brown purse. George is wearing a red jacket over a gray shirt.\n\nThe scene opens with George and Elaine standing together in the kitchen. George is in the middle of dressing, pulling on his red jacket. Jerry enters the room and immediately starts talking animatedly, gesturing with his hands as he speaks. He appears to be explaining something to the others, though the specific topic isn't clear from what's shown.\n\nElaine stands with her arms crossed, looking at Jerry with a somewhat skeptical expression. George, still in the process of getting dressed, watches Jerry with a neutral expression. The conversation continues with Jerry gesturing and speaking, while George and Elaine listen.\n\nAs the scene progresses, George and Elaine",
+        "input_tokens": 3753,
+        "output_tokens": 256,
+        "tok_per_s": 21.93,
+        "vram_peak_mib": 19426.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 4008,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 149.712890625,
+          "baseline_mib": 563.625,
+          "compression_ratio": 3.76,
+          "savings_mib": 413.912109375
+        },
+        "characters": {
+          "jerry": 7,
+          "george": 7,
+          "elaine": 6
+        }
+      },
+      {
+        "clip": "clip_0005.mp4",
+        "elapsed_s": 11.38,
+        "output_text": "The scene takes place in the apartment kitchen from Seinfeld, with the familiar gray walls, white tile backsplash, and stainless steel refrigerator covered in magnets and papers. The kitchen features gray cabinets with glass fronts displaying various food items, a roll of paper towels, and a microwave.\n\nJerry Seinfeld stands in the foreground wearing his signature brown jacket over a blue button-down shirt. He's holding a wallet in his right hand and gesturing with his left as he speaks to Elaine, who is standing to his left. Elaine is dressed in a brown leather jacket over a black shirt, with her purse slung over her shoulder. She has a surprised expression on her face.\n\nGeorge Costanza is present in the scene, wearing his red jacket over a gray shirt and glasses. He's positioned between Jerry and Elaine, looking at Jerry with a somewhat confused expression.\n\nThe conversation appears to be focused on Jerry, who is explaining something while gesturing animatedly. Elaine's reaction suggests she's taken aback by what he's saying. George seems to be trying to understand the situation as well.\n\nThe setting remains consistent throughout, with the kitchen's distinctive features clearly visible. The refrigerator, cabinets, and microwave all contribute to the recognizable Seinfeld apartment aesthetic.\n\nAs the scene progresses, Jerry and",
+        "input_tokens": 3041,
+        "output_tokens": 256,
+        "tok_per_s": 22.5,
+        "vram_peak_mib": 18876.0,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 3296,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 123.1171875,
+          "baseline_mib": 463.5,
+          "compression_ratio": 3.76,
+          "savings_mib": 340.3828125
+        },
+        "characters": {
+          "jerry": 5,
+          "george": 2,
+          "elaine": 4
+        }
+      }
+    ],
+    "total_elapsed_s": 72.87,
+    "model_load_s": 7.64,
+    "num_clips": 6,
+    "total_output_tokens": 1536,
+    "total_input_tokens": 22429
+  }
+}

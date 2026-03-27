@@ -1,0 +1,119 @@
+{
+  "experiment": "014-full-episode-benchmark",
+  "date": "2026-03-26 23:29:28",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 256,
+  "episode": "Seinfeld - S07E06 - The Soup Nazi - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1369.6,
+  "segment_duration_s": 120.0,
+  "baseline_clip_duration_s": 5,
+  "tq4_clip_duration_s": 30,
+  "tq4": {
+    "clips": [
+      {
+        "clip": "clip_0000.mp4",
+        "elapsed_s": 15.08,
+        "output_text": "The video clip shows a stand-up comedy performance from the TV show Seinfeld. Jerry Seinfeld, the main character, is performing on stage in a dimly lit comedy club. He's wearing a dark blue suit jacket over a light blue collared shirt with a dark tie that has a subtle pattern. His signature shaggy brown hair is styled in his characteristic mullet.\n\nJerry is holding a black handheld microphone and speaking animatedly to the audience. He's using expressive hand gestures throughout his performance, including raising his left hand with the palm facing up and extending his right arm outward. A silver watch is visible on his left wrist. The stage is illuminated by a spotlight that creates a warm glow, with a red curtain visible behind him.\n\nThe audience is seated in the foreground, watching attentively. The room has a dark atmosphere with red curtains in the background, creating a classic comedy club setting. The audience members are engaged in the performance, with some appearing to laugh at Jerry's jokes.\n\nAs Jerry performs, the show's title \"Seinfeld\" appears on screen along with the cast and crew credits. The credits include Jerry Seinfeld, Julia Louis-Dreyfus, Michael Richards, and Jason Alexander as George. The production team is also acknowledged, with Peter Me",
+        "input_tokens": 5533,
+        "output_tokens": 256,
+        "tok_per_s": 16.98,
+        "vram_peak_mib": 20804.3,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 5788,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 216.2021484375,
+          "baseline_mib": 813.9375,
+          "compression_ratio": 3.76,
+          "savings_mib": 597.7353515625
+        },
+        "characters": {
+          "jerry": 5,
+          "george": 1
+        }
+      },
+      {
+        "clip": "clip_0001.mp4",
+        "elapsed_s": 12.58,
+        "output_text": "The video clip opens with a man performing stand-up comedy on stage. He has short brown hair and is wearing a blue suit jacket over a light blue collared shirt with a blue and yellow tie. He's holding a microphone in his left hand and gesturing with his right as he speaks. The stage is dimly lit with a red curtain behind him, and there's a black microphone stand visible to his left. White text appears on screen reading \"Supervising Producers Tom Gamill and Max Pross.\"\n\nThe scene then transitions to the exterior of a brick apartment building at night. A white balcony with intricate carvings is visible, along with a white ladder leaning against it. The building has multiple windows, and trees with green leaves frame the view.\n\nThe setting shifts to the interior of an apartment, specifically the kitchen. Jerry Seinfeld is standing with a blonde woman who appears to be Elaine Benes. Jerry is wearing a blue button-down shirt and has his arms around Elaine, who is wearing a black sweater. They're smiling at each other and talking. In the foreground, George Costanza is seated at a table, reading a newspaper. He's wearing a gray and white checkered button-down shirt and has a receding hairline with brown hair.",
+        "input_tokens": 6156,
+        "output_tokens": 256,
+        "tok_per_s": 20.34,
+        "vram_peak_mib": 21297.9,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 6411,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 239.473388671875,
+          "baseline_mib": 901.546875,
+          "compression_ratio": 3.76,
+          "savings_mib": 662.073486328125
+        },
+        "characters": {
+          "jerry": 2,
+          "george": 1,
+          "elaine": 2
+        }
+      },
+      {
+        "clip": "clip_0002.mp4",
+        "elapsed_s": 9.66,
+        "output_text": "The scene takes place in the apartment's kitchen, where four people are gathered. On the left side of the room, a man with a receding hairline wearing a gray shirt and green pants stands next to a woman with long, curly brown hair wearing a brown leather jacket over a black shirt. On the right side, a man with short brown hair in a blue button-up shirt and blue jeans stands beside a blonde woman in a black shirt.\n\nThe man in the blue shirt and the blonde woman share a kiss, and then he turns to face the other two people. The woman with curly hair speaks to him, and he responds. He then walks over to the man with the receding hairline and takes a brown jacket from him. The man with the receding hairline puts on a red jacket and looks at the woman with curly hair. The man in the blue shirt puts on the brown jacket and continues speaking to the woman with curly hair.",
+        "input_tokens": 5533,
+        "output_tokens": 193,
+        "tok_per_s": 19.98,
+        "vram_peak_mib": 20804.4,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 5725,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 213.848876953125,
+          "baseline_mib": 805.078125,
+          "compression_ratio": 3.76,
+          "savings_mib": 591.229248046875
+        },
+        "characters": {}
+      },
+      {
+        "clip": "clip_0003.mp4",
+        "elapsed_s": 12.02,
+        "output_text": "The video clip is from the TV show Friends, set in the main apartment living room and kitchen area.\n\nThe scene opens with a man in a brown jacket over a blue shirt, who appears to be Joey Tribbiani. He's speaking animatedly to someone off-camera, gesturing with his hands as he talks. The apartment has a lived-in feel, with a window with blinds, a bookshelf with books and a Superman figurine, and a framed picture on the wall visible in the background.\n\nThe camera then widens to show two other characters in the room: a woman with curly brown hair wearing a brown leather jacket and black shirt, and a man in a red jacket with glasses. The woman is holding a purse over her shoulder. The three characters are engaged in conversation, with Joey continuing to gesture expressively as he speaks.\n\nThe woman and the man in the red jacket then walk over to a white refrigerator covered in magnets and papers. They look at something on the refrigerator, and the man in the red jacket turns to Joey with a confused expression. Joey responds by picking up a wallet from the counter and showing it to them, explaining something about it. The woman looks at Joey with a surprised expression.\n\nAs the conversation continues, Joey becomes more animated, holding",
+        "input_tokens": 4821,
+        "output_tokens": 256,
+        "tok_per_s": 21.29,
+        "vram_peak_mib": 20253.4,
+        "compression": {
+          "num_layers": 36,
+          "seq_len": 5076,
+          "batch_size": 1,
+          "num_heads": 8,
+          "head_dim": 128,
+          "bits": 4,
+          "nibble_packed": true,
+          "compressed_mib": 189.6064453125,
+          "baseline_mib": 713.8125,
+          "compression_ratio": 3.76,
+          "savings_mib": 524.2060546875
+        },
+        "characters": {}
+      }
+    ],
+    "total_elapsed_s": 49.34,
+    "model_load_s": 7.74,
+    "num_clips": 4,
+    "total_output_tokens": 961,
+    "total_input_tokens": 22043
+  }
+}

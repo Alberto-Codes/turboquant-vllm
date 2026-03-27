@@ -1,0 +1,313 @@
+{
+  "experiment": "015-profile-tq4-cache-bottleneck",
+  "phase": "P9-3c.7",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "config": {
+    "head_dim": 128,
+    "num_query_heads": 32,
+    "num_kv_heads": 8,
+    "tq4_bits": 4,
+    "warmup": 10,
+    "iters": 100
+  },
+  "decode": [
+    {
+      "cache_len": 128,
+      "compress": {
+        "median_ms": 0.154,
+        "mean_ms": 0.1633,
+        "min_ms": 0.0461,
+        "max_ms": 0.3615,
+        "p95_ms": 0.1905
+      },
+      "decompress": {
+        "median_ms": 0.1271,
+        "mean_ms": 0.1344,
+        "min_ms": 0.1228,
+        "max_ms": 0.2727,
+        "p95_ms": 0.1567
+      },
+      "attention": {
+        "median_ms": 0.0225,
+        "mean_ms": 0.0231,
+        "min_ms": 0.0215,
+        "max_ms": 0.0379,
+        "p95_ms": 0.027
+      },
+      "total_median_ms": 0.3036,
+      "pct_compress": 50.7,
+      "pct_decompress": 41.9,
+      "pct_attention": 7.4
+    },
+    {
+      "cache_len": 256,
+      "compress": {
+        "median_ms": 0.1526,
+        "mean_ms": 0.1599,
+        "min_ms": 0.0461,
+        "max_ms": 0.341,
+        "p95_ms": 0.1824
+      },
+      "decompress": {
+        "median_ms": 0.123,
+        "mean_ms": 0.1253,
+        "min_ms": 0.0563,
+        "max_ms": 0.1558,
+        "p95_ms": 0.1505
+      },
+      "attention": {
+        "median_ms": 0.0257,
+        "mean_ms": 0.0266,
+        "min_ms": 0.0246,
+        "max_ms": 0.0451,
+        "p95_ms": 0.0316
+      },
+      "total_median_ms": 0.3013,
+      "pct_compress": 50.6,
+      "pct_decompress": 40.8,
+      "pct_attention": 8.5
+    },
+    {
+      "cache_len": 512,
+      "compress": {
+        "median_ms": 0.1546,
+        "mean_ms": 0.1611,
+        "min_ms": 0.0451,
+        "max_ms": 0.3195,
+        "p95_ms": 0.1944
+      },
+      "decompress": {
+        "median_ms": 0.1249,
+        "mean_ms": 0.1296,
+        "min_ms": 0.1208,
+        "max_ms": 0.2857,
+        "p95_ms": 0.1506
+      },
+      "attention": {
+        "median_ms": 0.0246,
+        "mean_ms": 0.0255,
+        "min_ms": 0.0236,
+        "max_ms": 0.042,
+        "p95_ms": 0.0309
+      },
+      "total_median_ms": 0.3041,
+      "pct_compress": 50.8,
+      "pct_decompress": 41.1,
+      "pct_attention": 8.1
+    },
+    {
+      "cache_len": 1024,
+      "compress": {
+        "median_ms": 0.1546,
+        "mean_ms": 0.1582,
+        "min_ms": 0.0461,
+        "max_ms": 0.3109,
+        "p95_ms": 0.1823
+      },
+      "decompress": {
+        "median_ms": 0.13,
+        "mean_ms": 0.1371,
+        "min_ms": 0.1085,
+        "max_ms": 0.2427,
+        "p95_ms": 0.1791
+      },
+      "attention": {
+        "median_ms": 0.0256,
+        "mean_ms": 0.0258,
+        "min_ms": 0.0244,
+        "max_ms": 0.0443,
+        "p95_ms": 0.0285
+      },
+      "total_median_ms": 0.3102,
+      "pct_compress": 49.8,
+      "pct_decompress": 41.9,
+      "pct_attention": 8.3
+    },
+    {
+      "cache_len": 2048,
+      "compress": {
+        "median_ms": 0.1536,
+        "mean_ms": 0.1584,
+        "min_ms": 0.0453,
+        "max_ms": 0.3072,
+        "p95_ms": 0.1814
+      },
+      "decompress": {
+        "median_ms": 0.1894,
+        "mean_ms": 0.1924,
+        "min_ms": 0.1874,
+        "max_ms": 0.3992,
+        "p95_ms": 0.1976
+      },
+      "attention": {
+        "median_ms": 0.0273,
+        "mean_ms": 0.0278,
+        "min_ms": 0.0256,
+        "max_ms": 0.0461,
+        "p95_ms": 0.0319
+      },
+      "total_median_ms": 0.3703,
+      "pct_compress": 41.5,
+      "pct_decompress": 51.1,
+      "pct_attention": 7.4
+    },
+    {
+      "cache_len": 4096,
+      "compress": {
+        "median_ms": 0.1548,
+        "mean_ms": 0.1595,
+        "min_ms": 0.1505,
+        "max_ms": 0.3338,
+        "p95_ms": 0.1751
+      },
+      "decompress": {
+        "median_ms": 0.4053,
+        "mean_ms": 0.4069,
+        "min_ms": 0.3802,
+        "max_ms": 0.4516,
+        "p95_ms": 0.4424
+      },
+      "attention": {
+        "median_ms": 0.0356,
+        "mean_ms": 0.0359,
+        "min_ms": 0.0346,
+        "max_ms": 0.0471,
+        "p95_ms": 0.041
+      },
+      "total_median_ms": 0.5957,
+      "pct_compress": 26.0,
+      "pct_decompress": 68.0,
+      "pct_attention": 6.0
+    }
+  ],
+  "prefill": [
+    {
+      "seq_len": 128,
+      "compress": {
+        "median_ms": 0.1546,
+        "mean_ms": 0.161,
+        "min_ms": 0.1505,
+        "max_ms": 0.2867,
+        "p95_ms": 0.1884
+      },
+      "attention": {
+        "median_ms": 0.0163,
+        "mean_ms": 0.0182,
+        "min_ms": 0.0092,
+        "max_ms": 0.1925,
+        "p95_ms": 0.0205
+      },
+      "total_median_ms": 0.1709,
+      "pct_compress": 90.5,
+      "pct_attention": 9.5
+    },
+    {
+      "seq_len": 256,
+      "compress": {
+        "median_ms": 0.1618,
+        "mean_ms": 0.169,
+        "min_ms": 0.1567,
+        "max_ms": 0.2857,
+        "p95_ms": 0.1932
+      },
+      "attention": {
+        "median_ms": 0.0205,
+        "mean_ms": 0.0208,
+        "min_ms": 0.0195,
+        "max_ms": 0.0288,
+        "p95_ms": 0.0225
+      },
+      "total_median_ms": 0.1823,
+      "pct_compress": 88.8,
+      "pct_attention": 11.2
+    },
+    {
+      "seq_len": 512,
+      "compress": {
+        "median_ms": 0.1577,
+        "mean_ms": 0.1633,
+        "min_ms": 0.0737,
+        "max_ms": 0.3153,
+        "p95_ms": 0.1823
+      },
+      "attention": {
+        "median_ms": 0.042,
+        "mean_ms": 0.0427,
+        "min_ms": 0.041,
+        "max_ms": 0.0756,
+        "p95_ms": 0.0461
+      },
+      "total_median_ms": 0.1997,
+      "pct_compress": 79.0,
+      "pct_attention": 21.0
+    },
+    {
+      "seq_len": 1024,
+      "compress": {
+        "median_ms": 0.1587,
+        "mean_ms": 0.1658,
+        "min_ms": 0.1004,
+        "max_ms": 0.2988,
+        "p95_ms": 0.1997
+      },
+      "attention": {
+        "median_ms": 0.1004,
+        "mean_ms": 0.1015,
+        "min_ms": 0.0942,
+        "max_ms": 0.1393,
+        "p95_ms": 0.1096
+      },
+      "total_median_ms": 0.2591,
+      "pct_compress": 61.3,
+      "pct_attention": 38.7
+    },
+    {
+      "seq_len": 2048,
+      "compress": {
+        "median_ms": 0.1741,
+        "mean_ms": 0.1782,
+        "min_ms": 0.1619,
+        "max_ms": 0.3584,
+        "p95_ms": 0.1915
+      },
+      "attention": {
+        "median_ms": 0.2845,
+        "mean_ms": 0.2864,
+        "min_ms": 0.2676,
+        "max_ms": 0.4639,
+        "p95_ms": 0.2989
+      },
+      "total_median_ms": 0.4586,
+      "pct_compress": 38.0,
+      "pct_attention": 62.0
+    },
+    {
+      "seq_len": 4096,
+      "compress": {
+        "median_ms": 0.3738,
+        "mean_ms": 0.3771,
+        "min_ms": 0.3574,
+        "max_ms": 0.4178,
+        "p95_ms": 0.4127
+      },
+      "attention": {
+        "median_ms": 0.9667,
+        "mean_ms": 0.9665,
+        "min_ms": 0.932,
+        "max_ms": 1.0107,
+        "p95_ms": 1.0025
+      },
+      "total_median_ms": 1.3405,
+      "pct_compress": 27.9,
+      "pct_attention": 72.1
+    }
+  ],
+  "conclusion": {
+    "bottleneck": "compress/decompress",
+    "pct_compress_decompress": 94.0,
+    "pct_attention": 6.0,
+    "recommendation": "Triton kernels (3c.8-3c.9) likely worth it -- fuse compress+write and read+dequant",
+    "at_cache_len": 4096
+  },
+  "vram_peak_mib": 170.4
+}

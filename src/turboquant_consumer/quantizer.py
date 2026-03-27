@@ -49,15 +49,19 @@ def _generate_rotation_matrix(dim: int, seed: int = 42) -> torch.Tensor:
     Uses QR decomposition of a random Gaussian matrix. The resulting
     matrix is uniformly distributed over the orthogonal group O(d).
 
+    Generator and tensor are explicitly placed on CPU in float32 to
+    avoid conflicts when ``torch.set_default_device('cuda')`` or a
+    non-float32 default dtype is active (e.g., inside vLLM model init).
+
     Args:
         dim: Matrix dimension (d x d).
         seed: Random seed for reproducibility.
 
     Returns:
-        Orthogonal matrix of shape (dim, dim) in float32.
+        Orthogonal matrix of shape (dim, dim) in float32 on CPU.
     """
-    gen = torch.Generator().manual_seed(seed)
-    gaussian = torch.randn(dim, dim, generator=gen)
+    gen = torch.Generator(device="cpu").manual_seed(seed)
+    gaussian = torch.randn(dim, dim, generator=gen, device="cpu", dtype=torch.float32)
     q, r = torch.linalg.qr(gaussian)
     # Ensure uniform distribution by correcting signs
     diag_sign = torch.sign(torch.diag(r))

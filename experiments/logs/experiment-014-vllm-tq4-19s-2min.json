@@ -1,0 +1,87 @@
+{
+  "experiment": "014-full-episode-benchmark",
+  "date": "2026-03-27 11:05:42",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 256,
+  "episode": "Seinfeld - S07E06 - The Soup Nazi - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1369.6,
+  "segment_duration_s": 120.0,
+  "baseline_clip_duration_s": 19,
+  "tq4_clip_duration_s": 19,
+  "baseline": {
+    "clips": [
+      {
+        "clip": "clip_0000.mp4",
+        "elapsed_s": 8.98,
+        "output_text": "The scene opens in a well-lit, intimate comedy club setting where a stand-up comedian performs on stage in front of an audience. The performer fits the classic stand-up persona, dressed in a suit and tie rather than the typical comedy casual with t-shirt and jeans, holding a microphone and addressing the crowd with a steady, conversational delivery. His brown hair is styled with longer curls or a mullet-like appearance at the back, and he holds a microphone in his right hand while gesturing with his left along various up-and-down motions as he talks.\n\nHe works the crowd with practiced ease, moving between personal anecdotes and broader observations, maintaining a relaxed yet authoritative presence on stage. The camera work alternates between closer shots that capture his facial expressions and eye contact with different sections of the audience, and wider shots that show the full set: a large spotlight brightens him against a backdrop of red curtains divided by white vertical stripes, creating a clean, elegant contrast with darker areas surrounding the stage.\n\nAs he continues his set, the production identifies him explicitly on-screen in white text in the lower left corner: \"JERRY SEINFELD,\" making clear that this is the famous comedian Jerry Seinfeld performing his stand-up routine. The scene maintains its dimly lit atmosphere typical",
+        "input_tokens": 2870,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 2
+        }
+      },
+      {
+        "clip": "clip_0001.mp4",
+        "elapsed_s": 5.82,
+        "output_text": "I apologize for the confusion in my previous response. There is no live-action scene taking place at a comedy club. The video consists entirely of the same man in a blue suit with a purple tie performing stand-up comedy. He's holding a microphone and speaking to a small, attentive audience in a dimly lit venue with red curtains and warm lighting that creates a cozy ambience. While we can see he's gesturing expressively as he performs, I cannot make out any specific content of what he's saying or delivering. At the end of the performance, there's a brief exterior shot showing a red brick building with white trim and an ornate white balcony, along with some trees and foliage in the foreground, but this appears to be an unrelated shot inserted after the comedy routine rather than part of the club setting itself.",
+        "input_tokens": 2869,
+        "output_tokens": 166,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0002.mp4",
+        "elapsed_s": 8.26,
+        "output_text": "The video begins with qedal who is sitting with his wife and another man around a dinner table. They share a moment of connection, with qedal and the woman leaning toward each other as she rests her head on his shoulder while he encircles her with his arm. As qedal starts speaking, the conversation takes a turn into a brief argument that leaves the woman smiling while qedal appears concerned, prompting the other man to reach out and touch qedal's arm as if trying to de-escalate the situation.\n\nThe scene then punches forward in time to qedal in what looks like his home office three days later, displaying the passage of time through the edit while maintaining the continuity of the situation.\n\nIn this subsequent setting, qedal is now reading the newspaper with his attention fully engaged. The other man is standing next to him, with the woman between them, still with her head resting on the man's shoulder. The visible concern from the earlier moment lingers as evidenced by qedal's expression as he processes what the other man is saying to him.\n\nBetween these scenes, the video flashes a quick glimpse of a bedroom with a ladder, providing a stark visual interjection that contrasts with the domestic conversations taking place.",
+        "input_tokens": 2870,
+        "output_tokens": 246,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0003.mp4",
+        "elapsed_s": 8.52,
+        "output_text": "In a bright \"Seinfeld\" living room decorated with framed pictures on the walls, a man in a green shirt sits near a white dress table while a woman in a blue shirt and jeans is close by. A dark brown round table and a gray couch provide additional seating. Off to one side, a coat rack holds a red jacket. The apartment opens to a compact kitchen area with a white-tiled backsplash and gray cabinetry with glass doors displaying food items like cereal and spices. Among the shelves are a paper towel holder, a coffee maker, and a bottle of hand soap. A white microwave sits on the counter. A middle-aged man with short brown hair in a blue button-up shirt and brown belt stands near a woman with shoulder-length blonde hair in a black turtleneck; both smile as they face each other, with gray shelving behind them filled with cereal boxes such as Honey Nut Cheerios, Reese's Puffs, and Apple Jacks.\n\nBack with Jerry Seinfeld, he stands in front of the white refrigerator covered with magnets and pictures; his head is partially out of frame. Elaine walks toward him, back turned to the camera, wearing a brown leather jacket over a black shirt with a brown purse slung over her shoulder. The light brown wood",
+        "input_tokens": 2870,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 1,
+          "elaine": 1
+        }
+      },
+      {
+        "clip": "clip_0004.mp4",
+        "elapsed_s": 8.52,
+        "output_text": "In a dim living room, a man with long floppy hair in a blue long\u2011sleeve collared shirt stands holding a white inside and brown outside jacket. Behind him are blackout curtains with blinds, while a beige wall displays two tiers of artwork. An old\u2011fashioned computer sits on a black desk tucked in a corner, its \u226580s\u2011era screen supporting a large gray lampshade positioned toward his reading area.\n\nThe room appears to shift into a kitchen portion of the same space. Kenny Becker stands there in overcoat, flanked by two men who are turned away from the camera; he takes a red jacket in his left hand and hefts a second red one over his right shoulder as he moves. A girl with brown curly hair in a brown leather bomber jacket faces the man as he says something to her.\n\nThe characters then gather in another room with a white wall and a window dressed with white blinds, showing a cityscape outside. On the gray bookshelf, books and action figures, including a small Superhero, line the shelves. Two framed pictures hang on the wall. A black object is seated on a desk in the background.\n\nCentral to the group is the long\u2011haired man, now wearing a brown jacket over his blue shirt",
+        "input_tokens": 2870,
+        "output_tokens": 256,
+        "characters": {}
+      },
+      {
+        "clip": "clip_0005.mp4",
+        "elapsed_s": 7.49,
+        "output_text": "The video clip takes place in the iconic Seinfeld apartment kitchen with gray cabinetry topped with glass fronts, a stainless steel refrigerator covered in colorful magnets and papers, and a gray countertop. Jerry Seinfeld, in his brown shirt and blue button-up, stands at the center holding money in his right hand while the other character holds a wallet, seemingly grappling with an awkward financial situation as the others watch.\n\nChloe Seinfeld joins the group on the left side, wearing a brown leather jacket over a black top with a purse slung over her shoulder, bringing the focus to the trio gathered around the counter. surrounded by distinctive kitchen details including a microwave, a silvery stove, and a paper towel rack.\n\nThe conversation continues with GeorgeCostanza wearing a red jacket over a blue plaid shirt and glasses, holding a slotted spoon in his right hand, standing beside an oven mitt on the counter and the stainless refrigerator. Behind him is white tile with a black border, and a window above reveals a bicycle outside, completing the familiar kitchen setting and the mix of humor and everyday confusion that characterizes their interactions.",
+        "input_tokens": 2865,
+        "output_tokens": 224,
+        "characters": {
+          "jerry": 1,
+          "george": 1
+        }
+      },
+      {
+        "clip": "clip_0006.mp4",
+        "elapsed_s": 8.31,
+        "output_text": "In a kitchen from Seinfeld, Jerry Seinfeld stands prominently in a brown jacket over a blue shirt, speaking animatedly with his hands raised before gradually lowering them. His mouth is open mid-conversation as he faces slightly left, and his head moves side to side while he talks. The kitchen is richly detailed: gray cabinets line the space, including a top cabinet with a glass door revealing a jar of tomatoes and two boxes on the left side. Below are more gray cabinets and a gray tile backsplash. A gray refrigerator stands to the left with a few cans on top and keys hanging from its top. A countertop is visible on the right. Seasonings and a canister of Hershey's are stored nearby, and the counter holds a bottle of dish liquid, a paper towel holder with a paper towel front and back, and a small sign.\n\nGeorge Costanza, wearing a red jacket over a plaid shirt, is shown alongside Jerry. On the left side of the scene, Elaine stands as part of their rotating group dynamic, with later shots showing her laughing. The women's presence highlights the comedic and light-hearted nature of the kitchen conversation, with both women contributing to the banter while the men react with smiles and laughter.\n\nThe final sequence moves deeper into",
+        "input_tokens": 2854,
+        "output_tokens": 256,
+        "characters": {
+          "jerry": 2,
+          "george": 1,
+          "elaine": 1
+        }
+      }
+    ],
+    "total_elapsed_s": 55.9,
+    "num_clips": 7,
+    "total_output_tokens": 1660,
+    "total_input_tokens": 20068
+  }
+}
