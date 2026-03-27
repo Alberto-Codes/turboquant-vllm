@@ -1,0 +1,66 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Feature Request
+
+        **Title Guidelines:**
+        - Imperative mood (e.g., "Add", "Support", not "Added")
+        - Example: `[Feature] Add TQ2 ultra-low-bit quantization mode`
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: |
+        **As a** [role], **I want** [feature], **so that** [benefit].
+      placeholder: |
+        As a vLLM operator serving long-context workloads,
+        I want TQ2 quantization support,
+        so that I can serve 128K-context models within 24GB VRAM.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Key scenarios using Given/When/Then format.
+      placeholder: |
+        Scenario: Compress KV cache at 2 bits
+          Given a CompressedDynamicCache with bits=2
+          When a model generates 1024 tokens
+          Then KV cache VRAM is reduced by ~8x vs FP16
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical - Blocking current work
+        - High - Important for production use
+        - Medium - Nice to have
+        - Low - Future consideration
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, links, or references.
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### BMAD Workflow
+        When ready to implement, run in a fresh context:
+        - **Quick approach:** `/bmad-quick-dev` with the feature description
+        - **Full approach:** `/bmad-create-prd` → architecture → stories

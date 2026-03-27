@@ -1,0 +1,48 @@
+name: Story
+description: BMAD user story (typically created by create-story workflow)
+title: "Story N.N: "
+labels: ["story"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # User Story
+
+        Stories are normally created by the BMAD `create-story` workflow.
+        Manual creation is supported for ad-hoc work outside the sprint plan.
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: |
+        **As a** [role], **I want** [action], **so that** [benefit].
+      placeholder: |
+        As a vLLM operator,
+        I want the TQ4 backend to support paged attention,
+        so that long sequences can be served efficiently.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Checklist of criteria that must be met.
+      placeholder: |
+        - [ ] Paged KV cache blocks use TQ4 nibble-packed format
+        - [ ] Page eviction preserves compressed state
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Epic, story file, and branch references.
+      value: |
+        - **Epic**:
+        - **Story file**:
+        - **Branch**: `feat/`
+    validations:
+      required: false

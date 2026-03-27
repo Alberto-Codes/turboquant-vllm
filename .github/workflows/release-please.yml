@@ -1,0 +1,62 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      upload_url: ${{ steps.release.outputs.upload_url }}
+      prs_created: ${{ steps.release.outputs.prs_created }}
+      pr_branch: ${{ steps.release.outputs.prs_created == 'true' && fromJSON(steps.release.outputs.pr).headBranchName || '' }}
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          # Use PAT to allow created releases to trigger publish workflow
+          # Create PAT with 'repo' scope and add as RELEASE_PLEASE_TOKEN secret
+          # Falls back to GITHUB_TOKEN if PAT not configured (releases won't trigger other workflows)
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+          target-branch: main
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  update-lockfile:
+    needs: release-please
+    if: needs.release-please.outputs.prs_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release-please PR branch
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+          ref: ${{ needs.release-please.outputs.pr_branch }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Update uv.lock
+        run: uv lock --upgrade-package turboquant-vllm
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet uv.lock; then
+            echo "uv.lock is already up to date"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add uv.lock
+            git commit -m "chore: update uv.lock after version bump"
+            git push
+          fi

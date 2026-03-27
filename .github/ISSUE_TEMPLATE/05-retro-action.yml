@@ -1,0 +1,32 @@
+name: Retro Action
+description: Retrospective action item (typically created by retrospective workflow)
+title: "Retro Action: "
+labels: ["retro-action"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Retrospective Action Item
+
+        Retro action items are normally created by the BMAD `retrospective` workflow.
+        Manual creation is supported for action items identified outside retrospectives.
+
+  - type: textarea
+    id: action
+    attributes:
+      label: Action Item
+      description: What needs to be done?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Source retrospective, owner, and priority.
+      value: |
+        - **Source retrospective**: Epic N
+        - **Owner**:
+        - **Priority**:
+    validations:
+      required: false

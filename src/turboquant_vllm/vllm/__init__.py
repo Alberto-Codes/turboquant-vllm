@@ -14,10 +14,10 @@ See Also:
 
 Usage:
     The backend registers automatically via the ``vllm.general_plugins``
-    entry point when turboquant-consumer is installed with the ``vllm``
+    entry point when turboquant-vllm is installed with the ``vllm``
     extra::
 
-        uv pip install turboquant-consumer[vllm]
+        pip install turboquant-vllm[vllm]
         vllm serve <model> --attention-backend CUSTOM
 
     Or register manually before starting vLLM::

@@ -1,4 +1,4 @@
-# Architecture — `turboquant_consumer`
+# Architecture — `turboquant_vllm`
 
 Implementation of Google's **TurboQuant** algorithm (ICLR 2026, arXiv 2504.19874) for compressing transformer KV caches to 3–4 bits per coordinate on consumer GPUs.
 
@@ -8,12 +8,12 @@ Implementation of Google's **TurboQuant** algorithm (ICLR 2026, arXiv 2504.19874
 
 ```mermaid
 ---
-title: turboquant_consumer — module overview
+title: turboquant_vllm — module overview
 ---
 flowchart TD
     subgraph api ["Public API  __init__.py"]
         direction LR
-        API([turboquant_consumer])
+        API([turboquant_vllm])
     end
 
     subgraph core ["Core Quantization"]
@@ -99,7 +99,7 @@ Everything exported from `__init__.py`, grouped by purpose:
 
 ```mermaid
 mindmap
-  root((turboquant_consumer))
+  root((turboquant_vllm))
     **Quantizers**
       TurboQuantMSE
         Stage 1 only
