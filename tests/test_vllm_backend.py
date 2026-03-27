@@ -1,7 +1,9 @@
 """Tests for TQ4 vLLM attention backend.
 
 Phase 3a tests: plugin wiring, registration, class hierarchy, interface compliance.
-Phase 3b tests: TQ4 packed cache shape, compress/decompress round-trip.
+Phase 3b tests: TQ4 compress/decompress round-trip.
+Phase 3c tests: packed cache shape, TQ4FullAttentionSpec, compress_and_store,
+    decompress_cache round-trip.
 Requires vLLM to be installed.
 """
 
@@ -16,11 +18,14 @@ from vllm.v1.attention.backends.flash_attn import (  # noqa: E402
     FlashAttentionMetadataBuilder,
 )
 from vllm.v1.attention.backends.registry import AttentionBackendEnum  # noqa: E402
+from vllm.v1.kv_cache_interface import FullAttentionSpec  # noqa: E402
 
 from turboquant_consumer.vllm.tq4_backend import (  # noqa: E402
     TQ4AttentionBackend,
     TQ4AttentionImpl,
+    TQ4FullAttentionSpec,
     _tq4_bytes_per_token,
+    _tq4_bytes_per_token_kv,
     register_tq4_backend,
 )
 
@@ -55,24 +60,7 @@ class TestTQ4AttentionBackend:
     def test_subclasses_flash_attention(self):
         assert issubclass(TQ4AttentionBackend, FlashAttentionBackend)
 
-    def test_kv_cache_shape_matches_flash(self):
-        """Phase 3b: standard shape (packed layout deferred to Phase 3c)."""
-        shape = TQ4AttentionBackend.get_kv_cache_shape(
-            num_blocks=100,
-            block_size=16,
-            num_kv_heads=8,
-            head_size=128,
-        )
-        expected = FlashAttentionBackend.get_kv_cache_shape(
-            num_blocks=100,
-            block_size=16,
-            num_kv_heads=8,
-            head_size=128,
-        )
-        assert shape == expected
-
     def test_forward_includes_kv_cache_update(self):
-        """Phase 3b: forward() handles cache writes + compress round-trip."""
         assert TQ4AttentionBackend.forward_includes_kv_cache_update is True
 
     def test_compression_ratio_math(self):
@@ -89,6 +77,44 @@ class TestTQ4AttentionBackend:
 
     def test_supports_mm_prefix(self):
         assert TQ4AttentionBackend.supports_mm_prefix() is True
+
+    def test_packed_kv_cache_shape(self):
+        """Phase 3c: packed uint8 layout (NB, BS, total_bytes)."""
+        shape = TQ4AttentionBackend.get_kv_cache_shape(
+            num_blocks=100,
+            block_size=16,
+            num_kv_heads=8,
+            head_size=128,
+        )
+        expected_bytes = 8 * _tq4_bytes_per_token_kv(128)  # 8 * 136 = 1088
+        assert shape == (100, 16, expected_bytes)
+        assert expected_bytes == 1088
+
+    def test_packed_shape_not_5d(self):
+        """Phase 3c shape is 3D, not the standard 5D."""
+        shape = TQ4AttentionBackend.get_kv_cache_shape(
+            num_blocks=50,
+            block_size=16,
+            num_kv_heads=4,
+            head_size=64,
+        )
+        assert len(shape) == 3
+
+    def test_packed_shape_varies_with_heads(self):
+        """More KV heads = more bytes per token."""
+        shape_4h = TQ4AttentionBackend.get_kv_cache_shape(
+            num_blocks=10,
+            block_size=16,
+            num_kv_heads=4,
+            head_size=128,
+        )
+        shape_8h = TQ4AttentionBackend.get_kv_cache_shape(
+            num_blocks=10,
+            block_size=16,
+            num_kv_heads=8,
+            head_size=128,
+        )
+        assert shape_8h[2] == 2 * shape_4h[2]
 
 
 class TestTQ4AttentionImpl:
@@ -109,3 +135,299 @@ class TestTQ4ByteCalculation:
 
     def test_bytes_per_token_head_256(self):
         assert _tq4_bytes_per_token(256) == 132
+
+    def test_bytes_per_token_kv_128(self):
+        assert _tq4_bytes_per_token_kv(128) == 136
+
+    def test_bytes_per_token_kv_64(self):
+        assert _tq4_bytes_per_token_kv(64) == 72
+
+
+# ---------------------------------------------------------------------------
+# Phase 3c: TQ4FullAttentionSpec
+# ---------------------------------------------------------------------------
+
+
+class TestTQ4FullAttentionSpec:
+    """TQ4 cache spec page size override."""
+
+    def test_subclasses_full_attention_spec(self):
+        assert issubclass(TQ4FullAttentionSpec, FullAttentionSpec)
+
+    def test_page_size_bytes_molmo2_8b(self):
+        """Molmo2-8B: 8 KV heads, head_dim=128, block_size=16."""
+        spec = TQ4FullAttentionSpec(
+            block_size=16,
+            num_kv_heads=8,
+            head_size=128,
+            dtype=torch.uint8,
+        )
+        # 16 tokens * 8 heads * 136 bytes/token/head = 17,408
+        assert spec.page_size_bytes == 17_408
+
+    def test_page_size_vs_fp16(self):
+        """TQ4 page is 3.76x smaller than FP16."""
+        tq4_spec = TQ4FullAttentionSpec(
+            block_size=16,
+            num_kv_heads=8,
+            head_size=128,
+            dtype=torch.uint8,
+        )
+        fp16_spec = FullAttentionSpec(
+            block_size=16,
+            num_kv_heads=8,
+            head_size=128,
+            dtype=torch.float16,
+        )
+        ratio = fp16_spec.page_size_bytes / tq4_spec.page_size_bytes
+        assert abs(ratio - 3.76) < 0.01
+
+    def test_dtype_is_uint8(self):
+        spec = TQ4FullAttentionSpec(
+            block_size=16,
+            num_kv_heads=8,
+            head_size=128,
+            dtype=torch.uint8,
+        )
+        assert spec.dtype == torch.uint8
+
+    def test_block_size_scales_page_size(self):
+        spec_16 = TQ4FullAttentionSpec(
+            block_size=16,
+            num_kv_heads=8,
+            head_size=128,
+            dtype=torch.uint8,
+        )
+        spec_32 = TQ4FullAttentionSpec(
+            block_size=32,
+            num_kv_heads=8,
+            head_size=128,
+            dtype=torch.uint8,
+        )
+        assert spec_32.page_size_bytes == 2 * spec_16.page_size_bytes
+
+    def test_frozen_dataclass(self):
+        spec = TQ4FullAttentionSpec(
+            block_size=16,
+            num_kv_heads=8,
+            head_size=128,
+            dtype=torch.uint8,
+        )
+        with pytest.raises(AttributeError):
+            spec.block_size = 32  # ty: ignore[invalid-assignment]
+
+
+# ---------------------------------------------------------------------------
+# Phase 3c: compress_and_store + decompress_cache round-trip
+# ---------------------------------------------------------------------------
+
+
+class TestTQ4PackedCacheRoundTrip:
+    """Compress -> store -> decompress round-trip on packed uint8 cache."""
+
+    NUM_KV_HEADS = 8
+    HEAD_SIZE = 128
+    BLOCK_SIZE = 16
+
+    def _make_impl(self):
+        """Create a TQ4AttentionImpl without full vLLM init."""
+        # Bypass FlashAttentionImpl.__init__ -- only init TQ4 primitives
+        impl = object.__new__(TQ4AttentionImpl)
+        impl.head_size = self.HEAD_SIZE
+        impl.num_kv_heads = self.NUM_KV_HEADS
+
+        from turboquant_consumer.quantizer import TurboQuantMSE
+        from turboquant_consumer.vllm.tq4_backend import (
+            TQ4_BITS,
+            TQ4_NORM_BYTES,
+            TQ4_SEED,
+        )
+
+        quantizer = TurboQuantMSE(self.HEAD_SIZE, TQ4_BITS, seed=TQ4_SEED)
+        impl._tq4_rotation = quantizer.rotation
+        impl._tq4_centroids = quantizer.codebook.centroids
+        impl._tq4_boundaries = quantizer.codebook.boundaries
+        impl._tq4_on_device = False
+
+        half_D = self.HEAD_SIZE // 2
+        impl._half_D = half_D
+        impl._k_idx_end = self.NUM_KV_HEADS * half_D
+        impl._k_norm_end = impl._k_idx_end + self.NUM_KV_HEADS * TQ4_NORM_BYTES
+        impl._v_idx_end = impl._k_norm_end + self.NUM_KV_HEADS * half_D
+        impl._total_bytes = impl._v_idx_end + self.NUM_KV_HEADS * TQ4_NORM_BYTES
+
+        return impl
+
+    def _make_cache(self, num_blocks):
+        total_bytes = self.NUM_KV_HEADS * _tq4_bytes_per_token_kv(self.HEAD_SIZE)
+        return torch.zeros(num_blocks, self.BLOCK_SIZE, total_bytes, dtype=torch.uint8)
+
+    def test_compress_store_decompress_single_token(self):
+        impl = self._make_impl()
+        kv_cache = self._make_cache(num_blocks=4)
+
+        key = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        value = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        slot_mapping = torch.tensor([5])  # slot 5 = block 0, pos 5
+
+        impl._compress_and_store(key, value, kv_cache, slot_mapping)
+
+        # Verify bytes were written (slot 5 should be non-zero)
+        flat = kv_cache.view(-1, impl._total_bytes)
+        assert flat[5].any(), "Slot 5 should have data"
+        assert not flat[0].any(), "Slot 0 should still be zeros"
+
+        # Decompress full cache and check round-trip
+        key_cache, value_cache = impl._decompress_cache(kv_cache, torch.float32)
+        assert key_cache.shape == (
+            4,
+            self.BLOCK_SIZE,
+            self.NUM_KV_HEADS,
+            self.HEAD_SIZE,
+        )
+        assert value_cache.shape == (
+            4,
+            self.BLOCK_SIZE,
+            self.NUM_KV_HEADS,
+            self.HEAD_SIZE,
+        )
+
+        # Check the written slot has non-zero data
+        reconstructed_k = key_cache.view(-1, self.NUM_KV_HEADS, self.HEAD_SIZE)[5]
+        reconstructed_v = value_cache.view(-1, self.NUM_KV_HEADS, self.HEAD_SIZE)[5]
+        assert reconstructed_k.any(), "Decompressed K should be non-zero"
+        assert reconstructed_v.any(), "Decompressed V should be non-zero"
+
+    def test_round_trip_cosine_similarity(self):
+        """TQ4 round-trip should achieve >0.85 cosine on random data.
+
+        Note: real model KV cache data achieves >0.97 cosine (validated
+        in experiment 003/005).  Random Gaussian vectors give lower cosine
+        because their distribution differs from actual KV activations.
+        """
+        impl = self._make_impl()
+        kv_cache = self._make_cache(num_blocks=2)
+
+        key = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        value = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        slot_mapping = torch.tensor([0])
+
+        impl._compress_and_store(key, value, kv_cache, slot_mapping)
+        key_cache, value_cache = impl._decompress_cache(kv_cache, torch.float32)
+
+        recon_k = key_cache[0, 0]  # block 0, pos 0
+        recon_v = value_cache[0, 0]
+
+        for h in range(self.NUM_KV_HEADS):
+            cos_k = torch.nn.functional.cosine_similarity(
+                key[0, h].unsqueeze(0), recon_k[h].unsqueeze(0)
+            ).item()
+            cos_v = torch.nn.functional.cosine_similarity(
+                value[0, h].unsqueeze(0), recon_v[h].unsqueeze(0)
+            ).item()
+            assert cos_k > 0.85, f"K head {h} cosine {cos_k:.4f} < 0.85"
+            assert cos_v > 0.85, f"V head {h} cosine {cos_v:.4f} < 0.85"
+
+    def test_multi_token_scatter_write(self):
+        """Multiple tokens scattered to different slots."""
+        impl = self._make_impl()
+        kv_cache = self._make_cache(num_blocks=4)
+        N = 5
+
+        key = torch.randn(N, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        value = torch.randn(N, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        # Scatter to non-contiguous slots across blocks
+        slot_mapping = torch.tensor([0, 17, 33, 48, 63])
+
+        impl._compress_and_store(key, value, kv_cache, slot_mapping)
+        key_cache, value_cache = impl._decompress_cache(kv_cache, torch.float32)
+
+        flat_k = key_cache.view(-1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+
+        for i, slot in enumerate(slot_mapping.tolist()):
+            for h in range(self.NUM_KV_HEADS):
+                cos_k = torch.nn.functional.cosine_similarity(
+                    key[i, h].unsqueeze(0), flat_k[slot, h].unsqueeze(0)
+                ).item()
+                assert cos_k > 0.85, (
+                    f"Token {i} slot {slot} head {h}: K cos {cos_k:.4f}"
+                )
+
+    def test_empty_slots_decompress_to_zero(self):
+        """Unwritten slots should decompress to zero."""
+        impl = self._make_impl()
+        kv_cache = self._make_cache(num_blocks=2)
+
+        # Write only slot 0
+        key = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        value = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        impl._compress_and_store(key, value, kv_cache, torch.tensor([0]))
+
+        key_cache, _ = impl._decompress_cache(kv_cache, torch.float32)
+        flat_k = key_cache.view(-1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+
+        # Slot 0 should have data, slot 1 should be all zeros
+        assert flat_k[0].any(), "Slot 0 should have data"
+        assert not flat_k[1].any(), "Slot 1 should be zeros"
+
+    def test_overwrite_slot(self):
+        """Writing to the same slot twice should overwrite."""
+        impl = self._make_impl()
+        kv_cache = self._make_cache(num_blocks=1)
+
+        key1 = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        key2 = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        value = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+
+        impl._compress_and_store(key1, value, kv_cache, torch.tensor([0]))
+        impl._compress_and_store(key2, value, kv_cache, torch.tensor([0]))
+
+        key_cache, _ = impl._decompress_cache(kv_cache, torch.float32)
+        recon_k = key_cache[0, 0]
+
+        # Should be closer to key2 than key1
+        cos_k2 = torch.nn.functional.cosine_similarity(
+            key2[0, 0].unsqueeze(0), recon_k[0].unsqueeze(0)
+        )
+        cos_k1 = torch.nn.functional.cosine_similarity(
+            key1[0, 0].unsqueeze(0), recon_k[0].unsqueeze(0)
+        )
+        assert cos_k2 > cos_k1, "Overwrite should match key2, not key1"
+
+    def test_cache_shape_matches_backend(self):
+        """Cache shape from backend matches what decompress expects."""
+        shape = TQ4AttentionBackend.get_kv_cache_shape(
+            num_blocks=10,
+            block_size=self.BLOCK_SIZE,
+            num_kv_heads=self.NUM_KV_HEADS,
+            head_size=self.HEAD_SIZE,
+        )
+        cache = torch.zeros(*shape, dtype=torch.uint8)
+        impl = self._make_impl()
+
+        key_cache, value_cache = impl._decompress_cache(cache, torch.float32)
+        assert key_cache.shape == (
+            10,
+            self.BLOCK_SIZE,
+            self.NUM_KV_HEADS,
+            self.HEAD_SIZE,
+        )
+        assert value_cache.shape == (
+            10,
+            self.BLOCK_SIZE,
+            self.NUM_KV_HEADS,
+            self.HEAD_SIZE,
+        )
+
+    def test_bfloat16_output_dtype(self):
+        """Decompress can produce bf16 output."""
+        impl = self._make_impl()
+        kv_cache = self._make_cache(num_blocks=1)
+
+        key = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        value = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
+        impl._compress_and_store(key, value, kv_cache, torch.tensor([0]))
+
+        key_cache, value_cache = impl._decompress_cache(kv_cache, torch.bfloat16)
+        assert key_cache.dtype == torch.bfloat16
+        assert value_cache.dtype == torch.bfloat16

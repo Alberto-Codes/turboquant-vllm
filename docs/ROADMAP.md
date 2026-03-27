@@ -640,20 +640,40 @@ Override buffer allocation to use TQ4 page size (68 bytes/token/head vs 256 FP16
 
 | Step | Action | Status |
 |------|--------|--------|
-| 3c.1 | Research: override `FullAttentionSpec.page_size_bytes` for TQ4 page size (custom `KVCacheSpec` subclass or monkey-patch) | |
-| 3c.2 | Override `get_kv_cache_shape()` → `(num_blocks, block_size, total_bytes // elem_size)` for 3D packed layout | |
-| 3c.3 | Override `get_kv_cache_stride_order()` → `(0, 1, 2)` identity for 3D shape | |
-| 3c.4 | Implement `_compress_and_store()` — scatter-write TQ4 bytes to flat cache via `slot_mapping` | |
-| 3c.5 | Implement `_decompress_cache()` — read TQ4 pages, decompress all blocks to `(2, NB, BS, H, D)` FP16 for Flash Attention | |
-| 3c.6 | Smoke test: `vllm serve` + Molmo2-8B with TQ4 packed cache, verify VRAM reduction | |
+| 3c.1 | `TQ4FullAttentionSpec(FullAttentionSpec)` with overridden `real_page_size_bytes` + monkey-patch `Attention.get_kv_cache_spec` + register in `spec_manager_map` | ✅ |
+| 3c.2 | Override `get_kv_cache_shape()` → `(num_blocks, block_size, num_kv_heads * 136)` flat uint8 layout | ✅ |
+| 3c.3 | Override `get_kv_cache_stride_order()` → raise `NotImplementedError` for identity fallback | ✅ |
+| 3c.4 | Implement `_compress_and_store()` — scatter-write TQ4 bytes to flat cache via `slot_mapping` | ✅ |
+| 3c.5 | Implement `_decompress_cache()` — read uint8 blocks, decompress to `(NB, BS, H, D)` FP16, call `flash_attn_varlen_func` directly | ✅ |
+| 3c.6 | Smoke test: `vllm serve` + Molmo2-8B with TQ4 packed cache, verify VRAM reduction | ✅ |
 | 3c.7 | Profile: is PyTorch compress/dequant the bottleneck, or Flash Attention? | |
 | 3c.8 | If bottleneck: Triton `reshape_and_cache_tq4` kernel for fused compress+write | |
 | 3c.9 | If bottleneck: Triton dequant kernel for fused read+dequant | |
 | 3c.10 | Validate bit-for-bit match with pure PyTorch path | |
 
+169 tests pass. All pre-commit hooks green.
+
+**Smoke test result (2026-03-27):** vLLM 0.18.0 + Molmo2-8B + `--attention-backend CUSTOM` with packed TQ4 uint8 cache:
+- Model loads, serves on port 8100 ✅
+- "What is 2+2?" → "4" ✅
+- "Name the four main characters of Seinfeld" → "George Costanza, Jerry Seinfeld, Elaine Benes, and Kramer" ✅ (all 4 preserved)
+- KV cache: 60,880 tokens, 14.86x concurrency at max_model_len=4096
+
+**Architecture (follows FlashMLA pattern exactly):**
+- `TQ4FullAttentionSpec(FullAttentionSpec)` overrides `real_page_size_bytes` → `block_size * num_kv_heads * 136`
+- `dtype=torch.uint8` in spec — buffer stays byte-addressable
+- `get_kv_cache_shape()` returns `(NB, BS, H*136)` — flat uint8 byte layout
+- `get_kv_cache_stride_order()` raises `NotImplementedError` → identity fallback (same as FlashMLA)
+- `forward()` calls `flash_attn_varlen_func` directly (bypasses `super().forward()` and `do_kv_cache_update()`)
+- Monkey-patch in `register_tq4_backend()` replaces `Attention.get_kv_cache_spec`
+- `spec_manager_map[TQ4FullAttentionSpec] = FullAttentionManager` for KV cache manager compatibility
+
+**Bugs found and fixed during smoke test:**
+- `get_kv_cache_stride_order()` inherited 5-element tuple from FlashAttentionBackend, mismatched 3D shape. Fixed by overriding to raise `NotImplementedError`.
+- `spec_manager_map` uses `type()` (exact match), not `isinstance()`. `TQ4FullAttentionSpec` not in map. Fixed by registering in `register_tq4_backend()`.
+
 **Implementation notes for 3c.1 (page_size_bytes override):**
-- `FullAttentionSpec` is created in `vllm/model_executor/layers/attention/attention.py:533-539`
-- `page_size_bytes` is computed from `num_kv_heads * head_size * dtype_size * 2 * block_size`
+- Follows `MLAAttentionSpec` pattern: subclass `FullAttentionSpec`, override `real_page_size_bytes`
 - Options: (a) custom `AttentionSpec` subclass with overridden `page_size_bytes`, (b) post-init patch on the spec, (c) override at the `Attention` layer level
 - The compress/decompress code from Phase 3b (`_compress`, `_decompress`, `_compress_and_store`, `_decompress_cache`) is already written and tested — it just needs to target the packed cache instead of doing a round-trip
 

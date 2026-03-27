@@ -30,11 +30,13 @@ Usage:
 from turboquant_consumer.vllm.tq4_backend import (
     TQ4AttentionBackend,
     TQ4AttentionImpl,
+    TQ4FullAttentionSpec,
     register_tq4_backend,
 )
 
 __all__ = [
     "TQ4AttentionBackend",
     "TQ4AttentionImpl",
+    "TQ4FullAttentionSpec",
     "register_tq4_backend",
 ]

@@ -1,22 +1,26 @@
 """TQ4 compressed KV cache attention backend for vLLM.
 
-Phase 3b: Pure PyTorch compress/decompress in vLLM's attention path.
-Compresses K/V into nibble-packed TQ4 format in the paged cache,
-decompresses to FP16 for Flash Attention on each forward call.
+Phase 3c: Packed TQ4 cache layout with real VRAM savings.
 
-The naive PyTorch implementation validates correctness. Performance
-optimization (Triton kernels) is deferred to Phase 3c.
+The KV cache is stored as uint8 bytes in a packed TQ4 format (68 bytes
+per token per head per K/V = 136 bytes total vs 512 bytes FP16 = 3.76x
+compression).  Buffer allocation uses a custom ``TQ4FullAttentionSpec``
+that overrides ``page_size_bytes`` so the block allocator provisions
+3.76x more blocks in the same VRAM budget.  Each ``forward()`` call
+decompresses the relevant blocks to FP16 and delegates to Flash Attention.
 
 Implementation phases:
-    3a (done): Passthrough skeleton — validated plugin wiring.
-    3b (this): Pure PyTorch compress + decompress — validates correctness.
-    3c: Triton kernel optimization (if profiling shows bottleneck).
+    3a (done): Passthrough skeleton -- validated plugin wiring.
+    3b (done): Compress-decompress round-trip in standard FP16 cache.
+    3c (this): Packed uint8 cache with real VRAM savings.
     3d: Production benchmark against vLLM baseline.
 """
 
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
+from dataclasses import fields as dc_fields
 from typing import TYPE_CHECKING
 
 import torch
@@ -29,6 +33,7 @@ from vllm.v1.attention.backends.registry import (
     AttentionBackendEnum,
     register_backend,
 )
+from vllm.v1.kv_cache_interface import FullAttentionSpec
 
 from turboquant_consumer.quantizer import TurboQuantMSE
 
@@ -58,23 +63,47 @@ def _tq4_bytes_per_token(head_dim: int) -> int:
     return head_dim // 2 + TQ4_NORM_BYTES
 
 
+def _tq4_bytes_per_token_kv(head_dim: int) -> int:
+    """Total packed bytes per token per KV head (K + V combined)."""
+    return 2 * _tq4_bytes_per_token(head_dim)
+
+
 # ---------------------------------------------------------------------------
-# Backend
+# KV cache spec (3c.1)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True, kw_only=True)
+class TQ4FullAttentionSpec(FullAttentionSpec):
+    """KV cache spec with TQ4 packed page size.
+
+    Overrides ``real_page_size_bytes`` so the block allocator provisions
+    buffers sized for the packed TQ4 format (3.76x smaller than FP16).
+    Follows the same pattern as ``MLAAttentionSpec`` which overrides
+    page size for the 656-byte FlashMLA format.
+    """
+
+    @property
+    def real_page_size_bytes(self) -> int:  # noqa: D102
+        return (
+            self.block_size
+            * self.num_kv_heads
+            * _tq4_bytes_per_token_kv(self.head_size)
+        )
+
+
+# ---------------------------------------------------------------------------
+# Backend (3c.2 - 3c.3)
 # ---------------------------------------------------------------------------
 
 
 class TQ4AttentionBackend(FlashAttentionBackend):
     """TQ4 compressed KV cache attention backend.
 
-    Phase 3b uses the standard Flash Attention cache shape (5D) and
-    validates TQ4 compression quality via compress→decompress round-trip
-    in ``forward()``. The cache stores decompressed (lossy) FP16 data.
-
-    Phase 3c will override ``get_kv_cache_shape()`` and
-    ``KVCacheSpec.page_size_bytes`` for the packed TQ4 layout with
-    real VRAM savings. This requires deeper integration with vLLM's
-    buffer allocation (``page_size_bytes`` controls allocation size,
-    not ``get_kv_cache_shape()``).
+    Phase 3c: packed uint8 cache layout with real VRAM savings.
+    The cache stores nibble-packed TQ4 indices + fp32 norms as raw bytes.
+    ``get_kv_cache_shape()`` returns a 3D ``(NB, BS, bytes_per_token)``
+    layout matching the packed format.
     """
 
     forward_includes_kv_cache_update = True
@@ -96,32 +125,56 @@ class TQ4AttentionBackend(FlashAttentionBackend):
 
     @staticmethod
     def get_builder_cls() -> type[AttentionMetadataBuilder]:
-        """Return :class:`FlashAttentionMetadataBuilder` — reused."""
+        """Return :class:`FlashAttentionMetadataBuilder` -- reused."""
         return FlashAttentionMetadataBuilder
 
-    # get_kv_cache_shape() and get_kv_cache_stride_order() inherited from
-    # FlashAttentionBackend — standard (2, NB, BS, H, D) shape.
-    # Phase 3c will override with TQ4 packed layout once buffer allocation
-    # (KVCacheSpec.page_size_bytes) is also overridden.
+    @staticmethod
+    def get_kv_cache_shape(
+        num_blocks: int,
+        block_size: int,
+        num_kv_heads: int,
+        head_size: int,
+        cache_dtype_str: str = "auto",
+    ) -> tuple[int, ...]:
+        """Packed TQ4 cache: ``(num_blocks, block_size, total_bytes)``.
+
+        The last dimension packs K and V data for all heads as raw bytes:
+        ``[K_indices | K_norms | V_indices | V_norms]``.
+        """
+        total_bytes = num_kv_heads * _tq4_bytes_per_token_kv(head_size)
+        return (num_blocks, block_size, total_bytes)
+
+    @staticmethod
+    def get_kv_cache_stride_order(
+        include_num_layers_dimension: bool = False,
+    ) -> tuple[int, ...]:
+        """Raise to trigger identity fallback in reshape.
+
+        The inherited FlashAttentionBackend returns a 5-element stride
+        order for the standard ``(2, NB, BS, H, D)`` shape. Our 3D
+        packed layout ``(NB, BS, total_bytes)`` needs identity ordering.
+        Raising ``NotImplementedError`` triggers the fallback in
+        ``_reshape_kv_cache_tensors`` (same pattern as FlashMLA which
+        does not implement this method at all).
+        """
+        raise NotImplementedError
 
 
 # ---------------------------------------------------------------------------
-# Attention implementation
+# Attention implementation (3c.4 - 3c.5)
 # ---------------------------------------------------------------------------
 
 
 class TQ4AttentionImpl(FlashAttentionImpl):
-    """TQ4 attention: compress → store → decompress → Flash Attention.
+    """TQ4 attention: compress -> store -> decompress -> Flash Attention.
 
-    Overrides FlashAttentionImpl to:
+    Phase 3c: stores packed TQ4 bytes in a uint8 cache for real VRAM
+    savings.  Each ``forward()`` call:
 
-    1. Initialize TQ4 compression primitives (rotation matrix, codebook).
-    2. Compress incoming K/V tokens and write to the packed TQ4 cache.
-    3. Decompress the entire cache to standard FP16 format.
-    4. Delegate attention computation to Flash Attention via ``super()``.
-
-    This is the "naive-correct" Phase 3b implementation using pure PyTorch.
-    Performance optimization (Triton kernels) is deferred to Phase 3c.
+    1. Compresses incoming K/V tokens to TQ4 packed bytes.
+    2. Scatter-writes packed bytes to the uint8 cache via ``slot_mapping``.
+    3. Decompresses the full cache to FP16 for Flash Attention.
+    4. Calls ``flash_attn_varlen_func`` directly with the FP16 data.
     """
 
     def __init__(self, *args, **kwargs) -> None:
@@ -139,7 +192,8 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         self._tq4_boundaries = quantizer.codebook.boundaries  # (15,) fp32
         self._tq4_on_device = False
 
-        # Byte layout offsets (per token in uint8 view)
+        # Byte layout offsets within the last dimension of the packed cache.
+        # Layout: [K_indices(H*D/2) | K_norms(H*4) | V_indices(H*D/2) | V_norms(H*4)]
         half_D = head_size // 2
         self._half_D = half_D
         self._k_idx_end = num_kv_heads * half_D
@@ -172,11 +226,11 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         self,
         x: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Compress ``(N, H, D)`` → nibble-packed indices + fp32 norms.
+        """Compress ``(N, H, D)`` -> nibble-packed indices + fp32 norms.
 
         Returns:
-            packed: ``(N, H, D//2)`` uint8 — two 4-bit centroid indices per byte.
-            norms: ``(N, H, 1)`` fp32 — vector norms.
+            packed: ``(N, H, D//2)`` uint8 -- two 4-bit centroid indices per byte.
+            norms: ``(N, H, 1)`` fp32 -- vector norms.
         """
         N, H, D = x.shape
         flat = x.reshape(N * H, D).float()
@@ -199,7 +253,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         norms: torch.Tensor,
         dtype: torch.dtype,
     ) -> torch.Tensor:
-        """Decompress nibble-packed indices + norms → ``(N, H, D)``.
+        """Decompress nibble-packed indices + norms -> ``(N, H, D)``.
 
         Args:
             packed: ``(N, H, D//2)`` uint8.
@@ -223,20 +277,95 @@ class TQ4AttentionImpl(FlashAttentionImpl):
 
         return result.reshape(N, H, D).to(dtype)
 
-    # ----- compress → decompress round-trip -----
+    # ----- packed cache operations (3c.4 - 3c.5) -----
 
-    def _compress_decompress(
+    def _compress_and_store(
         self,
-        x: torch.Tensor,
-    ) -> torch.Tensor:
-        """Compress then decompress: validates TQ4 quality through vLLM.
+        key: torch.Tensor,
+        value: torch.Tensor,
+        kv_cache: torch.Tensor,
+        slot_mapping: torch.Tensor,
+    ) -> None:
+        """Compress K/V and scatter-write TQ4 bytes to packed cache.
 
-        Input and output have the same shape and dtype. The returned tensor
-        has lossy reconstruction error from the TQ4 round-trip (rotation →
-        quantize → centroid lookup → inverse rotation → rescale).
+        Args:
+            key: ``(N, H, D)`` new key tokens.
+            value: ``(N, H, D)`` new value tokens.
+            kv_cache: ``(NB, BS, total_bytes)`` uint8 packed cache.
+            slot_mapping: ``(num_actual_tokens,)`` flat slot indices.
         """
-        packed, norms = self._compress(x)
-        return self._decompress(packed, norms, x.dtype)
+        k_packed, k_norms = self._compress(key)  # (N, H, D//2), (N, H, 1)
+        v_packed, v_norms = self._compress(value)
+
+        N = k_packed.shape[0]
+        H = self.num_kv_heads
+        device = key.device
+
+        # Build packed byte row per token: [K_idx | K_norm | V_idx | V_norm]
+        row = torch.empty(N, self._total_bytes, dtype=torch.uint8, device=device)
+        row[:, : self._k_idx_end] = k_packed.reshape(N, -1)
+        row[:, self._k_idx_end : self._k_norm_end] = (
+            k_norms.reshape(N, H).contiguous().view(torch.uint8)
+        )
+        row[:, self._k_norm_end : self._v_idx_end] = v_packed.reshape(N, -1)
+        row[:, self._v_idx_end :] = v_norms.reshape(N, H).contiguous().view(torch.uint8)
+
+        # Scatter-write to flat cache using slot_mapping
+        num_actual = slot_mapping.shape[0]
+        flat_cache = kv_cache.view(-1, self._total_bytes)
+        flat_cache[slot_mapping[:num_actual]] = row[:num_actual]
+
+    def _decompress_cache(
+        self,
+        kv_cache: torch.Tensor,
+        compute_dtype: torch.dtype,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Decompress packed uint8 cache -> FP16 key_cache, value_cache.
+
+        Args:
+            kv_cache: ``(NB, BS, total_bytes)`` uint8 packed cache.
+            compute_dtype: Output dtype (e.g., ``torch.bfloat16``).
+
+        Returns:
+            key_cache: ``(NB, BS, H, D)`` in ``compute_dtype``.
+            value_cache: ``(NB, BS, H, D)`` in ``compute_dtype``.
+        """
+        NB, BS, _ = kv_cache.shape
+        H = self.num_kv_heads
+        half_D = self._half_D
+        D = self.head_size
+
+        flat = kv_cache.reshape(NB * BS, self._total_bytes)
+
+        # Extract and decompress K
+        k_packed = flat[:, : self._k_idx_end].contiguous().reshape(-1, H, half_D)
+        k_norms = (
+            flat[:, self._k_idx_end : self._k_norm_end]
+            .contiguous()
+            .view(torch.float32)
+            .reshape(-1, H, 1)
+        )
+        key_fp16 = self._decompress(k_packed, k_norms, compute_dtype)
+
+        # Extract and decompress V
+        v_packed = (
+            flat[:, self._k_norm_end : self._v_idx_end]
+            .contiguous()
+            .reshape(-1, H, half_D)
+        )
+        v_norms = (
+            flat[:, self._v_idx_end :]
+            .contiguous()
+            .view(torch.float32)
+            .reshape(-1, H, 1)
+        )
+        value_fp16 = self._decompress(v_packed, v_norms, compute_dtype)
+
+        # Reshape to (NB, BS, H, D) for Flash Attention
+        key_cache = key_fp16.reshape(NB, BS, H, D)
+        value_cache = value_fp16.reshape(NB, BS, H, D)
+
+        return key_cache, value_cache
 
     # ----- forward -----
 
@@ -252,60 +381,105 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         output_scale=None,
         output_block_scale=None,
     ):
-        """TQ4 attention: compress→decompress K/V, then Flash Attention.
+        """TQ4 attention: compress -> store packed -> decompress -> FA.
 
-        Phase 3b: Validates TQ4 compression quality through vLLM's serving
-        pipeline. The standard 5D KV cache stores decompressed (lossy) data.
-        No VRAM savings yet — that requires overriding KVCacheSpec.page_size_bytes
-        (Phase 3c).
-
-        1. Compress new K/V via TQ4 round-trip (lossy).
-        2. Write lossy K/V to standard cache via ``do_kv_cache_update()``.
-        3. Run Flash Attention on the cache.
+        Phase 3c: The uint8 KV cache stores packed TQ4 bytes. Each forward
+        call decompresses to FP16 and calls Flash Attention directly.
         """
         assert output is not None
+
+        if output_scale is not None or output_block_scale is not None:
+            raise NotImplementedError(
+                "Fused output quantization is not supported with TQ4 backend"
+            )
 
         # Profiling mode
         if attn_metadata is None:
             output.zero_()
             return output
 
-        # TQ4 round-trip on new K/V tokens
-        if kv_cache is not None and key is not None and value is not None:
-            self._ensure_device(query.device)
-            key = self._compress_decompress(key)
-            value = self._compress_decompress(value)
+        # Encoder attention: no TQ4, delegate to parent
+        # (VIT uses a separate backend, but guard just in case)
+        from vllm.v1.attention.backend import AttentionType
 
-            # Write lossy K/V to standard cache
-            self.do_kv_cache_update(
+        if self.attn_type in (AttentionType.ENCODER_ONLY, AttentionType.ENCODER):
+            return self._forward_encoder_attention(
+                query[: attn_metadata.num_actual_tokens],
+                key[: attn_metadata.num_actual_tokens],
+                value[: attn_metadata.num_actual_tokens],
+                output[: attn_metadata.num_actual_tokens],
+                attn_metadata,
                 layer,
-                key,
-                value,
-                kv_cache,
-                attn_metadata.slot_mapping,
             )
 
-        # Delegate attention to Flash Attention
-        return super().forward(
-            layer,
-            query,
-            key,
-            value,
-            kv_cache,
-            attn_metadata,
-            output,
-            output_scale,
-            output_block_scale,
+        num_actual_tokens = attn_metadata.num_actual_tokens
+
+        # Step 1: Compress and store new K/V tokens
+        if kv_cache is not None and key is not None and value is not None:
+            self._ensure_device(query.device)
+            self._compress_and_store(key, value, kv_cache, attn_metadata.slot_mapping)
+
+        # Step 2: Decompress full cache for attention
+        self._ensure_device(query.device)
+        key_cache, value_cache = self._decompress_cache(kv_cache, query.dtype)
+
+        # Step 3: Run Flash Attention directly
+        from vllm.v1.attention.backends.fa_utils import flash_attn_varlen_func
+
+        if attn_metadata.use_cascade:
+            raise NotImplementedError("TQ4 does not yet support cascade attention")
+
+        descale_shape = (
+            attn_metadata.query_start_loc.shape[0] - 1,
+            self.num_kv_heads,
+        )
+        q_descale = layer._q_scale.expand(descale_shape)
+        k_descale = layer._k_scale.expand(descale_shape)
+        v_descale = layer._v_scale.expand(descale_shape)
+
+        flash_attn_varlen_func(
+            q=query[:num_actual_tokens],
+            k=key_cache,
+            v=value_cache,
+            out=output[:num_actual_tokens],
+            cu_seqlens_q=attn_metadata.query_start_loc,
+            max_seqlen_q=attn_metadata.max_query_len,
+            seqused_k=attn_metadata.seq_lens,
+            max_seqlen_k=attn_metadata.max_seq_len,
+            softmax_scale=self.scale,
+            causal=attn_metadata.causal,
+            alibi_slopes=self.alibi_slopes,  # ty: ignore[invalid-argument-type]
+            window_size=list(self.sliding_window)
+            if self.sliding_window is not None
+            else None,
+            block_table=attn_metadata.block_table,
+            softcap=self.logits_soft_cap,
+            scheduler_metadata=attn_metadata.scheduler_metadata,
+            fa_version=self.vllm_flash_attn_version,  # ty: ignore[invalid-argument-type]
+            q_descale=q_descale,
+            k_descale=k_descale,
+            v_descale=v_descale,
+            num_splits=attn_metadata.max_num_splits,
+            s_aux=self.sinks,
         )
 
+        return output
+
 
 # ---------------------------------------------------------------------------
-# Registration
+# Registration (3c.1 -- monkey-patch for TQ4 page size)
 # ---------------------------------------------------------------------------
+
+_original_get_kv_cache_spec = None
 
 
 def register_tq4_backend() -> None:
     """Register TQ4 as the CUSTOM attention backend.
+
+    In addition to registering the backend class, this monkey-patches
+    ``Attention.get_kv_cache_spec`` so that decoder attention layers
+    return :class:`TQ4FullAttentionSpec` (with ``dtype=torch.uint8``
+    and TQ4-sized pages) instead of the standard ``FullAttentionSpec``.
 
     Called automatically by the ``vllm.general_plugins`` entry point,
     or manually before starting vLLM::
@@ -315,8 +489,36 @@ def register_tq4_backend() -> None:
         register_tq4_backend()
         # then start vLLM with --attention-backend CUSTOM
     """
+    global _original_get_kv_cache_spec  # noqa: PLW0603
+
     register_backend(
         AttentionBackendEnum.CUSTOM,
         "turboquant_consumer.vllm.tq4_backend.TQ4AttentionBackend",
     )
-    logger.info("TQ4 attention backend registered as CUSTOM")
+
+    # Register TQ4FullAttentionSpec in the KV cache manager mapping.
+    # vLLM uses exact type() match, not isinstance(), so subclasses
+    # of FullAttentionSpec must be explicitly added.
+    from vllm.v1.core.single_type_kv_cache_manager import spec_manager_map
+
+    if TQ4FullAttentionSpec not in spec_manager_map:
+        spec_manager_map[TQ4FullAttentionSpec] = spec_manager_map[FullAttentionSpec]
+
+    # Monkey-patch Attention.get_kv_cache_spec to return TQ4 spec
+    from vllm.model_executor.layers.attention.attention import Attention
+
+    if _original_get_kv_cache_spec is None:
+        _original_get_kv_cache_spec = Attention.get_kv_cache_spec
+
+    def _tq4_get_kv_cache_spec(self, vllm_config):
+        spec = _original_get_kv_cache_spec(self, vllm_config)
+        if isinstance(spec, FullAttentionSpec) and not isinstance(
+            spec, TQ4FullAttentionSpec
+        ):
+            kwargs = {f.name: getattr(spec, f.name) for f in dc_fields(spec)}
+            kwargs["dtype"] = torch.uint8
+            return TQ4FullAttentionSpec(**kwargs)
+        return spec
+
+    Attention.get_kv_cache_spec = _tq4_get_kv_cache_spec  # ty: ignore[invalid-assignment]
+    logger.info("TQ4 attention backend registered as CUSTOM (packed cache)")
