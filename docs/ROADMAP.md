@@ -144,7 +144,7 @@ podman run --rm \
   docker.io/rocm/pytorch:rocm7.1_ubuntu24.04_py3.12_pytorch_release_2.8.0
 ```
 
-#### Phase 1 — Dev Environment (IN PROGRESS)
+#### Phase 1 — Dev Environment (COMPLETED 2026-03-26)
 
 | Step | Action | Result |
 |------|--------|--------|
@@ -161,7 +161,7 @@ Implementation: Added `device` fixture in `conftest.py` parametrized with `["cpu
 
 Validated inside ROCm container on Radeon 890M (gfx1150): **84/84 tests passed** with no tolerance relaxation — all existing `atol`, cosine similarity, and correlation thresholds hold on AMD GPU.
 
-#### Phase 2 — Core Algorithm on AMD (IN PROGRESS)
+#### Phase 2 — Core Algorithm on AMD (COMPLETED 2026-03-26)
 
 **Session 1 — Quick wins (gates Phase 3):**
 
