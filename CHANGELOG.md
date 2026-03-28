@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/Alberto-Codes/turboquant-vllm/compare/v1.1.0...v1.1.1) (2026-03-28)
+
+
+### Performance Improvements
+
+* **tests:** add TQ4 fixture, cache simulations, and mark slow tests ([#13](https://github.com/Alberto-Codes/turboquant-vllm/issues/13)) ([96fc960](https://github.com/Alberto-Codes/turboquant-vllm/commit/96fc960eeb033f2948980d13d1fcbc20c4af4313)), closes [#8](https://github.com/Alberto-Codes/turboquant-vllm/issues/8)
+
 ## [1.1.0](https://github.com/Alberto-Codes/turboquant-vllm/compare/v1.0.0...v1.1.0) (2026-03-27)
 
 
