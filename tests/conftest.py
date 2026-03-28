@@ -4,13 +4,17 @@ Provides deterministic seeding, cached codebooks, and common quantizer
 instances to eliminate redundant computation and ensure reproducibility.
 """
 
+from __future__ import annotations
+
 import pytest
 import torch
+import torch.nn.functional as F
 
 from turboquant_vllm.compressors import (
     TurboQuantCompressorMSE,
     TurboQuantCompressorV2,
 )
+from turboquant_vllm.kv_cache import CompressedDynamicCache
 from turboquant_vllm.lloyd_max import LloydMaxCodebook, solve_lloyd_max
 from turboquant_vllm.quantizer import TurboQuantMSE, TurboQuantProd
 
@@ -19,6 +23,7 @@ from turboquant_vllm.quantizer import TurboQuantMSE, TurboQuantProd
 # ---------------------------------------------------------------------------
 DIM = 128
 BITS = 3
+BITS_4 = 4
 SEED = 42
 N_SAMPLES = 500
 N_PAIRS = 300
@@ -82,3 +87,58 @@ def key_compressor() -> TurboQuantCompressorV2:
 def value_compressor() -> TurboQuantCompressorMSE:
     """Module-scoped value compressor (dim=128, bits=3)."""
     return TurboQuantCompressorMSE(DIM, BITS, seed=SEED)
+
+
+# ---------------------------------------------------------------------------
+# Shared test helpers
+# ---------------------------------------------------------------------------
+
+
+def cosine_similarity_flat(a: torch.Tensor, b: torch.Tensor) -> float:
+    """Flat cosine similarity between two tensors."""
+    return F.cosine_similarity(a.flatten().float(), b.flatten().float(), dim=0).item()
+
+
+def compress_tq4(
+    tensor: torch.Tensor, quantizer: TurboQuantMSE
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Compress a tensor using TurboQuantMSE and nibble-pack.
+
+    Args:
+        tensor: ``[batch, heads, seq, head_dim]`` fp16/bf16.
+        quantizer: Configured TurboQuantMSE instance.
+
+    Returns:
+        ``(packed_indices, norms)`` where packed is uint8
+        ``[batch, heads, seq, head_dim//2]`` and norms is fp32
+        ``[batch, heads, seq]``.
+    """
+    B, H, S, D = tensor.shape
+    flat = tensor.float().reshape(-1, D)
+    indices, norms = quantizer.quantize(flat)
+    indices = indices.to(torch.uint8).reshape(B, H, S, D)
+    norms = norms.reshape(B, H, S)
+    packed = CompressedDynamicCache._nibble_pack(indices)
+    return packed, norms
+
+
+def decompress_tq4(
+    packed: torch.Tensor, norms: torch.Tensor, quantizer: TurboQuantMSE
+) -> torch.Tensor:
+    """Decompress nibble-packed tensor back to fp32.
+
+    Args:
+        packed: Nibble-packed indices ``[batch, heads, seq, head_dim//2]`` uint8.
+        norms: Norms ``[batch, heads, seq]`` fp32.
+        quantizer: Configured TurboQuantMSE instance.
+
+    Returns:
+        Reconstructed tensor ``[batch, heads, seq, head_dim]`` fp32.
+    """
+    B, H, S, HALF_D = packed.shape
+    D = HALF_D * 2
+    indices = CompressedDynamicCache._nibble_unpack(packed)
+    flat_idx = indices.reshape(-1, D)
+    flat_norms = norms.reshape(-1, 1)
+    reconstructed = quantizer.dequantize(flat_idx, flat_norms)
+    return reconstructed.reshape(B, H, S, D)

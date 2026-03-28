@@ -14,6 +14,8 @@ import torch.nn.functional as F
 
 from turboquant_vllm.triton.flash_attention import triton_flash_attention
 
+from .conftest import cosine_similarity_flat
+
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -49,11 +51,6 @@ def _sdpa_reference(
     )
 
 
-def _cosine_similarity(a: torch.Tensor, b: torch.Tensor) -> float:
-    """Flat cosine similarity between two tensors."""
-    return F.cosine_similarity(a.flatten().float(), b.flatten().float(), dim=0).item()
-
-
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
@@ -74,7 +71,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     def test_mha_causal(self, device: str) -> None:
         """Standard multi-head attention with causal masking."""
@@ -86,7 +83,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v, is_causal=True)
         actual = triton_flash_attention(q, k, v, is_causal=True)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     # -- GQA (Grouped-Query Attention) --
 
@@ -100,7 +97,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     def test_gqa_4_to_1(self, device: str) -> None:
         """Common 4:1 GQA ratio."""
@@ -112,7 +109,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     def test_gqa_causal(self, device: str) -> None:
         """GQA 7:1 with causal masking (prefill mode)."""
@@ -124,7 +121,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v, is_causal=True)
         actual = triton_flash_attention(q, k, v, is_causal=True)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     # -- Decode mode (seq_q = 1) --
 
@@ -139,7 +136,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     def test_decode_gqa(self, device: str) -> None:
         """Decode: single query with GQA 7:1 and long KV cache."""
@@ -152,7 +149,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     def test_decode_is_causal_forced_off(self, device: str) -> None:
         """is_causal=True with seq_q=1 should be forced to False (no hang)."""
@@ -166,7 +163,7 @@ class TestTritonFlashAttention:
         # Pass is_causal=True -- wrapper should override to False
         actual = triton_flash_attention(q, k, v, is_causal=True)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     # -- Attention mask --
 
@@ -187,7 +184,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v, attention_mask=mask)
         actual = triton_flash_attention(q, k, v, attention_mask=mask)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     # -- Dtype support --
 
@@ -201,7 +198,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     # -- Sequence length edge cases --
 
@@ -215,7 +212,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     def test_long_sequence(self, device: str) -> None:
         """Longer sequence to test multi-tile accumulation."""
@@ -227,7 +224,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        cos = _cosine_similarity(actual, expected)
+        cos = cosine_similarity_flat(actual, expected)
         assert cos > 0.999, f"Long-sequence cosine similarity {cos:.6f} < 0.999"
 
     # -- Precision validation --
@@ -247,7 +244,7 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        cos = _cosine_similarity(actual, expected)
+        cos = cosine_similarity_flat(actual, expected)
         assert cos > 0.9995, f"Precision cosine similarity {cos:.6f} < 0.9995"
 
         # Also check max absolute error
@@ -267,7 +264,7 @@ class TestTritonFlashAttention:
         expected = F.scaled_dot_product_attention(q, k, v, scale=scale)
         actual = triton_flash_attention(q, k, v, sm_scale=scale)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
 
     # -- Batch size > 1 --
 
@@ -281,4 +278,4 @@ class TestTritonFlashAttention:
         expected = _sdpa_reference(q, k, v)
         actual = triton_flash_attention(q, k, v)
 
-        assert _cosine_similarity(actual, expected) > 0.999
+        assert cosine_similarity_flat(actual, expected) > 0.999
