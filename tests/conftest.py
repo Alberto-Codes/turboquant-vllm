@@ -6,6 +6,8 @@ instances to eliminate redundant computation and ensure reproducibility.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import pytest
 import torch
 import torch.nn.functional as F
@@ -148,3 +150,48 @@ def decompress_tq4(
     flat_norms = norms.reshape(-1, 1)
     reconstructed = quantizer.dequantize(flat_idx, flat_norms)
     return reconstructed.reshape(B, H, S, D)
+
+
+def assert_tq4_fused_matches_unfused(
+    *,
+    q: torch.Tensor,
+    k: torch.Tensor,
+    v_ref: torch.Tensor,
+    tq4_quantizer: TurboQuantMSE,
+    device: str,
+    fused_fn: Callable[..., torch.Tensor],
+    is_causal: bool = False,
+    threshold: float = 0.998,
+) -> None:
+    """Assert a fused TQ4 FA kernel matches the unfused decompress-then-FA path.
+
+    Handles K compression/decompression internally.  The caller supplies
+    ``v_ref`` (raw V for K-only kernels, decompressed V for K+V kernels) and
+    a ``fused_fn`` closure that captures any V-side compressed artifacts it
+    needs.
+
+    Args:
+        q: Query tensor ``[B, H_Q, S_Q, D]``.
+        k: Key tensor ``[B, H_KV, S_KV, D]``.
+        v_ref: Value tensor for the unfused reference path (raw or
+            pre-decompressed).
+        tq4_quantizer: Configured TurboQuantMSE instance.
+        device: Device string (``"cuda"``).
+        fused_fn: ``(q, k_packed, k_norms, centroids, rotation, is_causal)
+            -> Tensor``.  For K+V kernels the closure captures ``v_packed``
+            and ``v_norms`` from the caller's scope.
+        is_causal: Whether to apply causal masking.
+        threshold: Minimum cosine similarity between fused and unfused outputs.
+    """
+    from turboquant_vllm.triton.flash_attention import triton_flash_attention
+
+    k_packed, k_norms = compress_tq4(k, tq4_quantizer)
+    k_dec = decompress_tq4(k_packed, k_norms, tq4_quantizer).to(q.dtype)
+    centroids = tq4_quantizer.codebook.centroids.to(device)
+    rotation = tq4_quantizer.rotation.to(device)
+
+    expected = triton_flash_attention(q, k_dec, v_ref, is_causal=is_causal)
+    actual = fused_fn(q, k_packed, k_norms, centroids, rotation, is_causal)
+
+    cos = cosine_similarity_flat(actual, expected)
+    assert cos > threshold, f"Fused vs unfused cosine {cos:.6f} < {threshold}"
