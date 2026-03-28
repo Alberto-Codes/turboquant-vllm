@@ -1,5 +1,7 @@
 """Tests for Lloyd-Max codebook solver and quantizer."""
 
+from __future__ import annotations
+
 import pytest
 import torch
 

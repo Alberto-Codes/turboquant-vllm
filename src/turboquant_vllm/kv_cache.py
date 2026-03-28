@@ -14,6 +14,8 @@ Two integration modes:
 Both use non-invasive method replacement: we save a reference to the
 original update() method and replace it with a wrapper. This avoids
 subclassing DynamicCache, which is fragile across transformers versions.
+Both classes support the context manager protocol (``with`` statement)
+for automatic ``restore()`` on scope exit, and detect double-wrapping.
 
 Usage:
     ```python
@@ -21,10 +23,11 @@ Usage:
     cache = DynamicCache()
     tq_cache = TurboQuantKVCache(cache, head_dim=128, bits=3)
 
-    # Mode 2: Real VRAM savings
+    # Mode 2: Real VRAM savings (with context manager)
     cache = DynamicCache()
-    compressed = CompressedDynamicCache(cache, head_dim=128, bits=3)
-    # In both cases, pass cache (not the wrapper) to model.generate()
+    with CompressedDynamicCache(cache, head_dim=128, bits=3) as compressed:
+        pass  # cache.update is patched inside the block
+    # cache.update is restored here
     ```
 
 Examples:
@@ -42,6 +45,7 @@ See Also:
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Any
 
@@ -61,6 +65,9 @@ class TurboQuantKVCache:
     operates on decompressed keys. For the QJL-corrected inner product
     path (TurboQuantProd), a custom attention kernel would be needed —
     see TurboQuantCompressorV2.asymmetric_attention_scores().
+
+    Supports the context manager protocol for automatic ``restore()``
+    on scope exit, and warns if the cache is already wrapped.
 
     Attributes:
         cache (Any): The wrapped DynamicCache instance.
@@ -99,6 +106,10 @@ class TurboQuantKVCache:
             seed: Random seed for reproducibility.
             compress_keys: Whether to compress key tensors.
             compress_values: Whether to compress value tensors.
+
+        Warns:
+            UserWarning: If ``cache`` is already wrapped by a TurboQuant
+                wrapper. Call ``restore()`` on the existing wrapper first.
         """
         self.cache = cache
         self.head_dim = head_dim
@@ -116,6 +127,18 @@ class TurboQuantKVCache:
         # See: https://dejan.ai/blog/turboquant/ (TurboQuant_mse for drop-in cache)
         self.key_compressor = TurboQuantCompressorMSE(head_dim, bits, seed=seed)
         self.value_compressor = TurboQuantCompressorMSE(head_dim, bits, seed=seed)
+
+        # Detect double-compression: if cache.update is already a bound method
+        # on one of our wrapper classes, the cache is already wrapped.
+        if hasattr(cache.update, "__self__") and isinstance(
+            cache.update.__self__, (CompressedDynamicCache, TurboQuantKVCache)
+        ):
+            warnings.warn(
+                "Cache is already wrapped by TurboQuant. "
+                "Call restore() on the existing wrapper first.",
+                UserWarning,
+                stacklevel=2,
+            )
 
         # Patch the cache's update method
         self._original_update = cache.update
@@ -182,6 +205,23 @@ class TurboQuantKVCache:
         """
         self.cache.update = self._original_update
 
+    def __enter__(self) -> TurboQuantKVCache:
+        """Enter the context manager.
+
+        Returns:
+            Self, for use in ``with ... as`` bindings.
+        """
+        return self
+
+    def __exit__(self, *exc: object) -> bool:
+        """Exit the context manager, restoring the original cache methods.
+
+        Returns:
+            False — exceptions are never suppressed.
+        """
+        self.restore()
+        return False
+
 
 @dataclass
 class _CompressedLayer:
@@ -241,7 +281,8 @@ class CompressedDynamicCache:
 
     Integration strategy: non-invasive method replacement (same pattern
     as TurboQuantKVCache). Patches ``update()`` and ``get_seq_length()``
-    on the wrapped DynamicCache.
+    on the wrapped DynamicCache. Supports the context manager protocol
+    for automatic ``restore()`` on scope exit, and warns on double-wrap.
 
     Attributes:
         cache (Any): The wrapped DynamicCache instance.
@@ -288,6 +329,10 @@ class CompressedDynamicCache:
 
         Raises:
             ValueError: If ``bits=4`` and ``head_dim`` is odd.
+
+        Warns:
+            UserWarning: If ``cache`` is already wrapped by a TurboQuant
+                wrapper. Call ``restore()`` on the existing wrapper first.
         """
         if bits == 4 and head_dim % 2 != 0:
             msg = f"bits=4 requires even head_dim for nibble packing, got {head_dim}"
@@ -308,6 +353,18 @@ class CompressedDynamicCache:
         self._decompressed_v: list[torch.Tensor | None] = []
         self._original_dtype: torch.dtype = torch.bfloat16
         self.fused_mode = False
+
+        # Detect double-compression: if cache.update is already a bound method
+        # on one of our wrapper classes, the cache is already wrapped.
+        if hasattr(cache.update, "__self__") and isinstance(
+            cache.update.__self__, (CompressedDynamicCache, TurboQuantKVCache)
+        ):
+            warnings.warn(
+                "Cache is already wrapped by TurboQuant. "
+                "Call restore() on the existing wrapper first.",
+                UserWarning,
+                stacklevel=2,
+            )
 
         # Patch cache methods
         self._original_update = cache.update
@@ -616,6 +673,23 @@ class CompressedDynamicCache:
         """
         self.cache.update = self._original_update
         self.cache.get_seq_length = self._original_get_seq_length
+
+    def __enter__(self) -> CompressedDynamicCache:
+        """Enter the context manager.
+
+        Returns:
+            Self, for use in ``with ... as`` bindings.
+        """
+        return self
+
+    def __exit__(self, *exc: object) -> bool:
+        """Exit the context manager, restoring the original cache methods.
+
+        Returns:
+            False — exceptions are never suppressed.
+        """
+        self.restore()
+        return False
 
     def vram_bytes(self) -> int:
         """Calculate total VRAM used by compressed storage.

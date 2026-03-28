@@ -1,5 +1,7 @@
 """Tests for production compressor wrappers and attention score estimation."""
 
+from __future__ import annotations
+
 import pytest
 import torch
 

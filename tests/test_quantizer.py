@@ -1,5 +1,7 @@
 """Tests for TurboQuantMSE and TurboQuantProd quantizers."""
 
+from __future__ import annotations
+
 import math
 
 import pytest
