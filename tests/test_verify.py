@@ -5,11 +5,13 @@ from __future__ import annotations
 import json
 
 import pytest
+import torch
 
 from turboquant_vllm.verify import (
     CACHE_PARITY_THRESHOLD,
     VALIDATED_MODELS,
     _format_human_summary,
+    _run_verification,
     main,
 )
 
@@ -347,3 +349,20 @@ class TestVerifyThreshold:
         with pytest.raises(SystemExit) as exc_info:
             main(["--model", "test/m", "--bits", "4"])
         assert exc_info.value.code == 0
+
+
+@pytest.mark.gpu
+@pytest.mark.slow
+class TestVerifyGPU:
+    """GPU smoke tests for _run_verification on real hardware."""
+
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
+    def test_run_verification_molmo2_passes(self) -> None:
+        """End-to-end verification of Molmo2-4B on real GPU."""
+        # 0.99 = compression quality tier for random Gaussian data at 4-bit
+        # (verify.py's default 0.999 is cache parity tier — wrong for this comparison)
+        result = _run_verification("allenai/Molmo2-4B", bits=4, threshold=0.99)
+        assert result["status"] == "PASS"
+        assert result["min_cosine"] > 0.99
+        assert result["validation"] == "VALIDATED"
+        torch.cuda.empty_cache()
