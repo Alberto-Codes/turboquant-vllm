@@ -132,21 +132,19 @@ class TestTQ4PackedCacheRoundTrip:
     HEAD_SIZE = 128
     BLOCK_SIZE = 16
 
-    def _make_impl(self):
-        """Create a TQ4AttentionImpl without full vLLM init."""
+    def _make_impl(self, quantizer):
+        """Create a TQ4AttentionImpl without full vLLM init.
+
+        Args:
+            quantizer: TurboQuantMSE instance (from conftest tq4_quantizer fixture).
+        """
+        from turboquant_vllm.vllm.tq4_backend import TQ4_NORM_BYTES
+
         # Bypass FlashAttentionImpl.__init__ -- only init TQ4 primitives
         impl = object.__new__(TQ4AttentionImpl)
         impl.head_size = self.HEAD_SIZE
         impl.num_kv_heads = self.NUM_KV_HEADS
 
-        from turboquant_vllm.quantizer import TurboQuantMSE
-        from turboquant_vllm.vllm.tq4_backend import (
-            TQ4_BITS,
-            TQ4_NORM_BYTES,
-            TQ4_SEED,
-        )
-
-        quantizer = TurboQuantMSE(self.HEAD_SIZE, TQ4_BITS, seed=TQ4_SEED)
         impl._tq4_rotation = quantizer.rotation
         impl._tq4_centroids = quantizer.codebook.centroids
         impl._tq4_boundaries = quantizer.codebook.boundaries
@@ -168,8 +166,8 @@ class TestTQ4PackedCacheRoundTrip:
         total_bytes = self.NUM_KV_HEADS * _tq4_bytes_per_token_kv(self.HEAD_SIZE)
         return torch.zeros(num_blocks, self.BLOCK_SIZE, total_bytes, dtype=torch.uint8)
 
-    def test_compress_store_decompress_single_token(self):
-        impl = self._make_impl()
+    def test_compress_store_decompress_single_token(self, tq4_quantizer):
+        impl = self._make_impl(tq4_quantizer)
         kv_cache = self._make_cache(num_blocks=4)
 
         key = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
@@ -204,14 +202,14 @@ class TestTQ4PackedCacheRoundTrip:
         assert reconstructed_k.any(), "Decompressed K should be non-zero"
         assert reconstructed_v.any(), "Decompressed V should be non-zero"
 
-    def test_round_trip_cosine_similarity(self):
+    def test_round_trip_cosine_similarity(self, tq4_quantizer):
         """TQ4 round-trip should achieve >0.85 cosine on random data.
 
         Note: real model KV cache data achieves >0.97 cosine (validated
         in experiment 003/005).  Random Gaussian vectors give lower cosine
         because their distribution differs from actual KV activations.
         """
-        impl = self._make_impl()
+        impl = self._make_impl(tq4_quantizer)
         kv_cache = self._make_cache(num_blocks=2)
 
         key = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
@@ -234,9 +232,9 @@ class TestTQ4PackedCacheRoundTrip:
             assert cos_k > 0.85, f"K head {h} cosine {cos_k:.4f} < 0.85"
             assert cos_v > 0.85, f"V head {h} cosine {cos_v:.4f} < 0.85"
 
-    def test_multi_token_scatter_write(self):
+    def test_multi_token_scatter_write(self, tq4_quantizer):
         """Multiple tokens scattered to different slots."""
-        impl = self._make_impl()
+        impl = self._make_impl(tq4_quantizer)
         kv_cache = self._make_cache(num_blocks=4)
         N = 5
 
@@ -259,9 +257,9 @@ class TestTQ4PackedCacheRoundTrip:
                     f"Token {i} slot {slot} head {h}: K cos {cos_k:.4f}"
                 )
 
-    def test_empty_slots_decompress_to_zero(self):
+    def test_empty_slots_decompress_to_zero(self, tq4_quantizer):
         """Unwritten slots should decompress to zero."""
-        impl = self._make_impl()
+        impl = self._make_impl(tq4_quantizer)
         kv_cache = self._make_cache(num_blocks=2)
 
         # Write only slot 0
@@ -276,9 +274,9 @@ class TestTQ4PackedCacheRoundTrip:
         assert flat_k[0].any(), "Slot 0 should have data"
         assert not flat_k[1].any(), "Slot 1 should be zeros"
 
-    def test_overwrite_slot(self):
+    def test_overwrite_slot(self, tq4_quantizer):
         """Writing to the same slot twice should overwrite."""
-        impl = self._make_impl()
+        impl = self._make_impl(tq4_quantizer)
         kv_cache = self._make_cache(num_blocks=1)
 
         key1 = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)
@@ -300,7 +298,7 @@ class TestTQ4PackedCacheRoundTrip:
         )
         assert cos_k2 > cos_k1, "Overwrite should match key2, not key1"
 
-    def test_cache_shape_matches_backend(self):
+    def test_cache_shape_matches_backend(self, tq4_quantizer):
         """Cache shape from backend matches what decompress expects."""
         shape = TQ4AttentionBackend.get_kv_cache_shape(
             num_blocks=10,
@@ -309,7 +307,7 @@ class TestTQ4PackedCacheRoundTrip:
             head_size=self.HEAD_SIZE,
         )
         cache = torch.zeros(*shape, dtype=torch.uint8)
-        impl = self._make_impl()
+        impl = self._make_impl(tq4_quantizer)
 
         key_cache, value_cache = impl._decompress_cache(cache, torch.float32)
         assert key_cache.shape == (
@@ -325,9 +323,9 @@ class TestTQ4PackedCacheRoundTrip:
             self.HEAD_SIZE,
         )
 
-    def test_bfloat16_output_dtype(self):
+    def test_bfloat16_output_dtype(self, tq4_quantizer):
         """Decompress can produce bf16 output."""
-        impl = self._make_impl()
+        impl = self._make_impl(tq4_quantizer)
         kv_cache = self._make_cache(num_blocks=1)
 
         key = torch.randn(1, self.NUM_KV_HEADS, self.HEAD_SIZE)

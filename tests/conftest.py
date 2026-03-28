@@ -72,6 +72,12 @@ def mse_quantizer() -> TurboQuantMSE:
 
 
 @pytest.fixture(scope="module")
+def tq4_quantizer() -> TurboQuantMSE:
+    """Module-scoped TurboQuantMSE(dim=128, bits=4)."""
+    return TurboQuantMSE(DIM, BITS_4, seed=SEED)
+
+
+@pytest.fixture(scope="module")
 def prod_quantizer() -> TurboQuantProd:
     """Module-scoped TurboQuantProd(dim=128, bits=3)."""
     return TurboQuantProd(DIM, BITS, seed=SEED)

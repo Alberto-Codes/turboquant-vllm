@@ -17,6 +17,7 @@ from .conftest import BITS, DIM, SEED
 
 
 @pytest.mark.unit
+@pytest.mark.slow
 class TestLongSequenceRegression:
     """Regression tests for precision at realistic sequence lengths."""
 

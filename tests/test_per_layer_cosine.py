@@ -9,6 +9,8 @@ Formalizes experimentally validated results from Experiments 002-005:
 
 from __future__ import annotations
 
+import functools
+
 import pytest
 import torch
 import torch.nn.functional as F
@@ -22,11 +24,12 @@ NUM_HEADS = 8
 SEQ_LEN = 128
 
 
+@functools.lru_cache(maxsize=None)
 def _per_layer_cosine(
     bits: int,
     num_layers: int = NUM_LAYERS,
     seq_len: int = SEQ_LEN,
-) -> list[float]:
+) -> tuple[float, ...]:
     """Compress random KV through multiple layers, return per-layer cosine.
 
     Args:
@@ -35,7 +38,7 @@ def _per_layer_cosine(
         seq_len: Sequence length per layer.
 
     Returns:
-        List of cosine similarities (one per layer) between original
+        Tuple of cosine similarities (one per layer) between original
         and decompressed keys.
     """
     from transformers import DynamicCache
@@ -59,7 +62,7 @@ def _per_layer_cosine(
         cos = F.cosine_similarity(original.flatten(), decompressed.flatten(), dim=0)
         cosines.append(cos.item())
 
-    return cosines
+    return tuple(cosines)
 
 
 @pytest.mark.unit
@@ -112,7 +115,73 @@ class TestPerLayerCosine:
         )
 
 
+@functools.lru_cache(maxsize=None)
+def _cached_autoregressive_decode(
+    bits: int,
+    num_layers: int = NUM_LAYERS,
+    prefill_len: int = 256,
+    gen_steps: int = 64,
+) -> tuple[tuple[float, ...], tuple[float, ...]]:
+    """Simulate prefill + decode, return per-layer cosine for both phases.
+
+    Args:
+        bits: Quantization bit width.
+        num_layers: Number of transformer layers.
+        prefill_len: Tokens in prefill phase.
+        gen_steps: Number of decode steps.
+
+    Returns:
+        Tuple of (prefill_cosines, decode_cosines) per layer.
+    """
+    from transformers import DynamicCache
+
+    torch.manual_seed(42)
+    cache = DynamicCache()
+    _ = CompressedDynamicCache(cache, head_dim=DIM, bits=bits)
+
+    # Prefill
+    prefill_originals: list[torch.Tensor] = []
+    for layer_idx in range(num_layers):
+        keys = torch.randn(1, NUM_HEADS, prefill_len, DIM)
+        values = torch.randn(1, NUM_HEADS, prefill_len, DIM)
+        prefill_originals.append(keys.clone())
+        cache.update(keys, values, layer_idx=layer_idx)
+
+    prefill_cosines = []
+    for layer_idx in range(num_layers):
+        layer_keys = cache.layers[layer_idx].keys
+        assert layer_keys is not None  # populated by cache.update above
+        decompressed = layer_keys[:, :, :prefill_len, :]
+        cos = F.cosine_similarity(
+            prefill_originals[layer_idx].flatten(),
+            decompressed.flatten(),
+            dim=0,
+        )
+        prefill_cosines.append(cos.item())
+
+    # Decode — accumulate tokens one at a time
+    decode_originals: list[list[torch.Tensor]] = [[] for _ in range(num_layers)]
+    for _ in range(gen_steps):
+        for layer_idx in range(num_layers):
+            keys = torch.randn(1, NUM_HEADS, 1, DIM)
+            values = torch.randn(1, NUM_HEADS, 1, DIM)
+            decode_originals[layer_idx].append(keys.clone())
+            cache.update(keys, values, layer_idx=layer_idx)
+
+    decode_cosines = []
+    for layer_idx in range(num_layers):
+        all_orig = torch.cat(decode_originals[layer_idx], dim=2)
+        layer_keys = cache.layers[layer_idx].keys
+        assert layer_keys is not None  # populated by decode loop above
+        decompressed = layer_keys[:, :, prefill_len:, :]
+        cos = F.cosine_similarity(all_orig.flatten(), decompressed.flatten(), dim=0)
+        decode_cosines.append(cos.item())
+
+    return tuple(prefill_cosines), tuple(decode_cosines)
+
+
 @pytest.mark.unit
+@pytest.mark.slow
 class TestMultiLayerComposition:
     """Validate multi-layer composition does not degrade quality.
 
@@ -127,7 +196,7 @@ class TestMultiLayerComposition:
         num_layers: int = NUM_LAYERS,
         prefill_len: int = 256,
         gen_steps: int = 64,
-    ) -> tuple[list[float], list[float]]:
+    ) -> tuple[tuple[float, ...], tuple[float, ...]]:
         """Simulate prefill + decode, return per-layer cosine for both phases.
 
         Args:
@@ -139,51 +208,7 @@ class TestMultiLayerComposition:
         Returns:
             Tuple of (prefill_cosines, decode_cosines) per layer.
         """
-        from transformers import DynamicCache
-
-        torch.manual_seed(42)
-        cache = DynamicCache()
-        _ = CompressedDynamicCache(cache, head_dim=DIM, bits=bits)
-
-        # Prefill
-        prefill_originals: list[torch.Tensor] = []
-        for layer_idx in range(num_layers):
-            keys = torch.randn(1, NUM_HEADS, prefill_len, DIM)
-            values = torch.randn(1, NUM_HEADS, prefill_len, DIM)
-            prefill_originals.append(keys.clone())
-            cache.update(keys, values, layer_idx=layer_idx)
-
-        prefill_cosines = []
-        for layer_idx in range(num_layers):
-            layer_keys = cache.layers[layer_idx].keys
-            assert layer_keys is not None  # populated by cache.update above
-            decompressed = layer_keys[:, :, :prefill_len, :]
-            cos = F.cosine_similarity(
-                prefill_originals[layer_idx].flatten(),
-                decompressed.flatten(),
-                dim=0,
-            )
-            prefill_cosines.append(cos.item())
-
-        # Decode — accumulate tokens one at a time
-        decode_originals: list[list[torch.Tensor]] = [[] for _ in range(num_layers)]
-        for _ in range(gen_steps):
-            for layer_idx in range(num_layers):
-                keys = torch.randn(1, NUM_HEADS, 1, DIM)
-                values = torch.randn(1, NUM_HEADS, 1, DIM)
-                decode_originals[layer_idx].append(keys.clone())
-                cache.update(keys, values, layer_idx=layer_idx)
-
-        decode_cosines = []
-        for layer_idx in range(num_layers):
-            all_orig = torch.cat(decode_originals[layer_idx], dim=2)
-            layer_keys = cache.layers[layer_idx].keys
-            assert layer_keys is not None  # populated by decode loop above
-            decompressed = layer_keys[:, :, prefill_len:, :]
-            cos = F.cosine_similarity(all_orig.flatten(), decompressed.flatten(), dim=0)
-            decode_cosines.append(cos.item())
-
-        return prefill_cosines, decode_cosines
+        return _cached_autoregressive_decode(bits, num_layers, prefill_len, gen_steps)
 
     @pytest.mark.parametrize(
         ("bits", "min_cosine"),

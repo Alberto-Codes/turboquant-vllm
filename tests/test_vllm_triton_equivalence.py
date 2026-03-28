@@ -24,20 +24,26 @@ class TestTritonPyTorchEquivalence:
     HEAD_DIM = 128
     NUM_KV_HEADS = 8
 
-    @pytest.fixture(autouse=True)
-    def _setup(self):
-        """Set up quantizer primitives for both paths."""
-        from turboquant_vllm.quantizer import TurboQuantMSE
-        from turboquant_vllm.vllm.tq4_backend import TQ4_BITS, TQ4_SEED
+    # Set dynamically by class-scoped _setup fixture via request.cls
+    device: torch.device
+    rotation: torch.Tensor
+    rotation_t: torch.Tensor
+    boundaries: torch.Tensor
+    centroids: torch.Tensor
+    rot_T_even: torch.Tensor
+    rot_T_odd: torch.Tensor
 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        quantizer = TurboQuantMSE(self.HEAD_DIM, TQ4_BITS, seed=TQ4_SEED)
-        self.rotation = quantizer.rotation.to(self.device)
-        self.rotation_t = self.rotation.T.contiguous()
-        self.boundaries = quantizer.codebook.boundaries.to(self.device)
-        self.centroids = quantizer.codebook.centroids.to(self.device)
-        self.rot_T_even = self.rotation_t[:, 0::2].contiguous()
-        self.rot_T_odd = self.rotation_t[:, 1::2].contiguous()
+    @pytest.fixture(autouse=True, scope="class")
+    def _setup(self, request, tq4_quantizer):
+        """Set up quantizer primitives for both paths (once per class)."""
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        request.cls.device = device
+        request.cls.rotation = tq4_quantizer.rotation.to(device)
+        request.cls.rotation_t = request.cls.rotation.T.contiguous()
+        request.cls.boundaries = tq4_quantizer.codebook.boundaries.to(device)
+        request.cls.centroids = tq4_quantizer.codebook.centroids.to(device)
+        request.cls.rot_T_even = request.cls.rotation_t[:, 0::2].contiguous()
+        request.cls.rot_T_odd = request.cls.rotation_t[:, 1::2].contiguous()
 
     # --- helpers: old PyTorch path ---
 
