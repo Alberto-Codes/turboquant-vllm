@@ -27,6 +27,7 @@ COMPRESSION_QUALITY_THRESHOLD = 0.99  # compression quality tier -- see architec
 
 REGRESSION_MODELS = [
     pytest.param("allenai/Molmo2-4B", id="molmo2-4b"),
+    pytest.param("mistralai/Mistral-7B-v0.1", id="mistral-7b"),
 ]
 
 
@@ -57,10 +58,8 @@ def test_model_regression(model_id: str) -> None:
 
     try:
         text_config = getattr(config, "text_config", config)
-        head_dim = getattr(
-            text_config,
-            "head_dim",
-            text_config.hidden_size // text_config.num_attention_heads,
+        head_dim = getattr(text_config, "head_dim", None) or (
+            text_config.hidden_size // text_config.num_attention_heads
         )
         num_kv_heads = getattr(
             text_config, "num_key_value_heads", text_config.num_attention_heads

@@ -50,10 +50,10 @@ class TestTritonPyTorchEquivalence:
         """Set up quantizer primitives for both paths (once per class)."""
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         request.cls.device = device
-        request.cls.rotation = tq4_quantizer.rotation.to(device)
+        request.cls.rotation = tq4_quantizer.rotation.to(device).clone()
         request.cls.rotation_t = request.cls.rotation.T.contiguous()
-        request.cls.boundaries = tq4_quantizer.codebook.boundaries.to(device)
-        request.cls.centroids = tq4_quantizer.codebook.centroids.to(device)
+        request.cls.boundaries = tq4_quantizer.codebook.boundaries.to(device).clone()
+        request.cls.centroids = tq4_quantizer.codebook.centroids.to(device).clone()
         request.cls.rot_T_even = request.cls.rotation_t[:, 0::2].contiguous()
         request.cls.rot_T_odd = request.cls.rotation_t[:, 1::2].contiguous()
 

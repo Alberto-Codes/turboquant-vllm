@@ -4,13 +4,16 @@ Runs a 128-token random Gaussian prefill through CompressedDynamicCache and
 reports per-layer cosine similarity vs uncompressed DynamicCache. Outputs
 PASS/FAIL against a configurable threshold (default 0.999, cache parity tier).
 
+Validated model families (Molmo2, Mistral) report ``"validation": "VALIDATED"``
+in the output; unvalidated models report ``"UNVALIDATED"`` as a warning.
+
 Usage:
     ```bash
     # Human-readable summary to stdout
     python -m turboquant_vllm.verify --model allenai/Molmo2-4B --bits 4
 
     # JSON to stdout, human summary to stderr (pipe-friendly)
-    python -m turboquant_vllm.verify --model allenai/Molmo2-4B --bits 4 --json
+    python -m turboquant_vllm.verify --model mistralai/Mistral-7B-v0.1 --bits 4 --json
     ```
 
 Examples:
@@ -37,6 +40,7 @@ from typing import Any
 # Llama and Mistral are added by stories 2.3 and 2.4 respectively.
 VALIDATED_MODELS: dict[str, str] = {
     "molmo2": "Molmo2",
+    "mistral": "Mistral",
 }
 
 CACHE_PARITY_THRESHOLD = 0.999  # cache parity tier
@@ -44,6 +48,9 @@ CACHE_PARITY_THRESHOLD = 0.999  # cache parity tier
 
 def _detect_model_config(model: Any) -> dict[str, int]:
     """Extract KV cache parameters from a model's config.
+
+    Handles both VLMs (``text_config`` wrapper) and text-only models.
+    Falls back to ``hidden_size // num_heads`` when ``head_dim`` is ``None``.
 
     Args:
         model: A loaded HuggingFace model.
@@ -56,7 +63,7 @@ def _detect_model_config(model: Any) -> dict[str, int]:
     text_config = getattr(config, "text_config", config)
     hidden_size = text_config.hidden_size
     num_heads = text_config.num_attention_heads
-    head_dim = getattr(text_config, "head_dim", hidden_size // num_heads)
+    head_dim = getattr(text_config, "head_dim", None) or hidden_size // num_heads
     num_kv_heads = getattr(text_config, "num_key_value_heads", num_heads)
     num_layers = text_config.num_hidden_layers
     return {
