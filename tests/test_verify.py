@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import json
 
 import pytest
@@ -365,4 +366,5 @@ class TestVerifyGPU:
         assert result["status"] == "PASS"
         assert result["min_cosine"] > 0.99
         assert result["validation"] == "VALIDATED"
+        gc.collect()
         torch.cuda.empty_cache()
