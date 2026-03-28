@@ -97,7 +97,7 @@ def test_model_regression(model_id: str) -> None:
                     ref_v.flatten().float(), comp_v.flatten().float(), dim=0
                 ).item()
                 layer_cos = min(k_cos, v_cos)
-                assert layer_cos > COMPRESSION_QUALITY_THRESHOLD, (
+                assert layer_cos >= COMPRESSION_QUALITY_THRESHOLD, (
                     f"Layer {layer_idx}: cosine {layer_cos:.6f} < {COMPRESSION_QUALITY_THRESHOLD}"
                 )
     finally:

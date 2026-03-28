@@ -362,9 +362,11 @@ class TestVerifyGPU:
         """End-to-end verification of Molmo2-4B on real GPU."""
         # 0.99 = compression quality tier for random Gaussian data at 4-bit
         # (verify.py's default 0.999 is cache parity tier — wrong for this comparison)
-        result = _run_verification("allenai/Molmo2-4B", bits=4, threshold=0.99)
-        assert result["status"] == "PASS"
-        assert result["min_cosine"] > 0.99
-        assert result["validation"] == "VALIDATED"
-        gc.collect()
-        torch.cuda.empty_cache()
+        try:
+            result = _run_verification("allenai/Molmo2-4B", bits=4, threshold=0.99)
+            assert result["status"] == "PASS"
+            assert result["min_cosine"] >= 0.99
+            assert result["validation"] == "VALIDATED"
+        finally:
+            gc.collect()
+            torch.cuda.empty_cache()
