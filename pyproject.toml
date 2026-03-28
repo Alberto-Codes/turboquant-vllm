@@ -107,11 +107,12 @@ check-extra-raises = true
 [tool.docvet.presence]
 min-coverage = 100.0
 
-[tool.ty]
-exclude = ["src/turboquant_vllm/vllm/"]
-
 [tool.ty.src]
 include = ["src", "tests"]
+
+[[tool.ty.overrides]]
+include = ["src/turboquant_vllm/vllm/**"]
+rules.unresolved-import = "ignore"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
