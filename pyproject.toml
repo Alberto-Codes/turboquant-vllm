@@ -110,6 +110,11 @@ min-coverage = 100.0
 [tool.ty.src]
 include = ["src", "tests"]
 
+[[tool.ty.overrides]]
+include = ["src/turboquant_vllm/vllm/**", "tests/test_vllm_backend.py"]
+rules.unresolved-import = "ignore"
+rules.unknown-argument = "ignore"
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]

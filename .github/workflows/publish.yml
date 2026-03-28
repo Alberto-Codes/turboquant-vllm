@@ -44,8 +44,29 @@ jobs:
           fi
           echo "Version ${TAG_VERSION} matches — OK"
 
-      - name: Verify wheel contents
+      - name: Smoke-test wheel
         run: |
+          # --- size gate (torch is not bundled, wheel should be small) ---
+          WHEEL=$(ls dist/*.whl)
+          SIZE=$(stat --format=%s "$WHEEL")
+          MAX=$((500 * 1024))
+          if [ "$SIZE" -gt "$MAX" ]; then
+            echo "::error::Wheel is ${SIZE} bytes (max ${MAX})"
+            exit 1
+          fi
+          echo "Wheel size ${SIZE} bytes — OK"
+
+          # --- no test or dev files leaked into wheel ---
+          CONTENTS=$(python3 -m zipfile -l "$WHEEL")
+          for PATTERN in tests/ _bmad/ .pre-commit; do
+            if echo "$CONTENTS" | grep -q "$PATTERN"; then
+              echo "::error::Wheel contains '${PATTERN}' files"
+              exit 1
+            fi
+          done
+          echo "Wheel content exclusions — OK"
+
+          # --- install and verify metadata ---
           uv venv /tmp/smoke --python 3.12
           SMOKE=/tmp/smoke/bin
           uv pip install --python "$SMOKE/python" dist/*.whl --no-deps
@@ -56,7 +77,6 @@ jobs:
           assert m['Version'] == '${GITHUB_REF_NAME#v}', f'Wrong version: {m[\"Version\"]}'
           print(f'{m[\"Name\"]} {m[\"Version\"]} — metadata OK')
           "
-          echo "Wheel contents verified — OK"
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4

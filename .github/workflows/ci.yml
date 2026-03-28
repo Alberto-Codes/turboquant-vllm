@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Lint — ruff, lockfile, supply-chain scan
+  # ---------------------------------------------------------------------------
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv lock --check
+      - run: uv run uv-secure
+
+      - run: uv cache prune --ci
+        if: always()
+        continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # Type check — ty
+  # ---------------------------------------------------------------------------
+  type-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+
+      - run: uv run ty check src tests
+
+      - run: uv cache prune --ci
+        if: always()
+        continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # Test — pytest matrix (GPU and benchmark tests excluded)
+  # ---------------------------------------------------------------------------
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-suffix: py${{ matrix.python-version }}
+      - run: uv python install ${{ matrix.python-version }}
+
+      - name: Run tests
+        run: >
+          uv run pytest
+          -m "not benchmark and not gpu"
+          --cov=src
+          --cov-report=xml
+          --cov-report=term-missing
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+
+      - run: uv cache prune --ci
+        if: always()
+        continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # Docvet — docstring quality
+  # ---------------------------------------------------------------------------
+  docvet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: Alberto-Codes/docvet@v1
