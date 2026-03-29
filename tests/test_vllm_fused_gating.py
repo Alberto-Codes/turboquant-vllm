@@ -68,6 +68,7 @@ def _make_impl(quantizer, *, fused_paged_available=False, max_prefill_len=2048):
     impl._total_bytes = impl._v_idx_end + NUM_KV_HEADS * TQ4_NORM_BYTES
 
     impl._fused_paged_available = fused_paged_available
+    impl._int8_prefill_available = False
     impl._max_prefill_len = max_prefill_len
 
     return impl

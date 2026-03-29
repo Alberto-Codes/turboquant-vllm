@@ -106,6 +106,37 @@ def _parse_fused_paged_env() -> bool:
 
 
 # ---------------------------------------------------------------------------
+# INT8 prefill feature gate (Story 6.4)
+# ---------------------------------------------------------------------------
+
+_int8_prefill_kernel_available = False
+_fused_paged_tq4_int8_prefill_fn = None
+try:
+    from turboquant_vllm.triton.fused_paged_tq4_int8_prefill import (
+        fused_paged_tq4_int8_prefill as _fused_paged_tq4_int8_prefill_fn,
+    )
+
+    _int8_prefill_kernel_available = True
+except (ImportError, RuntimeError) as exc:
+    logger.info("INT8 prefill kernel unavailable: %s", exc)
+
+
+def _parse_int8_prefill_env() -> bool:
+    """Parse ``TQ4_USE_INT8_PREFILL`` environment variable.
+
+    Returns:
+        ``True`` when the env var is set to a truthy value
+        (``"1"``, ``"true"``, ``"yes"``; case-insensitive).
+        ``False`` for everything else including absent.
+    """
+    return os.environ.get("TQ4_USE_INT8_PREFILL", "").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+
+
+# ---------------------------------------------------------------------------
 # KV cache spec (3c.1)
 # ---------------------------------------------------------------------------
 
@@ -286,6 +317,14 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             _parse_fused_paged_env() and _fused_paged_kernel_available
         )
 
+        # INT8 prefill gate (Story 6.4): requires fused decode gate + its own
+        # env var + successful kernel import.
+        self._int8_prefill_available = (
+            self._fused_paged_available
+            and _parse_int8_prefill_env()
+            and _int8_prefill_kernel_available
+        )
+
         # Buffer downsizing source: scheduler knows its own max prefill length.
         # Fallback 2048 matches vLLM's default max_num_batched_tokens for
         # chunked prefill.
@@ -306,6 +345,10 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         logger.info(
             "Fused paged TQ4 decode: %s",
             "enabled" if self._fused_paged_available else "disabled",
+        )
+        logger.info(
+            "INT8 prefill path: %s",
+            "enabled" if self._int8_prefill_available else "disabled",
         )
 
     def _init_cg_buffers(
@@ -613,6 +656,47 @@ class TQ4AttentionImpl(FlashAttentionImpl):
 
         return output
 
+    # ----- INT8 prefill path (Story 6.4) -----
+
+    def _int8_prefill_path(
+        self, query, key, value, kv_cache, attn_metadata, output
+    ) -> torch.Tensor:
+        """Fused paged INT8 prefill: compress → INT8 fused kernel.
+
+        Uses IMMA tensor cores for Q@K^T (INT8) while P@V stays FP16.
+        Same compression pipeline as decompress-all prefill — no changes
+        to ``_compress_and_store()``.
+        """
+        num_actual_tokens = attn_metadata.num_actual_tokens
+
+        # Step 1: Compress and store (same as decompress-all path)
+        if key is not None and value is not None:
+            self._compress_and_store(
+                key,
+                value,
+                kv_cache,
+                attn_metadata.slot_mapping,
+            )
+
+        # Step 2: INT8 fused kernel
+        q_slice = query[:num_actual_tokens]
+        assert _fused_paged_tq4_int8_prefill_fn is not None
+        _fused_paged_tq4_int8_prefill_fn(
+            q_slice,
+            kv_cache,
+            attn_metadata.block_table,
+            attn_metadata.seq_lens,
+            self._tq4_centroids,
+            self._tq4_rotation,
+            self.num_kv_heads,
+            self.head_size,
+            kv_cache.shape[1],  # block_size
+            self.scale,
+            out=output[:num_actual_tokens],
+        )
+
+        return output
+
     # ----- forward -----
 
     def forward(
@@ -672,6 +756,18 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         # decompress + FlashAttn + post-rotate for decode steps.
         if self._fused_paged_available and is_decode:
             return self._fused_decode_path(
+                query, key, value, kv_cache, attn_metadata, output
+            )
+
+        # INT8 prefill (Story 6.4): IMMA tensor core Q@K^T for prefill.
+        # Guard: kernel is single-sequence only; fall back for multi-sequence
+        # batches (vLLM scheduler may combine multiple requests).
+        if (
+            self._int8_prefill_available
+            and not is_decode
+            and attn_metadata.seq_lens.shape[0] == 1
+        ):
+            return self._int8_prefill_path(
                 query, key, value, kv_cache, attn_metadata, output
             )
 

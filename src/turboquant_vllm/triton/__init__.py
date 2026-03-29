@@ -6,6 +6,7 @@ Phase 3 (P5): Fused TQ4 K+V decompression with post-rotation.
 Phase 3c.8: Standalone TQ4 cache decompress kernel for vLLM backend.
 Phase 3c.9: Standalone TQ4 compress kernel for vLLM backend.
 Phase 3a (D9): Fused paged TQ4 decode attention -- decompresses from page table.
+Phase 3b (D9): Fused paged TQ4 INT8 prefill -- IMMA tensor core Q@K^T path.
 
 Legacy: Q@K^T-only fused kernel (superseded -- see Key Lesson #7).
 
@@ -14,6 +15,7 @@ Attributes:
     triton_flash_attention_tq4: Fused TQ4 FA with compressed K tiles.
     triton_flash_attention_tq4_kv: Fused TQ4 FA with compressed K+V tiles.
     fused_paged_tq4_decode: Fused paged TQ4 decode with in-tile decompress.
+    fused_paged_tq4_int8_prefill: Fused paged TQ4 INT8 prefill with IMMA.
     triton_fa_forward: HF AttentionInterface-compatible wrapper.
     register_triton_fa: Register the ``triton_fa`` backend globally.
     install_triton_fa: Register and activate vanilla FA on a model.
@@ -59,6 +61,9 @@ from turboquant_vllm.triton.flash_attention_tq4_kv import (
     triton_flash_attention_tq4_kv,
 )
 from turboquant_vllm.triton.fused_paged_tq4_attention import fused_paged_tq4_decode
+from turboquant_vllm.triton.fused_paged_tq4_int8_prefill import (
+    fused_paged_tq4_int8_prefill,
+)
 from turboquant_vllm.triton.fused_qk_attention import fused_qk_scores
 from turboquant_vllm.triton.tq4_compress import tq4_compress
 from turboquant_vllm.triton.tq4_decompress import tq4_decompress
@@ -76,5 +81,6 @@ __all__ = [
     "tq4_compress",
     "tq4_decompress",
     "fused_paged_tq4_decode",
+    "fused_paged_tq4_int8_prefill",
     "fused_qk_scores",
 ]
