@@ -78,7 +78,8 @@ def load_model(
     """Load a supported model and tokenizer/processor from HuggingFace.
 
     Detects whether the model is a VLM (e.g., Molmo2) or text-only (e.g.,
-    Llama, Mistral) and loads the appropriate classes.
+    Llama, Mistral) and loads the appropriate classes. The config is loaded
+    once and reused for model instantiation to avoid redundant Hub calls.
 
     Args:
         model_id: HuggingFace model identifier (e.g., 'allenai/Molmo2-8B').
@@ -101,6 +102,7 @@ def load_model(
         _reset_vram_tracking()
         model = AutoModelForImageTextToText.from_pretrained(
             model_id,
+            config=config,
             torch_dtype=torch.bfloat16,
             device_map="auto",
             trust_remote_code=True,
@@ -115,6 +117,7 @@ def load_model(
         _reset_vram_tracking()
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
+            config=config,
             torch_dtype=torch.bfloat16,
             device_map="auto",
             trust_remote_code=True,
