@@ -93,8 +93,6 @@ class TestFusedPagedGating:
         """_fused_paged_available is False when TQ4_USE_FUSED_PAGED is not set."""
         monkeypatch.delenv("TQ4_USE_FUSED_PAGED", raising=False)
         impl = _make_impl(tq4_quantizer)
-        # After real __init__, _fused_paged_available should be False
-        # For now we test the helper; real __init__ test below
         assert impl._fused_paged_available is False
 
     @pytest.mark.parametrize(
@@ -163,9 +161,10 @@ class TestFusedPagedGating:
         monkeypatch.setenv("TQ4_USE_FUSED_PAGED", "1")
         import turboquant_vllm.vllm.tq4_backend as backend_mod
 
-        # The kernel should be importable in a CUDA environment
-        # Just verify the parsing side is True
         assert backend_mod._parse_fused_paged_env() is True
+        if not backend_mod._fused_paged_kernel_available:
+            pytest.skip("fused kernel not importable on this platform")
+        assert backend_mod._fused_paged_kernel_available is True
 
 
 # ---------------------------------------------------------------------------

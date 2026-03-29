@@ -331,7 +331,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         # decompression entirely — only prefill needs these buffers.
         # Downsize from (max_blocks*block_size, H, D) to (max_prefill_len, H, D).
         if self._fused_paged_available:
-            decompress_tokens = self._max_prefill_len
+            decompress_tokens = min(self._max_prefill_len, max_tokens)
             buffer_source = "max_prefill_len"
         else:
             decompress_tokens = max_tokens
