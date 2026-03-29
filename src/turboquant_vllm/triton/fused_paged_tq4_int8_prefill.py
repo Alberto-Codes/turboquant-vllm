@@ -15,6 +15,10 @@ The kernel operates in **rotated space**: caller pre-rotates Q by
 ``Pi^T`` and post-rotates the output by ``Pi``.  QJL correction is
 deferred (placeholders in signature, compiled out via constexpr).
 
+Autotune: 4 configs (BLOCK_N in {16, 32} x stages=1 x warps {4, 8}).
+Stages {2, 3} dropped after Experiment 021 profiling showed them 3-5x
+slower than single-stage at 1K-2K prefill on RTX 4090.
+
 Attributes:
     fused_paged_tq4_int8_prefill: Python wrapper that pre-rotates Q,
         launches the INT8 prefill kernel, and post-rotates the output.
@@ -55,12 +59,12 @@ import triton.language as tl
 # ---------------------------------------------------------------------------
 # Autotune configs — BLOCK_M=64 (constexpr), BLOCK_N in {16, 32}
 # BLOCK_N=64 excluded: SRAM ~93 KB, only 6 KB headroom on SM89 (99 KB)
+# stages={2,3} dropped: 3-5x slower than stages=1 at 1K-2K (Experiment 021)
 # ---------------------------------------------------------------------------
 
 _FUSED_INT8_PREFILL_CONFIGS = [
-    triton.Config({"BLOCK_N": BN}, num_stages=s, num_warps=w)
+    triton.Config({"BLOCK_N": BN}, num_stages=1, num_warps=w)
     for BN in [16, 32]
-    for s in [1, 2, 3]
     for w in [4, 8]
 ]
 

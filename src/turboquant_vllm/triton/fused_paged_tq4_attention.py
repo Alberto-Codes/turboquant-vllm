@@ -15,6 +15,10 @@ Scope: FP16/BF16 Q decode path only (``USE_INT8_QK=False``).  INT8 path
 is Story 6.4.  Placeholder parameters are included for forward
 compatibility but compiled out by the constexpr switch.
 
+Autotune: 8 configs (BLOCK_N in {32, 64} x stages {2,3} x warps {4,8}).
+BLOCK_N=16 dropped after Experiment 020 profiling showed it consistently
+slowest across 1K-32K context on RTX 4090.
+
 Attributes:
     fused_paged_tq4_decode: Python wrapper that pre-rotates Q,
         launches the fused paged kernel, and post-rotates the output.
@@ -54,11 +58,12 @@ import triton.language as tl
 
 # ---------------------------------------------------------------------------
 # Autotune configs (key=["HEAD_DIM"] only -- no seq_len, no num_kv_heads)
+# BN=16 dropped: consistently slowest across 1K-32K (Experiment 020 profiling)
 # ---------------------------------------------------------------------------
 
 _FUSED_DECODE_CONFIGS = [
     triton.Config({"BLOCK_N": BN}, num_stages=s, num_warps=w)
-    for BN in [16, 32, 64]
+    for BN in [32, 64]
     for s in [2, 3]
     for w in [4, 8]
 ]

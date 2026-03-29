@@ -1,0 +1,191 @@
+{
+  "experiment": "021-int8-prefill-benchmark",
+  "timestamp": "2026-03-29T21:07:35.199966+00:00",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "model_config": {
+    "H_Q": 28,
+    "H_KV": 4,
+    "HEAD_DIM": 128,
+    "BLOCK_SIZE": 16
+  },
+  "config": {
+    "prefill_lens": [
+      128,
+      512,
+      1024,
+      2048
+    ],
+    "warmup": 10,
+    "timed": 50
+  },
+  "hardware": {
+    "pytorch": "2.10.0+cu128",
+    "cuda": "12.8"
+  },
+  "correctness_gate": {
+    "mean_cosine": 0.999701,
+    "min_cosine": 0.998349
+  },
+  "kernel_results": [
+    {
+      "prefill_length": 128,
+      "decompress_all": {
+        "mean_us": 303.76,
+        "std_us": 74.19,
+        "p50_us": 272.56,
+        "p99_us": 591.1,
+        "min_us": 235.17,
+        "max_us": 591.1
+      },
+      "int8_prefill": {
+        "mean_us": 157.54,
+        "std_us": 37.03,
+        "p50_us": 150.48,
+        "p99_us": 390.14,
+        "min_us": 126.82,
+        "max_us": 390.14
+      },
+      "speedup": 1.811,
+      "throughput_baseline_tok_s": 469621.0,
+      "throughput_int8_tok_s": 850611.0,
+      "projection_range": [
+        1.0,
+        1.3
+      ],
+      "meets_projection": "above"
+    },
+    {
+      "prefill_length": 512,
+      "decompress_all": {
+        "mean_us": 302.4,
+        "std_us": 71.05,
+        "p50_us": 277.23,
+        "p99_us": 610.3,
+        "min_us": 249.86,
+        "max_us": 610.3
+      },
+      "int8_prefill": {
+        "mean_us": 217.64,
+        "std_us": 76.11,
+        "p50_us": 197.65,
+        "p99_us": 465.12,
+        "min_us": 119.81,
+        "max_us": 465.12
+      },
+      "speedup": 1.403,
+      "throughput_baseline_tok_s": 1846842.0,
+      "throughput_int8_tok_s": 2590438.0,
+      "projection_range": [
+        1.1,
+        1.5
+      ],
+      "meets_projection": "within"
+    },
+    {
+      "prefill_length": 1024,
+      "decompress_all": {
+        "mean_us": 377.4,
+        "std_us": 86.31,
+        "p50_us": 347.6,
+        "p99_us": 700.74,
+        "min_us": 316.45,
+        "max_us": 700.74
+      },
+      "int8_prefill": {
+        "mean_us": 386.36,
+        "std_us": 30.03,
+        "p50_us": 388.46,
+        "p99_us": 512.86,
+        "min_us": 322.56,
+        "max_us": 512.86
+      },
+      "speedup": 0.895,
+      "throughput_baseline_tok_s": 2945915.0,
+      "throughput_int8_tok_s": 2636050.0,
+      "projection_range": [
+        1.3,
+        1.8
+      ],
+      "meets_projection": "below"
+    },
+    {
+      "prefill_length": 2048,
+      "decompress_all": {
+        "mean_us": 660.56,
+        "std_us": 51.22,
+        "p50_us": 640.67,
+        "p99_us": 845.79,
+        "min_us": 616.45,
+        "max_us": 845.79
+      },
+      "int8_prefill": {
+        "mean_us": 1071.14,
+        "std_us": 18.45,
+        "p50_us": 1074.18,
+        "p99_us": 1121.38,
+        "min_us": 1043.81,
+        "max_us": 1121.38
+      },
+      "speedup": 0.596,
+      "throughput_baseline_tok_s": 3196654.0,
+      "throughput_int8_tok_s": 1906571.0,
+      "projection_range": [
+        1.3,
+        2.0
+      ],
+      "meets_projection": "below"
+    }
+  ],
+  "autotune_profiling": {
+    "per_length_results": {
+      "128": {
+        "BN=16_s=1_w=4": 134.14,
+        "BN=16_s=1_w=8": 134.14,
+        "BN=16_s=2_w=4": 138.32,
+        "BN=16_s=2_w=8": 141.15,
+        "BN=16_s=3_w=4": 137.14,
+        "BN=16_s=3_w=8": 140.18,
+        "BN=32_s=1_w=4": 136.62,
+        "BN=32_s=1_w=8": 135.52,
+        "BN=32_s=2_w=4": 140.5,
+        "BN=32_s=2_w=8": 141.3,
+        "BN=32_s=3_w=4": 152.37,
+        "BN=32_s=3_w=8": 159.14
+      },
+      "1024": {
+        "BN=16_s=1_w=4": 480.0,
+        "BN=16_s=1_w=8": 805.92,
+        "BN=16_s=2_w=4": 1031.17,
+        "BN=16_s=2_w=8": 1306.62,
+        "BN=16_s=3_w=4": 1061.78,
+        "BN=16_s=3_w=8": 1331.17,
+        "BN=32_s=1_w=4": 389.04,
+        "BN=32_s=1_w=8": 582.96,
+        "BN=32_s=2_w=4": 1245.06,
+        "BN=32_s=2_w=8": 1351.68,
+        "BN=32_s=3_w=4": 1353.22,
+        "BN=32_s=3_w=8": 1427.54
+      },
+      "2048": {
+        "BN=16_s=1_w=4": 1497.9,
+        "BN=16_s=1_w=8": 2749.86,
+        "BN=16_s=2_w=4": 3779.71,
+        "BN=16_s=2_w=8": 4325.38,
+        "BN=16_s=3_w=4": 3355.28,
+        "BN=16_s=3_w=8": 4709.89,
+        "BN=32_s=1_w=4": 1063.94,
+        "BN=32_s=1_w=8": 1742.61,
+        "BN=32_s=2_w=4": 3980.29,
+        "BN=32_s=2_w=8": 4829.7,
+        "BN=32_s=3_w=4": 4724.78,
+        "BN=32_s=3_w=8": 4965.74
+      }
+    },
+    "winners": {
+      "128": "BN=16_s=1_w=4",
+      "1024": "BN=32_s=1_w=4",
+      "2048": "BN=32_s=1_w=4"
+    },
+    "consistent": false
+  }
+}

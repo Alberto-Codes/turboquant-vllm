@@ -1,0 +1,157 @@
+{
+  "experiment": "020-fused-paged-decode-benchmark",
+  "timestamp": "2026-03-29T21:04:47.560712+00:00",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "model_config": {
+    "H_Q": 28,
+    "H_KV": 4,
+    "HEAD_DIM": 128,
+    "BLOCK_SIZE": 16
+  },
+  "config": {
+    "context_lens": [
+      1024,
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "warmup": 20,
+    "timed": 200
+  },
+  "hardware": {
+    "pytorch": "2.10.0+cu128",
+    "cuda": "12.8"
+  },
+  "correctness_gate": {
+    "mean_cosine": 0.999998,
+    "min_cosine": 0.999994
+  },
+  "kernel_results": [
+    {
+      "context_length": 1024,
+      "decompress_all": {
+        "mean_us": 286.13,
+        "std_us": 69.51,
+        "p50_us": 292.46,
+        "p99_us": 543.74,
+        "min_us": 185.34,
+        "max_us": 597.22
+      },
+      "fused_decode": {
+        "mean_us": 168.56,
+        "std_us": 47.43,
+        "p50_us": 172.54,
+        "p99_us": 430.88,
+        "min_us": 86.02,
+        "max_us": 441.34
+      },
+      "speedup": 1.695,
+      "projection_range": [
+        1.2,
+        1.5
+      ],
+      "meets_projection": "above"
+    },
+    {
+      "context_length": 4096,
+      "decompress_all": {
+        "mean_us": 296.31,
+        "std_us": 69.15,
+        "p50_us": 294.91,
+        "p99_us": 550.91,
+        "min_us": 186.11,
+        "max_us": 595.2
+      },
+      "fused_decode": {
+        "mean_us": 360.55,
+        "std_us": 52.72,
+        "p50_us": 373.89,
+        "p99_us": 694.27,
+        "min_us": 269.6,
+        "max_us": 695.3
+      },
+      "speedup": 0.789,
+      "projection_range": [
+        1.5,
+        2.0
+      ],
+      "meets_projection": "below"
+    },
+    {
+      "context_length": 8192,
+      "decompress_all": {
+        "mean_us": 286.89,
+        "std_us": 71.6,
+        "p50_us": 295.34,
+        "p99_us": 523.26,
+        "min_us": 185.34,
+        "max_us": 559.94
+      },
+      "fused_decode": {
+        "mean_us": 608.31,
+        "std_us": 53.08,
+        "p50_us": 629.76,
+        "p99_us": 801.79,
+        "min_us": 515.17,
+        "max_us": 944.13
+      },
+      "speedup": 0.469,
+      "projection_range": [
+        1.8,
+        2.5
+      ],
+      "meets_projection": "below"
+    },
+    {
+      "context_length": 16384,
+      "decompress_all": {
+        "mean_us": 308.31,
+        "std_us": 72.59,
+        "p50_us": 285.68,
+        "p99_us": 589.6,
+        "min_us": 225.28,
+        "max_us": 610.3
+      },
+      "fused_decode": {
+        "mean_us": 1206.49,
+        "std_us": 138.27,
+        "p50_us": 1218.69,
+        "p99_us": 1594.37,
+        "min_us": 1004.7,
+        "max_us": 2226.18
+      },
+      "speedup": 0.234,
+      "projection_range": [
+        2.0,
+        2.8
+      ],
+      "meets_projection": "below"
+    },
+    {
+      "context_length": 32768,
+      "decompress_all": {
+        "mean_us": 420.62,
+        "std_us": 142.19,
+        "p50_us": 405.97,
+        "p99_us": 860.16,
+        "min_us": 279.55,
+        "max_us": 886.78
+      },
+      "fused_decode": {
+        "mean_us": 2131.29,
+        "std_us": 226.14,
+        "p50_us": 2050.05,
+        "p99_us": 3162.11,
+        "min_us": 1984.58,
+        "max_us": 3184.64
+      },
+      "speedup": 0.198,
+      "projection_range": [
+        2.5,
+        3.0
+      ],
+      "meets_projection": "below"
+    }
+  ]
+}
