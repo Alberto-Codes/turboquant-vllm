@@ -102,6 +102,7 @@ def tq4_decompress(
     norms: torch.Tensor,
     centroids: torch.Tensor,
     dtype: torch.dtype = torch.float16,
+    out: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """Decompress TQ4 nibble-packed data to full-precision vectors.
 
@@ -114,6 +115,9 @@ def tq4_decompress(
         norms: ``(N, H, 1)`` fp32 -- per-vector norms.
         centroids: ``(C,)`` fp32 -- centroid table (C=16 for TQ4).
         dtype: Output dtype (default: ``torch.float16``).
+        out: Optional pre-allocated ``(N, H, D)`` output tensor.  When
+            provided, results are written into it and the same tensor is
+            returned.  Follows PyTorch ``out`` convention.
 
     Returns:
         Tensor of shape ``(N, H, D)`` in ``dtype``, still in rotated
@@ -125,13 +129,15 @@ def tq4_decompress(
 
     # CPU fallback: PyTorch path (Triton requires CUDA)
     if not packed.is_cuda:
-        return _tq4_decompress_cpu(packed, norms, centroids, dtype)
+        return _tq4_decompress_cpu(packed, norms, centroids, dtype, out)
 
     # Flatten to 2D for the kernel
     packed_flat = packed.reshape(M, half_D).contiguous()
     norms_flat = norms.reshape(M).contiguous()
 
-    out = torch.empty(M, D, dtype=dtype, device=packed.device)
+    caller_out = out
+    if out is None:
+        out = torch.empty(M, D, dtype=dtype, device=packed.device)
 
     grid = (M,)
     _tq4_decompress_kernel[grid](
@@ -143,6 +149,8 @@ def tq4_decompress(
         HALF_D=half_D,  # ty: ignore[invalid-argument-type]
     )
 
+    if caller_out is not None:
+        return caller_out
     return out.reshape(N, H, D)
 
 
@@ -151,6 +159,7 @@ def _tq4_decompress_cpu(
     norms: torch.Tensor,
     centroids: torch.Tensor,
     dtype: torch.dtype,
+    out: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """Pure PyTorch fallback for CPU tensors (no rotation).
 
@@ -159,6 +168,7 @@ def _tq4_decompress_cpu(
         norms: ``(N, H, 1)`` fp32.
         centroids: ``(C,)`` fp32.
         dtype: Output dtype.
+        out: Optional pre-allocated output tensor.
 
     Returns:
         Tensor ``(N, H, D)`` in ``dtype``, rotated space.
@@ -170,5 +180,9 @@ def _tq4_decompress_cpu(
     indices = torch.stack([high, low], dim=-1).reshape(N * H, D)
     flat_norms = norms.reshape(N * H, 1)
     reconstructed = centroids[indices]
-    result = reconstructed * flat_norms
-    return result.reshape(N, H, D).to(dtype)
+    result = (reconstructed * flat_norms).reshape(N, H, D).to(dtype)
+
+    if out is not None:
+        out.copy_(result)
+        return out
+    return result

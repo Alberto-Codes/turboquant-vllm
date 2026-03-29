@@ -27,7 +27,7 @@ from .conftest import (
 
 
 @pytest.fixture()
-def device():
+def device() -> str:
     """CUDA-only device fixture (overrides conftest parametrized fixture)."""
     if not torch.cuda.is_available():
         pytest.skip("CUDA required for Triton Flash Attention")

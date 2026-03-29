@@ -140,6 +140,7 @@ def tq4_compress(
     rotation_T_even: torch.Tensor,
     rotation_T_odd: torch.Tensor,
     boundaries: torch.Tensor,
+    out: tuple[torch.Tensor, torch.Tensor] | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Compress vectors to TQ4 nibble-packed format.
 
@@ -152,6 +153,9 @@ def tq4_compress(
             ``rotation.T``, pre-split for contiguous loads.
         rotation_T_odd: ``(D, D//2)`` fp32 -- odd columns.
         boundaries: ``(N_BOUND,)`` fp32 quantization boundaries.
+        out: Optional pre-allocated ``(packed, norms)`` buffers.  When
+            provided, results are written into these tensors and the same
+            objects are returned.  Follows PyTorch ``out`` convention.
 
     Returns:
         Tuple of ``(packed, norms)`` where packed is ``(N, H, D//2)``
@@ -162,11 +166,14 @@ def tq4_compress(
     M = N * H
 
     if not x.is_cuda:
-        return _tq4_compress_cpu(x, rotation_T_even, rotation_T_odd, boundaries)
+        return _tq4_compress_cpu(x, rotation_T_even, rotation_T_odd, boundaries, out)
 
     x_flat = x.reshape(M, D).contiguous()
-    packed = torch.empty(M, HALF_D, dtype=torch.uint8, device=x.device)
-    norms = torch.empty(M, dtype=torch.float32, device=x.device)
+    if out is not None:
+        packed, norms = out
+    else:
+        packed = torch.empty(M, HALF_D, dtype=torch.uint8, device=x.device)
+        norms = torch.empty(M, dtype=torch.float32, device=x.device)
 
     N_BOUND = boundaries.shape[0]
     BLOCK_K = min(32, D)
@@ -186,6 +193,8 @@ def tq4_compress(
         BLOCK_K=BLOCK_K,  # ty: ignore[invalid-argument-type]
     )
 
+    if out is not None:
+        return packed, norms
     return packed.reshape(N, H, HALF_D), norms.reshape(N, H, 1)
 
 
@@ -194,6 +203,7 @@ def _tq4_compress_cpu(
     rotation_T_even: torch.Tensor,
     rotation_T_odd: torch.Tensor,
     boundaries: torch.Tensor,
+    out: tuple[torch.Tensor, torch.Tensor] | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Pure PyTorch fallback for CPU tensors.
 
@@ -202,16 +212,18 @@ def _tq4_compress_cpu(
         rotation_T_even: ``(D, D//2)`` fp32 even cols of rotation.T.
         rotation_T_odd: ``(D, D//2)`` fp32 odd cols of rotation.T.
         boundaries: ``(N_BOUND,)`` fp32 boundaries.
+        out: Optional pre-allocated ``(packed, norms)`` buffers.
 
     Returns:
         Tuple of ``(packed, norms)`` — same shapes as Triton path.
     """
     N, H, D = x.shape
     HALF_D = D // 2
-    flat = x.reshape(N * H, D).float()
+    M = N * H
+    flat = x.reshape(M, D).float()
 
-    norms = torch.norm(flat, dim=-1, keepdim=True)
-    normalized = flat / (norms + 1e-10)
+    raw_norms = torch.norm(flat, dim=-1, keepdim=True)
+    normalized = flat / (raw_norms + 1e-10)
 
     # Reconstruct full rotation.T from even/odd halves
     rotation_T = torch.empty(D, D, dtype=torch.float32, device=x.device)
@@ -223,6 +235,14 @@ def _tq4_compress_cpu(
     indices = indices.clamp(0, 2**4 - 1)
 
     idx_u8 = indices.to(torch.uint8)
-    packed = (idx_u8[:, 0::2] << 4) | idx_u8[:, 1::2]
+    raw_packed = (idx_u8[:, 0::2] << 4) | idx_u8[:, 1::2]
 
-    return packed.reshape(N, H, HALF_D), norms.reshape(N, H, 1)
+    packed_out = raw_packed.reshape(N, H, HALF_D)
+    norms_out = raw_norms.reshape(N, H, 1)
+
+    if out is not None:
+        out[0].copy_(packed_out)
+        out[1].copy_(norms_out)
+        return out
+
+    return packed_out, norms_out
