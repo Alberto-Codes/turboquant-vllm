@@ -89,7 +89,7 @@ def build_paged_cache(
 
     # Shuffle physical block assignment to test non-contiguous access.
     phys_order = list(range(total_blocks))
-    random.Random(42).shuffle(phys_order)
+    random.Random(SEED).shuffle(phys_order)
 
     block_idx = 0
     token_offset = 0

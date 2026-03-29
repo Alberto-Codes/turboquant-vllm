@@ -31,7 +31,7 @@ from turboquant_vllm.triton.fused_paged_tq4_int8_prefill import (  # noqa: E402
 )
 from turboquant_vllm.triton.tq4_decompress import tq4_decompress  # noqa: E402
 
-pytestmark = [pytest.mark.unit]
+pytestmark = [pytest.mark.gpu]
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -198,7 +198,7 @@ def _call_fp16_mode(
         K_NORM_OFFSET=k_norm_offset,
         V_IDX_OFFSET=v_idx_offset,
         V_NORM_OFFSET=v_norm_offset,
-        SEQ_LEN=num_tokens,
+        NUM_TOKENS=num_tokens,
         USE_INT8_QK=False,
         QJL_DIM=0,
     )

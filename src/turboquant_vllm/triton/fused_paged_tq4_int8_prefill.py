@@ -111,7 +111,7 @@ def _fused_paged_tq4_int8_prefill_kernel(
     K_NORM_OFFSET: tl.constexpr,
     V_IDX_OFFSET: tl.constexpr,
     V_NORM_OFFSET: tl.constexpr,
-    SEQ_LEN: tl.constexpr,
+    NUM_TOKENS,
     # ── Dual-path switch ──
     USE_INT8_QK: tl.constexpr = True,  # ty: ignore[invalid-parameter-default]
     QJL_DIM: tl.constexpr = 0,  # ty: ignore[invalid-parameter-default]
@@ -124,6 +124,9 @@ def _fused_paged_tq4_int8_prefill_kernel(
     One program per (Q-tile, query head).  Loads BLOCK_M=64 queries,
     loops over all KV tiles with in-tile TQ4 decompression + INT8
     re-quantization, and computes attention with online softmax.
+
+    ``NUM_TOKENS`` is a runtime parameter (not constexpr) to avoid
+    per-sequence-length recompilation.
     """
     # Grid: (cdiv(num_tokens, BLOCK_M), H_Q)
     off_tile = tl.program_id(0)
@@ -138,7 +141,7 @@ def _fused_paged_tq4_int8_prefill_kernel(
     # Load Q tile [BLOCK_M, HEAD_DIM] — each row is a different token's query
     # For prefill with single sequence: all queries share seq 0
     q_base = Q_rot + 0 * stride_qz + off_h_q * stride_qh
-    q_mask = offs_m < SEQ_LEN
+    q_mask = offs_m < NUM_TOKENS
     q_tile = tl.load(
         q_base + offs_m[:, None] * stride_qz + offs_d[None, :] * stride_qk,
         mask=q_mask[:, None],
@@ -308,8 +311,10 @@ def fused_paged_tq4_int8_prefill(
         q: Query ``[num_tokens, H_Q, head_dim]`` fp16/bf16.
         kv_cache: Packed paged cache ``[num_blocks, block_size, total_bytes]``
             uint8.
-        block_table: Page table ``[num_seqs, max_num_blocks_per_seq]`` int32.
-        seq_lens: Sequence lengths ``[num_seqs]`` int32.
+        block_table: Page table ``[1, max_num_blocks_per_seq]`` int32.
+            Must have exactly one sequence (single-sequence kernel).
+        seq_lens: Sequence lengths ``[1]`` int32.  Must have exactly one
+            entry (single-sequence kernel).
         centroids: TQ4 codebook ``[16]`` fp32.
         rotation: Orthogonal rotation ``[head_dim, head_dim]`` fp32.
         num_kv_heads: Number of KV heads.
@@ -320,6 +325,10 @@ def fused_paged_tq4_int8_prefill(
 
     Returns:
         Attention output ``[num_tokens, H_Q, head_dim]`` in original space.
+
+    Raises:
+        ValueError: If ``seq_lens`` or ``block_table`` contain more than
+            one sequence (kernel hardcodes ``seq_id=0``).
     """
     num_tokens, H_Q, D = q.shape
 
@@ -328,6 +337,18 @@ def fused_paged_tq4_int8_prefill(
     assert kv_cache.dtype == torch.uint8
     assert block_table.dtype == torch.int32
     assert seq_lens.dtype == torch.int32
+
+    # Kernel hardcodes seq_id=0; reject multi-sequence inputs at the API boundary.
+    if seq_lens.numel() != 1:
+        raise ValueError(
+            f"fused_paged_tq4_int8_prefill supports only a single sequence, "
+            f"but got seq_lens.numel() == {seq_lens.numel()}."
+        )
+    if block_table.shape[0] != 1:
+        raise ValueError(
+            "fused_paged_tq4_int8_prefill supports only a single sequence "
+            f"(block_table.shape[0] must be 1), but got {block_table.shape[0]}."
+        )
 
     if sm_scale is None:
         sm_scale = 1.0 / math.sqrt(head_dim)
@@ -379,7 +400,7 @@ def fused_paged_tq4_int8_prefill(
         K_NORM_OFFSET=k_norm_offset,
         V_IDX_OFFSET=v_idx_offset,
         V_NORM_OFFSET=v_norm_offset,
-        SEQ_LEN=num_tokens,
+        NUM_TOKENS=num_tokens,
         USE_INT8_QK=True,
         QJL_DIM=0,
     )
