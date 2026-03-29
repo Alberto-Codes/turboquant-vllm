@@ -248,9 +248,12 @@ class TestValidatedModels:
         assert "mistral" in VALIDATED_MODELS
         assert VALIDATED_MODELS["mistral"] == "Mistral"
 
+    def test_llama_exact_match(self):
+        assert "llama" in VALIDATED_MODELS
+        assert VALIDATED_MODELS["llama"] == "Llama"
+
     def test_unvalidated_for_unknown_type(self):
         assert "gpt2" not in VALIDATED_MODELS
-        assert "llama" not in VALIDATED_MODELS
 
     def test_no_substring_match(self):
         # "molmo2" should not match "molmo2-extended" or "xmolmo2"

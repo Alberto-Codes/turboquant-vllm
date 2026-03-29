@@ -28,6 +28,7 @@ COMPRESSION_QUALITY_THRESHOLD = 0.99  # compression quality tier -- see architec
 REGRESSION_MODELS = [
     pytest.param("allenai/Molmo2-4B", id="molmo2-4b"),
     pytest.param("mistralai/Mistral-7B-v0.1", id="mistral-7b"),
+    pytest.param("meta-llama/Llama-3.1-8B", id="llama-3.1-8b"),
 ]
 
 

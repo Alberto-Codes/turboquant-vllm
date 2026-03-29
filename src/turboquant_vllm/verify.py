@@ -4,7 +4,7 @@ Runs a 128-token random Gaussian prefill through CompressedDynamicCache and
 reports per-layer cosine similarity vs uncompressed DynamicCache. Outputs
 PASS/FAIL against a configurable threshold (default 0.999, cache parity tier).
 
-Validated model families (Molmo2, Mistral) report ``"validation": "VALIDATED"``
+Validated model families (Molmo2, Mistral, Llama) report ``"validation": "VALIDATED"``
 in the output; unvalidated models report ``"UNVALIDATED"`` as a warning.
 
 Usage:
@@ -41,6 +41,7 @@ from typing import Any
 VALIDATED_MODELS: dict[str, str] = {
     "molmo2": "Molmo2",
     "mistral": "Mistral",
+    "llama": "Llama",
 }
 
 CACHE_PARITY_THRESHOLD = 0.999  # cache parity tier
