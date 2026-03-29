@@ -19,6 +19,7 @@ Implementation phases:
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass
 from dataclasses import fields as dc_fields
 from typing import TYPE_CHECKING
@@ -72,6 +73,36 @@ def _tq4_bytes_per_token(head_dim: int) -> int:
 def _tq4_bytes_per_token_kv(head_dim: int) -> int:
     """Total packed bytes per token per KV head (K + V combined)."""
     return 2 * _tq4_bytes_per_token(head_dim)
+
+
+# ---------------------------------------------------------------------------
+# Fused paged decode feature gate (Story 6.3)
+# ---------------------------------------------------------------------------
+
+# Try importing the fused kernel at module load time.  If Triton is missing
+# or the kernel's JIT compilation fails at import, the flag stays False and
+# the decompress-all path is used unconditionally.
+_fused_paged_kernel_available = False
+_fused_paged_tq4_decode_fn = None
+try:
+    from turboquant_vllm.triton.fused_paged_tq4_attention import (
+        fused_paged_tq4_decode as _fused_paged_tq4_decode_fn,
+    )
+
+    _fused_paged_kernel_available = True
+except (ImportError, RuntimeError) as exc:
+    logger.info("Fused paged TQ4 decode kernel unavailable: %s", exc)
+
+
+def _parse_fused_paged_env() -> bool:
+    """Parse ``TQ4_USE_FUSED_PAGED`` environment variable.
+
+    Returns:
+        ``True`` when the env var is set to a truthy value
+        (``"1"``, ``"true"``, ``"yes"``; case-insensitive).
+        ``False`` for everything else including absent.
+    """
+    return os.environ.get("TQ4_USE_FUSED_PAGED", "").lower() in ("1", "true", "yes")
 
 
 # ---------------------------------------------------------------------------
@@ -248,6 +279,22 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         # First forward runs during vLLM warmup, before graph capture.
         self._cg_buffers_ready = False
 
+        # Fused paged decode feature gate (Story 6.3, AC 1+6).
+        # Explicit opt-in via TQ4_USE_FUSED_PAGED env var AND successful
+        # kernel import.  Default is False (decompress-all path).
+        self._fused_paged_available = (
+            _parse_fused_paged_env() and _fused_paged_kernel_available
+        )
+
+        # Buffer downsizing source: scheduler knows its own max prefill length.
+        # Fallback 2048 matches vLLM's default max_num_batched_tokens for
+        # chunked prefill.
+        self._max_prefill_len = (
+            vllm_config.scheduler_config.max_num_batched_tokens
+            if vllm_config is not None
+            else 2048
+        )
+
         logger.info(
             "TQ4AttentionImpl: %d KV heads, head_size=%d, "
             "%d bytes/token (%.2fx compression vs FP16)",
@@ -255,6 +302,10 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             head_size,
             self._total_bytes,
             (2 * num_kv_heads * head_size * 2) / self._total_bytes,
+        )
+        logger.info(
+            "Fused paged TQ4 decode: %s",
+            "enabled" if self._fused_paged_available else "disabled",
         )
 
     def _init_cg_buffers(
@@ -276,9 +327,18 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         H = self.num_kv_heads
         D = self.head_size
 
-        # Decompress buffers: full cache decompressed to compute dtype
+        # Decompress buffers: when fused decode is available, decode skips
+        # decompression entirely — only prefill needs these buffers.
+        # Downsize from (max_blocks*block_size, H, D) to (max_prefill_len, H, D).
+        if self._fused_paged_available:
+            decompress_tokens = self._max_prefill_len
+            buffer_source = "max_prefill_len"
+        else:
+            decompress_tokens = max_tokens
+            buffer_source = "full_cache"
+
         self._cg_decompress_k = torch.empty(
-            max_tokens, H, D, dtype=compute_dtype, device=device
+            decompress_tokens, H, D, dtype=compute_dtype, device=device
         )
         self._cg_decompress_v = torch.empty_like(self._cg_decompress_k)
 
@@ -309,10 +369,14 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         self._cg_buffers_ready = True
         dtype_bytes = self._cg_decompress_k.element_size()
         logger.info(
-            "TQ4 CUDA graph buffers allocated: max_tokens=%d, "
+            "TQ4 CUDA graph buffers allocated: decompress=%s "
+            "(fused_paged=%s, tokens=%d, source=%s), "
             "decompress=2×%.1f MiB, compress+row+q_rot=%.1f KiB",
-            max_tokens,
-            max_tokens * H * D * dtype_bytes / (1024 * 1024),
+            self._cg_decompress_k.shape,
+            self._fused_paged_available,
+            decompress_tokens,
+            buffer_source,
+            decompress_tokens * H * D * dtype_bytes / (1024 * 1024),
             (half_D * H + 4 * H + self.num_heads * D * 4 + self._total_bytes) / 1024,
         )
 
@@ -503,6 +567,52 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         )
         return q_rot, key_cache, value_cache
 
+    # ----- fused decode path (Story 6.3) -----
+
+    def _fused_decode_path(
+        self, query, key, value, kv_cache, attn_metadata, output
+    ) -> torch.Tensor:
+        """Fused paged decode: compress → fused kernel (in-place attention + rotation).
+
+        Replaces the decompress-all → FlashAttn → post-rotate pipeline
+        with a single ``fused_paged_tq4_decode()`` call.  The fused
+        wrapper handles Q pre-rotation, in-tile TQ4 decompression,
+        attention scoring, and output post-rotation.
+        """
+        num_actual_tokens = attn_metadata.num_actual_tokens
+
+        # Step 1: Compress and store new tokens (same as decompress-all path)
+        if key is not None and value is not None:
+            self._compress_and_store(
+                key,
+                value,
+                kv_cache,
+                attn_metadata.slot_mapping,
+                compress_out=(self._cg_compress_packed, self._cg_compress_norms),
+                row_out=self._cg_compress_row,
+            )
+
+        # Step 2: Fused kernel — handles Q rotation, paged decompression,
+        # attention, and output post-rotation in one call.
+        q_slice = query[:num_actual_tokens]
+        # Guaranteed non-None: _fused_paged_available requires successful import.
+        assert _fused_paged_tq4_decode_fn is not None
+        _fused_paged_tq4_decode_fn(
+            q_slice,
+            kv_cache,
+            attn_metadata.block_table,
+            attn_metadata.seq_lens,
+            self._tq4_centroids,
+            self._tq4_rotation,
+            self.num_kv_heads,
+            self.head_size,
+            kv_cache.shape[1],  # block_size
+            self.scale,
+            out=output[:num_actual_tokens],
+        )
+
+        return output
+
     # ----- forward -----
 
     def forward(
@@ -557,6 +667,14 @@ class TQ4AttentionImpl(FlashAttentionImpl):
 
         # Steps 1-3: compress, rotate Q, decompress (decode vs prefill path)
         is_decode = self._cg_buffers_ready and num_actual_tokens == 1
+
+        # Fused paged decode (Story 6.3): single kernel replaces
+        # decompress + FlashAttn + post-rotate for decode steps.
+        if self._fused_paged_available and is_decode:
+            return self._fused_decode_path(
+                query, key, value, kv_cache, attn_metadata, output
+            )
+
         if is_decode:
             q_rot, key_cache, value_cache = self._tq4_decode(
                 query, key, value, kv_cache, attn_metadata

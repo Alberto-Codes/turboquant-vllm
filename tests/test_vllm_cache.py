@@ -157,6 +157,8 @@ class TestTQ4PackedCacheRoundTrip:
         impl._tq4_rot_T_even = rot_t[:, 0::2].contiguous()
         impl._tq4_rot_T_odd = rot_t[:, 1::2].contiguous()
         impl._cg_buffers_ready = False
+        impl._fused_paged_available = False
+        impl._max_prefill_len = 2048
 
         half_D = self.HEAD_SIZE // 2
         impl._half_D = half_D
@@ -377,6 +379,8 @@ class TestCUDAGraphBufferPreallocation:
         impl._tq4_rot_T_even = rot_t[:, 0::2].contiguous()
         impl._tq4_rot_T_odd = rot_t[:, 1::2].contiguous()
         impl._cg_buffers_ready = False
+        impl._fused_paged_available = False
+        impl._max_prefill_len = 2048
 
         half_D = self.HEAD_SIZE // 2
         impl._half_D = half_D

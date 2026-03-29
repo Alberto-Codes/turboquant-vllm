@@ -1,0 +1,44 @@
+{
+  "experiment": "018-cuda-graph-decode-latency",
+  "phase": "D7-Phase-C",
+  "timestamp": "2026-03-29T06:12:10.138320+00:00",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "model": "allenai/Molmo2-4B",
+  "config": {
+    "batch_sizes": [
+      1
+    ],
+    "context_lengths": [
+      2048
+    ],
+    "max_new_tokens": 32,
+    "num_trials": 1
+  },
+  "conditions": [
+    {
+      "name": "baseline_eager",
+      "load_time_s": 20.1,
+      "results": [
+        {
+          "batch_size": 1,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 32,
+          "median_tpot_ms": 35.169,
+          "median_throughput_tok_s": 28.43,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 1.1254,
+              "output_tokens": 32,
+              "throughput_tok_s": 28.43,
+              "tpot_ms": 35.169,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
