@@ -1,0 +1,670 @@
+{
+  "experiment": "018-cuda-graph-decode-latency",
+  "phase": "D7-Phase-C",
+  "timestamp": "2026-03-29T06:13:02.899954+00:00",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "model": "allenai/Molmo2-4B",
+  "config": {
+    "batch_sizes": [
+      1,
+      4,
+      8
+    ],
+    "context_lengths": [
+      2048,
+      4096
+    ],
+    "max_new_tokens": 128,
+    "num_trials": 3
+  },
+  "conditions": [
+    {
+      "name": "baseline_eager",
+      "load_time_s": 18.9,
+      "results": [
+        {
+          "batch_size": 1,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 37.835,
+          "median_throughput_tok_s": 26.43,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 4.8626,
+              "output_tokens": 128,
+              "throughput_tok_s": 26.32,
+              "tpot_ms": 37.989,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 4.8396,
+              "output_tokens": 128,
+              "throughput_tok_s": 26.45,
+              "tpot_ms": 37.809,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 4.8428,
+              "output_tokens": 128,
+              "throughput_tok_s": 26.43,
+              "tpot_ms": 37.835,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 4,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 10.947,
+          "median_throughput_tok_s": 91.35,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 5.6098,
+              "output_tokens": 512,
+              "throughput_tok_s": 91.27,
+              "tpot_ms": 10.957,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 5.605,
+              "output_tokens": 512,
+              "throughput_tok_s": 91.35,
+              "tpot_ms": 10.947,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 5.5698,
+              "output_tokens": 512,
+              "throughput_tok_s": 91.92,
+              "tpot_ms": 10.879,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 8,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 6.281,
+          "median_throughput_tok_s": 159.21,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 6.4669,
+              "output_tokens": 1024,
+              "throughput_tok_s": 158.35,
+              "tpot_ms": 6.315,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 6.4317,
+              "output_tokens": 1024,
+              "throughput_tok_s": 159.21,
+              "tpot_ms": 6.281,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 6.3377,
+              "output_tokens": 1024,
+              "throughput_tok_s": 161.57,
+              "tpot_ms": 6.189,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 1,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 39.979,
+          "median_throughput_tok_s": 25.01,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 5.1188,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.01,
+              "tpot_ms": 39.991,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 5.1173,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.01,
+              "tpot_ms": 39.979,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 5.1148,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.03,
+              "tpot_ms": 39.959,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 4,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 12.653,
+          "median_throughput_tok_s": 79.03,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 6.407,
+              "output_tokens": 512,
+              "throughput_tok_s": 79.91,
+              "tpot_ms": 12.514,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 6.4784,
+              "output_tokens": 512,
+              "throughput_tok_s": 79.03,
+              "tpot_ms": 12.653,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 6.4968,
+              "output_tokens": 512,
+              "throughput_tok_s": 78.81,
+              "tpot_ms": 12.689,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 8,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 7.95,
+          "median_throughput_tok_s": 125.79,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 8.2248,
+              "output_tokens": 1024,
+              "throughput_tok_s": 124.5,
+              "tpot_ms": 8.032,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 8.1083,
+              "output_tokens": 1024,
+              "throughput_tok_s": 126.29,
+              "tpot_ms": 7.918,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 8.1404,
+              "output_tokens": 1024,
+              "throughput_tok_s": 125.79,
+              "tpot_ms": 7.95,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "piecewise",
+      "load_time_s": 43.3,
+      "results": [
+        {
+          "batch_size": 1,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 37.588,
+          "median_throughput_tok_s": 26.6,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 4.7983,
+              "output_tokens": 128,
+              "throughput_tok_s": 26.68,
+              "tpot_ms": 37.486,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 4.8113,
+              "output_tokens": 128,
+              "throughput_tok_s": 26.6,
+              "tpot_ms": 37.588,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 4.8197,
+              "output_tokens": 128,
+              "throughput_tok_s": 26.56,
+              "tpot_ms": 37.654,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 4,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 10.83,
+          "median_throughput_tok_s": 92.34,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 5.5593,
+              "output_tokens": 512,
+              "throughput_tok_s": 92.1,
+              "tpot_ms": 10.858,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 5.545,
+              "output_tokens": 512,
+              "throughput_tok_s": 92.34,
+              "tpot_ms": 10.83,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 5.5141,
+              "output_tokens": 512,
+              "throughput_tok_s": 92.85,
+              "tpot_ms": 10.77,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 8,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 6.213,
+          "median_throughput_tok_s": 160.94,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 6.4067,
+              "output_tokens": 1024,
+              "throughput_tok_s": 159.83,
+              "tpot_ms": 6.257,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 6.3625,
+              "output_tokens": 1024,
+              "throughput_tok_s": 160.94,
+              "tpot_ms": 6.213,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 6.2746,
+              "output_tokens": 1024,
+              "throughput_tok_s": 163.2,
+              "tpot_ms": 6.128,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 1,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 39.657,
+          "median_throughput_tok_s": 25.22,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 5.0831,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.18,
+              "tpot_ms": 39.712,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 5.0689,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.25,
+              "tpot_ms": 39.601,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 5.0761,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.22,
+              "tpot_ms": 39.657,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 4,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 12.605,
+          "median_throughput_tok_s": 79.33,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 6.3599,
+              "output_tokens": 512,
+              "throughput_tok_s": 80.5,
+              "tpot_ms": 12.422,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 6.4541,
+              "output_tokens": 512,
+              "throughput_tok_s": 79.33,
+              "tpot_ms": 12.606,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 6.4539,
+              "output_tokens": 512,
+              "throughput_tok_s": 79.33,
+              "tpot_ms": 12.605,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 8,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 7.913,
+          "median_throughput_tok_s": 126.38,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 8.2211,
+              "output_tokens": 1024,
+              "throughput_tok_s": 124.56,
+              "tpot_ms": 8.028,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 8.0902,
+              "output_tokens": 1024,
+              "throughput_tok_s": 126.57,
+              "tpot_ms": 7.901,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 8.1028,
+              "output_tokens": 1024,
+              "throughput_tok_s": 126.38,
+              "tpot_ms": 7.913,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "full_decode",
+      "load_time_s": 31.0,
+      "results": [
+        {
+          "batch_size": 1,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 36.804,
+          "median_throughput_tok_s": 27.17,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 4.7271,
+              "output_tokens": 128,
+              "throughput_tok_s": 27.08,
+              "tpot_ms": 36.93,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 4.7011,
+              "output_tokens": 128,
+              "throughput_tok_s": 27.23,
+              "tpot_ms": 36.728,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 4.7109,
+              "output_tokens": 128,
+              "throughput_tok_s": 27.17,
+              "tpot_ms": 36.804,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 4,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 10.463,
+          "median_throughput_tok_s": 95.58,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 5.4523,
+              "output_tokens": 512,
+              "throughput_tok_s": 93.9,
+              "tpot_ms": 10.649,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 5.3475,
+              "output_tokens": 512,
+              "throughput_tok_s": 95.75,
+              "tpot_ms": 10.444,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 5.3569,
+              "output_tokens": 512,
+              "throughput_tok_s": 95.58,
+              "tpot_ms": 10.463,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 8,
+          "context_length": 2048,
+          "target_context_length": 2048,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 6.14,
+          "median_throughput_tok_s": 162.88,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 6.3137,
+              "output_tokens": 1024,
+              "throughput_tok_s": 162.19,
+              "tpot_ms": 6.166,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 6.2869,
+              "output_tokens": 1024,
+              "throughput_tok_s": 162.88,
+              "tpot_ms": 6.14,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 6.1989,
+              "output_tokens": 1024,
+              "throughput_tok_s": 165.19,
+              "tpot_ms": 6.054,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 1,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 38.821,
+          "median_throughput_tok_s": 25.76,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 4.9713,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.75,
+              "tpot_ms": 38.838,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 4.9692,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.76,
+              "tpot_ms": 38.821,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 4.9601,
+              "output_tokens": 128,
+              "throughput_tok_s": 25.81,
+              "tpot_ms": 38.751,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 4,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 12.379,
+          "median_throughput_tok_s": 80.78,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 6.2152,
+              "output_tokens": 512,
+              "throughput_tok_s": 82.38,
+              "tpot_ms": 12.139,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 6.3379,
+              "output_tokens": 512,
+              "throughput_tok_s": 80.78,
+              "tpot_ms": 12.379,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 6.3628,
+              "output_tokens": 512,
+              "throughput_tok_s": 80.47,
+              "tpot_ms": 12.427,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        },
+        {
+          "batch_size": 8,
+          "context_length": 4096,
+          "target_context_length": 4096,
+          "max_new_tokens": 128,
+          "median_tpot_ms": 7.859,
+          "median_throughput_tok_s": 127.25,
+          "vram_peak_mib": 0.0,
+          "trials": [
+            {
+              "trial": 1,
+              "wall_s": 8.1047,
+              "output_tokens": 1024,
+              "throughput_tok_s": 126.35,
+              "tpot_ms": 7.915,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 2,
+              "wall_s": 8.0204,
+              "output_tokens": 1024,
+              "throughput_tok_s": 127.68,
+              "tpot_ms": 7.832,
+              "vram_peak_mib": 0.0
+            },
+            {
+              "trial": 3,
+              "wall_s": 8.0475,
+              "output_tokens": 1024,
+              "throughput_tok_s": 127.25,
+              "tpot_ms": 7.859,
+              "vram_peak_mib": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
