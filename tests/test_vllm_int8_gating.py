@@ -177,6 +177,7 @@ class TestTwoKernelDispatch:
 
         attn_metadata = mocker.MagicMock()
         attn_metadata.num_actual_tokens = 32  # prefill (> 1 token)
+        attn_metadata.seq_lens = torch.tensor([32], dtype=torch.int32)
 
         output = torch.zeros(32, NUM_HEADS, HEAD_SIZE)
         kv_cache = _make_cache(4)
@@ -263,6 +264,50 @@ class TestTwoKernelDispatch:
         impl.forward(
             layer,
             torch.randn(32, NUM_HEADS, HEAD_SIZE),
+            None,
+            None,
+            kv_cache,
+            attn_metadata,
+            output=output,
+        )
+
+        int8_spy.assert_not_called()
+
+    def test_multi_sequence_prefill_falls_back(self, tq4_quantizer, mocker) -> None:
+        """Multi-sequence batch bypasses INT8 kernel (single-seq only)."""
+        from vllm.v1.attention.backend import AttentionType
+
+        impl = _make_impl(
+            tq4_quantizer, fused_paged_available=True, int8_prefill_available=True
+        )
+        impl.attn_type = AttentionType.DECODER
+        impl.alibi_slopes = None
+        impl.sliding_window = None
+        impl.logits_soft_cap = 0.0
+        impl.vllm_flash_attn_version = None
+        impl.sinks = None
+        impl._cg_buffers_ready = True
+
+        int8_spy = mocker.patch.object(impl, "_int8_prefill_path")
+        mocker.patch.object(
+            impl,
+            "_tq4_prefill",
+            return_value=(torch.zeros(1), torch.zeros(1), torch.zeros(1)),
+        )
+        mocker.patch("vllm.v1.attention.backends.fa_utils.flash_attn_varlen_func")
+
+        attn_metadata = mocker.MagicMock()
+        attn_metadata.num_actual_tokens = 64  # two sequences
+        attn_metadata.seq_lens = torch.tensor([32, 32], dtype=torch.int32)
+        attn_metadata.use_cascade = False
+
+        layer = mocker.MagicMock()
+        output = torch.zeros(64, NUM_HEADS, HEAD_SIZE)
+        kv_cache = _make_cache(8)
+
+        impl.forward(
+            layer,
+            torch.randn(64, NUM_HEADS, HEAD_SIZE),
             None,
             None,
             kv_cache,

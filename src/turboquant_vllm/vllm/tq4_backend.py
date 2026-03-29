@@ -760,7 +760,13 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             )
 
         # INT8 prefill (Story 6.4): IMMA tensor core Q@K^T for prefill.
-        if self._int8_prefill_available and not is_decode:
+        # Guard: kernel is single-sequence only; fall back for multi-sequence
+        # batches (vLLM scheduler may combine multiple requests).
+        if (
+            self._int8_prefill_available
+            and not is_decode
+            and attn_metadata.seq_lens.shape[0] == 1
+        ):
             return self._int8_prefill_path(
                 query, key, value, kv_cache, attn_metadata, output
             )
