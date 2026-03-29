@@ -1,0 +1,57 @@
+{
+  "experiment": "019-fused-paged-hbm-traffic",
+  "phase": "D9-Phase-3a",
+  "timestamp": "2026-03-28",
+  "description": "HBM traffic analysis for fused paged TQ4 decode kernel vs decompress-all reference path",
+  "model_config": {
+    "model": "allenai/Molmo2-4B",
+    "num_kv_heads": 4,
+    "head_dim": 128,
+    "block_size": 16,
+    "tq4_bits": 4
+  },
+  "per_token_byte_layout": {
+    "k_indices_bytes": 256,
+    "k_norms_bytes": 16,
+    "v_indices_bytes": 256,
+    "v_norms_bytes": 16,
+    "total_compressed_bytes": 544,
+    "note": "Per-token across all 4 KV heads: H_KV * (D/2 + 4) * 2 = 4 * (64 + 4) * 2 = 544"
+  },
+  "per_token_per_head": {
+    "compressed_bytes": 68,
+    "fp16_bytes": 256,
+    "compression_ratio": 3.76
+  },
+  "fused_path": {
+    "description": "Single fused kernel reads compressed blocks directly from page table, decompresses in SRAM",
+    "hbm_read_bytes_per_token": 136,
+    "hbm_write_bytes_per_token": 0,
+    "total_hbm_bytes_per_token": 136,
+    "breakdown": "136 = 2 * 68 (K compressed read + V compressed read per KV head)"
+  },
+  "reference_path": {
+    "description": "Decompress-all to HBM temp buffer, then Flash Attention reads decompressed cache",
+    "hbm_read_compressed_bytes_per_token": 136,
+    "hbm_write_decompressed_bytes_per_token": 512,
+    "hbm_read_decompressed_bytes_per_token": 512,
+    "total_hbm_bytes_per_token": 1160,
+    "breakdown": "1160 = 136 (read compressed) + 512 (write FP16 K+V) + 512 (re-read FP16 K+V for FA)"
+  },
+  "comparison": {
+    "bandwidth_reduction_ratio": 8.53,
+    "fused_bytes": 136,
+    "reference_bytes": 1160,
+    "note": "8.53x HBM bandwidth reduction. Since decode attention is deeply memory-bound (arithmetic intensity 27.2 FLOPs/byte vs RTX 4090 ridge point 327 FLOPs/byte), this translates directly to wall-clock speedup."
+  },
+  "validation": {
+    "cache_parity_threshold": 0.999,
+    "kernel_correctness_threshold": 0.998,
+    "36_layer_composition": "PASS",
+    "gqa_configs_tested": [
+      "28Q/4KV (Molmo2)",
+      "32Q/8KV (Llama)",
+      "32Q/8KV (Mistral)"
+    ]
+  }
+}
