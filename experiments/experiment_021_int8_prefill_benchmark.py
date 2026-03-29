@@ -6,8 +6,9 @@ vs decompress-all + attention baseline by using IMMA tensor cores for Q@K^T.
 Caveat: Experiment 017 showed INT8/FP16 ratio of ~0.99x with unoptimized
 single-stage kernels (48 TOPS, 7.3% of 660 TOPS peak). This benchmark
 measures the current kernel as a pre-optimization baseline.  Task 3
-(autotune config profiling) is where INT8 speedup should materialize via
-deeper pipeline staging.
+(autotune config profiling) now focuses on refining single-stage kernel
+configs (num_stages=1); deeper pipeline staging was explored but is
+currently slower on RTX 4090 and not the primary path to INT8 speedup.
 
 Three paths measured:
 

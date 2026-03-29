@@ -19,9 +19,9 @@ Mean cosine: 0.999701, min cosine: 0.998349 — **PASS**
 
 ## INT8 Prefill Gate Recommendation
 
-**Recommendation:** `enable-by-default`
+**Recommendation:** `disable-by-default`
 
-INT8 prefill shows 1.81x peak speedup, exceeding the 1.3x threshold. Recommend enabling TQ4_USE_INT8_PREFILL by default.
+INT8 prefill shows 1.15x median speedup (min 0.60x, max 1.81x) — marginal overall. Keep TQ4_USE_INT8_PREFILL disabled by default; users can opt in.
 
 ## Notes
 
