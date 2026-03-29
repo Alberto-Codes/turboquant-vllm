@@ -121,13 +121,21 @@ def _build_paged_cache(
         num_seqs, max_blocks_per_seq, dtype=torch.int32, device=device
     )
 
-    # Fill pages: assign blocks sequentially
+    # Shuffle physical block assignment to test non-contiguous access.
+    # Production vLLM allocates from a free list -- physical order rarely
+    # matches logical order.
+    import random
+
+    phys_order = list(range(total_blocks))
+    random.Random(42).shuffle(phys_order)
+
     block_idx = 0
     token_offset = 0
     for seq_i, sl in enumerate(seq_lens):
         num_blocks_for_seq = (sl + BLOCK_SIZE - 1) // BLOCK_SIZE
         for b in range(num_blocks_for_seq):
-            block_table[seq_i, b] = block_idx
+            phys_block = phys_order[block_idx]
+            block_table[seq_i, b] = phys_block
             start = token_offset + b * BLOCK_SIZE
             end = min(start + BLOCK_SIZE, token_offset + sl)
             num_tokens_in_block = end - start
@@ -135,7 +143,7 @@ def _build_paged_cache(
             # Pack row: [K_idx | K_norms | V_idx | V_norms]
             for t in range(num_tokens_in_block):
                 global_t = start + t
-                row = kv_cache[block_idx, t]
+                row = kv_cache[phys_block, t]
                 # K indices
                 row[:k_idx_end] = k_packed[global_t].reshape(-1)
                 # K norms (fp32 as bytes)
@@ -272,7 +280,7 @@ def _cosine_sim(a: torch.Tensor, b: torch.Tensor) -> float:
 GQA_CONFIGS = [
     pytest.param(28, 4, id="molmo2_28q_4kv"),
     pytest.param(32, 8, id="llama_32q_8kv"),
-    pytest.param(32, 8, id="mistral_32q_8kv"),
+    pytest.param(4, 4, id="mha_4q_4kv"),
 ]
 
 
@@ -285,12 +293,18 @@ class TestFusedPagedTQ4Decode:
     """Fused paged TQ4 decode kernel correctness tests."""
 
     @pytest.mark.parametrize(("H_Q", "H_KV"), GQA_CONFIGS)
+    @pytest.mark.parametrize(
+        "dtype",
+        [torch.float16, torch.bfloat16],
+        ids=["fp16", "bf16"],
+    )
     def test_cache_parity(
         self,
         device: str,
         tq4_quantizer: TurboQuantMSE,
         H_Q: int,
         H_KV: int,
+        dtype: torch.dtype,
     ) -> None:
         """Fused paged output matches decompress-all reference (>0.999)."""
         seq_lens = [64]
@@ -302,9 +316,7 @@ class TestFusedPagedTQ4Decode:
         v = torch.randn(
             total_tokens, H_KV, HEAD_DIM, device=device, dtype=torch.float16
         )
-        q = torch.randn(
-            len(seq_lens), H_Q, HEAD_DIM, device=device, dtype=torch.float16
-        )
+        q = torch.randn(len(seq_lens), H_Q, HEAD_DIM, device=device, dtype=dtype)
 
         centroids = tq4_quantizer.codebook.centroids.to(device)
         rotation = tq4_quantizer.rotation.to(device)

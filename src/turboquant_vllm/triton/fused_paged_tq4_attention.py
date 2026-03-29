@@ -279,9 +279,14 @@ def fused_paged_tq4_decode(
         block_size: vLLM page size (tokens per block).
         sm_scale: Softmax scale.  Defaults to ``1 / sqrt(head_dim)``.
         out: Optional pre-allocated output ``[num_seqs, H_Q, head_dim]``.
+            When provided, the final post-rotated result is copied into
+            this buffer and returned.  A private scratch buffer is used
+            internally for the kernel's rotated-space output.
 
     Returns:
         Attention output ``[num_seqs, H_Q, head_dim]`` in original space.
+        When ``out`` is provided, returns ``out`` with the result written
+        in-place.
 
     Note:
         INT8 placeholder parameters (``Q_scale``, ``QJL_S``, ``QJL_signs``,
@@ -309,10 +314,9 @@ def fused_paged_tq4_decode(
     # Pre-rotate Q by Pi^T (O(num_seqs), not O(cache_len))
     q_rot = torch.matmul(q.float(), rotation.T).to(q.dtype)
 
-    if out is None:
-        out_rot = torch.empty_like(q)
-    else:
-        out_rot = out
+    # Always use a private scratch buffer for the kernel's rotated-space output.
+    # When ``out`` is provided, the final (post-rotated) result is copied into it.
+    out_rot = torch.empty_like(q)
 
     # INT8 placeholders (unused, compiled out)
     dummy = torch.empty(0, device=q.device)
@@ -354,4 +358,8 @@ def fused_paged_tq4_decode(
     )
 
     # Post-rotate: convert from rotated space back to original space
-    return torch.matmul(out_rot.float(), rotation).to(q.dtype)
+    result = torch.matmul(out_rot.float(), rotation).to(q.dtype)
+    if out is not None:
+        out.copy_(result)
+        return out
+    return result
