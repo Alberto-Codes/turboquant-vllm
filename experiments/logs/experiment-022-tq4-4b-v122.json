@@ -1,0 +1,48 @@
+{
+  "experiment": "022-clip-duration-comparison",
+  "date": "2026-03-29 22:29:16",
+  "tag": "tq4-4b-v122",
+  "model_id": "allenai/Molmo2-4B",
+  "max_new_tokens": 512,
+  "episode": "Seinfeld - S05E12 - The Stall - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1371.3,
+  "start_offset_s": 120,
+  "clips": [
+    {
+      "elapsed_s": 10.04,
+      "output_text": "In a movie theater, four individuals are focused on the screen as one person with a cleft lip breaks into laughter. A man wearing a turquoise blue shirt and holding popcorn stands in front of a sign that reads \"United Artists\" with the coffee-colored Swan brand, sharing the screen with a woman dressed in green at the bar.\n\nThe scene then shows a young man and a young woman sitting together on a red couch. The man, with short brown hair and a blue shirt, has a blue cup of popcorn along with a silver and green box cup in front of him. A woman with long brown hair and a black shirt has her body angled slightly, shows a blunt on her index finger, and holds a piece of popcorn in her left hand.\n\nThroughout, a party is surrounded by red sofas, where multiple people consume drink desserts with straws. One.props is part of the decorative setup. On a darker stage, a show plays on a screen featuring a woman with dark hair dressed in red, set against a neon green and red background with red shilling around the edge. Behind the man, a silhouette wearing black sits.\n\nA blue bucket of popcorn is visible in the foreground as the man talks. The woman, seated to his right with her body still slightly angled, has hands that are clenched in fists. A man with glasses stands behind both individuals.",
+      "input_tokens": 1798,
+      "output_tokens": 274,
+      "characters": {},
+      "duration_s": 5,
+      "clip_size_mb": 3.1
+    },
+    {
+      "elapsed_s": 14.68,
+      "output_text": "The scene opens inside a dimly lit movie theater where an intimate, humorous conversation unfolds between two characters seated together in a red theater seat. One of them is Dan Aykroyd as Austin Powers, who is facing to the right of the screen. He eats popcorn while talking, punctuating his comments with exaggerated movements. Across from him sits the character played by Elizabeth Hurley, who is wearing red lipstick, white earrings, and her hair styled in curls or large wavyles. She rests one hand on her chin and places the other on top of it in a gesture of emphasis, leaning forward as she reacts to what he's saying.\n\nThroughout their exchange, they display a mix of puzzlement and confusion, their expressions animated and playful, suggesting they're both thinking, \"Wait, what? How?\" around particularly absurd or unexpected subject matter. The moment between them carries an air of quirky comedy, fitting the show's style of delivering dry, deadpan humor in a dramatic setting.\n\nAt one point, Elizabeth Hurley's character pauses, her hands rising into a brief stop gesture as if she's reacting mid-sentence. The two continue their back-and-forth, with Austin Powers occasionally glancing left off-screen and then returning his eyes to her. Her gestures and his popcorn-sucking demeanor work in tandem to create a comic rhythm to their exchange, and the pairing establishes a friendship thread as they lean in toward each other together.\n\nBehind them, the audience fills the frames, some absorbed in movies and others entertaining themselves. A row of people is visible down the aisle, and in views from behind, the setting appears warmly lit despite the otherwise dim theater. Among the theatergoers in the background sits a woman in denim jeans with red lipstick and long dark\nbrown hair, wearing a black, long-sleeved, high-necked top. She is seated close to a man whose long lavenders and dark brown hair flows down his back, and she leans her head on top of that long hair, a contemplative posture that suggests she, too, is waiting for something to be said or having her own thoughts drift amid the general hum of the moviegoing crowd.",
+      "input_tokens": 2334,
+      "output_tokens": 438,
+      "characters": {},
+      "duration_s": 15,
+      "clip_size_mb": 6.8
+    },
+    {
+      "elapsed_s": 3.28,
+      "output_text": "The scene takes place in a crowded indoor cinema theater. The lighting is dark and homey, with a warm amber cast throughout the space. Red theater seats create a striking contrast, separated by rows of standard wooden interleaving strips between the rows. The theater appears active and well-attended, with multiple pairs and rows of people spread through the frame.",
+      "input_tokens": 2609,
+      "output_tokens": 71,
+      "characters": {},
+      "duration_s": 30,
+      "clip_size_mb": 12.5
+    },
+    {
+      "elapsed_s": 4.44,
+      "output_text": "The video opens inside a dimly lit theater with red seats and a dark background suggesting a crowded cinema. Adam Sandler and Jennifer Aniston sit side by side watching a baseball game unfold on the big screen. Sandler has brown hair styled shorter on the sides, wears a blue shirt, and appears animated and slightly animated. Aniston, with long brown hair, sits next to him and is dressed in a red",
+      "input_tokens": 2703,
+      "output_tokens": 85,
+      "characters": {},
+      "duration_s": 60,
+      "clip_size_mb": 23.7
+    }
+  ]
+}

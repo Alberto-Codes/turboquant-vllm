@@ -1,0 +1,53 @@
+{
+  "experiment": "022-clip-duration-comparison",
+  "date": "2026-03-29 15:52:10",
+  "tag": "baseline",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 512,
+  "episode": "Seinfeld - S05E12 - The Stall - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1371.3,
+  "start_offset_s": 120,
+  "clips": [
+    {
+      "elapsed_s": 10.08,
+      "output_text": "This scene from Seinfeld takes place in a movie theater. Jerry Seinfeld and Elaine Benes are seated in the row in front, both wearing black. Jerry is across from Elaine, with a blue cup on his lap. They're engaged in a lively conversation, sharing an animated discussion and showing clear chemistry with each other.\n\nThe theater setting includes a brown wall visible in the background. One of the chairs in Jerry and Elaine's row appears to be red and brown. In the row behind them, there's a man wearing a black leather jacket, a business suit, and glasses with short brown hair. He's facing away from the camera. Next to him sits another man in a black suit jacket with short brown hair.\n\nJerry is eating popcorn during their conversation, which adds to the typical movie theater atmosphere. Elaine sits with her hands raised as she speaks passionately to Jerry, while he remains focused on their discussion, reaching for more popcorn. The scene captures a genuine moment of connection between these two characters in a casual movie theater setting.",
+      "input_tokens": 1798,
+      "output_tokens": 208,
+      "characters": {
+        "jerry": 5,
+        "elaine": 4
+      },
+      "duration_s": 5,
+      "clip_size_mb": 3.1
+    },
+    {
+      "elapsed_s": 9.13,
+      "output_text": "The video is a comedy sketch depicting two strangers having an animated conversation while sitting together in a movie theater. They're seated side by side in the front row on red couches, and the entire scene is staged to capture the look and feel of a movie theater setting.\n\nAfter this initial moment between the strangers, the scene then switches to show Jerry Seinfeld sitting next to a woman who is positioned slightly lower than him in the frame. Jerry is wearing a yellow jacket, and the woman beside him is wearing a red dress with a padlock detail on the front. This sudden change in pairing creates an intriguing contrast between the two different interactions taking place.\n\nThe transitions between the seated conversations suggest this is structured comedic material designed to blend different moments of dialogue or setups. The casual, everyday setting of the movie theater combined with the pairing of strangers and famous comedic actors creates potential for humorous setups or punchlines that would be characteristic of comedy sketch work or a observational comedy piece.",
+      "input_tokens": 2334,
+      "output_tokens": 194,
+      "characters": {
+        "jerry": 2
+      },
+      "duration_s": 15,
+      "clip_size_mb": 6.8
+    },
+    {
+      "elapsed_s": 17.5,
+      "output_text": "This clip captures a scene from the movie Ghostbusters 2 set in a movie theater. The focus is primarily on two couples who, throughout the conversation, react and respond to each other's behavior.\n\nIn the foreground, we see Dr. Peter Venkman, recognizable by his short brown hair and blue sweater. He's sitting on a red seat with a blue cup of popcorn in front of him, an object that's a constant throughout their exchange. Next to him is Louisa hamming it up, wearing what appears to be a black shirt. Her animated expressions and hand gestures become more exaggerated as the conversation progresses.\n\nBeside them sits Erin Harris, wearing a blue shirt. She has a blue cup with a green bottom in her hand, parallel to Venkman's but with a different color scheme. The two exchange sharp, questioning glances as the conversation unfolds.\n\nInitially, the atmosphere is relatively calm, with Venkman and Louisa occasionally looking over at Erin Harris while she responds. However, as the exchange continues, Louisa's performance becomes increasingly theatrical and dramatic. Her hand movements grow more pronounced, her expressions more exaggerated, and her overall demeanor shifts from casual conversation to a more performative display.\n\nErin Harris responds to Louisa's escalating behavior throughout, their back-and-forth creating a tense dynamic. The other theater-goers sitting around them react to the ongoing verbal sparring, with people in nearby seats looking over and reacting to the conversation happening around them.\n\nA notable moment occurs when Erin answers Louisa, prompting Venkman to shake his head, demonstrating the tension and disagreement between the characters.\n\nThe setting\u2014a dimly lit movie theater with red seats and casual moviegoers\u2014creates an interesting juxtaposition between the everyday setting and the animated, emotionally charged conversation taking place between the main characters. Despite the mundane theater environment, the couple's interaction becomes the focal point of the scene, surrounded by an audience who are seemingly engaged in the unfolding drama between the two couples.",
+      "input_tokens": 2609,
+      "output_tokens": 403,
+      "characters": {},
+      "duration_s": 30,
+      "clip_size_mb": 12.5
+    },
+    {
+      "elapsed_s": 13.91,
+      "output_text": "It takes place in an urban area where people are watching a baseball game at a movie theater. The scene appears to be set in the 1990s based on the clothing styles, which include winter coats and sweater vests worn by some of the attendees.\n\nIn one part of the theater, people are seated in the red seats watching the game while eating popcorn. There's a close-up of a woman with long brown hair wearing a black shirt who looks very surprised - her eyebrows are raised and her mouth is open in an startled expression. Beside her sits a man with short brown hair in a black shirt, also holding a blue and white popcorn container, his mouth slightly open as if reacting to something on the screen.\n\nNearby, a man in a yellow puffy vest over a red and black plaid shirt with long brown hair has his hand raised to his head, while a woman in a red jacket with black sleeves, who has short brown hair and is wearing a wedding ring, looks toward him with concern.\n\nThe stadium appears to have a row of seats with a red backrest.\n\nIn one area, a young man with slightly curly brown hair wearing a white shirt is engrossed in playing a computer game in green. He's seated at a desk arranged with various books on it, and the setup is illuminated by natural light coming from a window covered by blinds.\n\nThe video seems to capture both the casual movie-going atmosphere and a quiet moment of concentrated gaming activity in the same football stadium.",
+      "input_tokens": 2703,
+      "output_tokens": 304,
+      "characters": {},
+      "duration_s": 60,
+      "clip_size_mb": 23.7
+    }
+  ]
+}

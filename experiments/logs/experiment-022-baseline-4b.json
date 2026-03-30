@@ -1,0 +1,51 @@
+{
+  "experiment": "022-clip-duration-comparison",
+  "date": "2026-03-29 19:48:11",
+  "tag": "baseline-4b",
+  "model_id": "allenai/Molmo2-4B",
+  "max_new_tokens": 512,
+  "episode": "Seinfeld - S05E12 - The Stall - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1371.3,
+  "start_offset_s": 120,
+  "clips": [
+    {
+      "elapsed_s": 8.45,
+      "output_text": "This scene from the movie \"Cinema Paradiso\" features Salvatore and Dora sitting together on red movie theater chairs. Salvatore, played by Julian McMahon, across from her, is studying a chart on his arm while munching on popcorn from a blue bucket. In between bites he briefly glances at Dora, who is played by Charlotte Rampling, before returning his focus to his chart.\n\nDora watches Salvatore with open-mouthed surprise and wide-eyed reactions, reacting with exaggerated expressions and gestures along various upturning of her hands. Throughout the scene, Salvatore continues eating and studying his chart, occasionally shifting his body in his seat. Dora maintains her stance across from him, her attention fixed either on Salvatore or the chart, as their contrasting reactions manifest in these distinct expressions.\n\nThe setting clearly establishes an atmosphere of a classic movie theater experience, with other patrons visible in the surrounding theater seats. The focus remains squarely on the interaction between the two main characters as this exchange unfolds.",
+      "input_tokens": 1798,
+      "output_tokens": 203,
+      "characters": {},
+      "duration_s": 5,
+      "clip_size_mb": 3.1
+    },
+    {
+      "elapsed_s": 11.51,
+      "output_text": "The clip shows two seated characters in a theater environment with red seats, distinguished by a shared color scheme and an \"Athletics\" cup on the table. The man has short brown hair and wears a blue and navy blue shirt, while the woman has long brown hair and is dressed in a black jacket with black pants. In the background, several audience members are visible in the darkened theater, all seemingly focused on something being shown.\n\nThe man shifts slightly to his right and reaches into a blue \"United Artists\" bucket to grab popcorn. As the woman leans toward him to speak, her eyes widen in surprise and she begins an animated, long, excited speech. Her demeanor is highly demonstrative and passionate as she talks while sitting next to him. The man continues eating popcorn casually as he listens, picking it up and eating with his left hand, and then he takes another single piece from the bucket with his right hand.\n\nThe woman's energy spikes higher as she continues, her mouth opening wide in an exaggerated display. Her body language suggests her exuberance and intensity is spilling out beyond words, with her gestures conveying the same level of excitement. The scene appears designed to showcase an over-the-top, entertainment-focused personality, with the woman taking center stage while the man remains relatively relaxed next to her, munching on movie theater snacks.\n\nThroughout, the theater seating, the \"United Artists\" branding, and the attentive audience create a cinematic atmosphere, emphasizing the entertainment nature of the moment with the woman displaying her characteristic animated speaking style and the man calmly enjoying his popcorn.",
+      "input_tokens": 2334,
+      "output_tokens": 316,
+      "characters": {},
+      "duration_s": 15,
+      "clip_size_mb": 6.8
+    },
+    {
+      "elapsed_s": 16.48,
+      "output_text": "The video clip appears to be from the iconic television series \"Seinfeld,\" specifically showing what looks like a movie theater scene featuring Kramer and Elaine. \n\nKramer, the character with thick brown hair and a mustache, is seated in the foreground. He's wearing a dark blue sweater with a light blue collar and has his left arm resting across his chest while holding a dark blue, cardboard bucket of popcorn branded as United Colors of Benetton. His right fist is clenched and then floated upward in a brief gesture, followed by him\nElaine, Kramer's partner, has long dark hair and is wearing a black shirt. She engages in an animated conversation with him, punctuating her points with expressive hand gestures and at least one emphatic thrust of her tongue that she then licks from her lips. The two share quick glances and moments of surprise during their banter, creating a dynamic and sparring energy that's characteristic of their relationship dynamics.\n\nThe setting is clearly a movie theater, with rows of crimson red chairs. The brown wall in the background and the audience create the typical moviegoing atmosphere of the strip-mall-like complex where \"Seinfeld\" was set. The color palette is dominated by the vivid reds of the seats, the blues and black tones of the characters' clothing, and the metallic sheen of the popcorn bucket, all set against the warm brown ambient lighting of the theater.\n\nIn the background, the theater scene is bustling with patrons watching a film. A man wearing glasses is visible passing between the seats as the camera angles shift, adding to the layered, cinematic feel of the scene. Other theatergoers can be seen in various actions - some gazing downward as if checking their phones or reading, others sitting attentively with their heads bowed or faces partially obscured in shadow, all deeply engrossed in their experience at the multiplex.\n\nThe presentation captures several signature elements of \"Seinfeld's\" style - the everyday setting transformed into dramatic theater, the rapid-fire humor and character interactions, the visual quirks like Kramer's floppy arm and clenched fist, and the animated, emotionally charged delivery that equals the signature dialogue rhythm. It's the kind of slice-of-life moment that showcases why the show remains so iconic, blending ordinary daily scenes with the extraordinary humor that made it a cultural touchstone.",
+      "input_tokens": 2609,
+      "output_tokens": 471,
+      "characters": {
+        "kramer": 4,
+        "elaine": 2
+      },
+      "duration_s": 30,
+      "clip_size_mb": 12.5
+    },
+    {
+      "elapsed_s": 13.26,
+      "output_text": "The action unfolds in two different settings, beginning in a movie theater and then shifting to an office.\n\nThe clip opens on Richard Gere and Julia Roberts seated in red theater chairs, with other patrons visible around them. Julia Roberts has long brown hair and a serious, concerned expression, and she's holding a blue bucket of Pringles with visible lettering arranged on it. Richard Gere, with short brown hair, is casually eating from the same bucket. The atmosphere appears tense as Julia expressions her mild concern or confusion directly at Richard.\n\nA comedic twist follows: Julia delivers a cutting remark. Richard reacts by grabbing a handful of salt from the Pringles bucket and sloshing it over his face. As Julia turns to watch him, soaking wet with salt, she remains calm and composed with her arms folded, maintaining her initial posture of mild concern.\n\nThe scene then transitions to an office setting. Joey Tribbiani sits at a desk using a keyboard, shirt changed from blue to purple. Behind him is a gray wall, a window with blinds, and a desk lamp visible. As Joey works, he suddenly peers out of the office door and yells, interrupting his typing moments before resuming his focus.\n\nOverall, it's a \"Seinfeld\"-style sketch that plays with timing\u2014mixing slapstick physical comedy (Julia's salt-sloshing reaction) with deadpan facial expressions and quick dialogue cuts, all conveyed through deliberate pacing and character interaction in these two distinct locations.",
+      "input_tokens": 2703,
+      "output_tokens": 301,
+      "characters": {},
+      "duration_s": 60,
+      "clip_size_mb": 23.7
+    }
+  ]
+}

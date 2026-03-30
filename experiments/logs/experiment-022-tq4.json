@@ -1,0 +1,45 @@
+{
+  "experiment": "022-clip-duration-comparison",
+  "date": "2026-03-29 16:19:29",
+  "tag": "tq4",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 512,
+  "episode": "Seinfeld - S05E12 - The Stall - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1371.3,
+  "start_offset_s": 120,
+  "clips": [
+    {
+      "elapsed_s": 7.74,
+      "output_text": "In this clip from Seinfeld, Jerry and Elaine are sitting together in a movie theater watching a film. The red theater seats and the pop culture setting create a casual evening atmosphere. Jerry is on the left wearing his blue shirt, holding a blue popcorn bucket with white \"United Artists\" text visible, and at one point he reaches into the bucket to grab popcorn. Elaine, on the right, also has a blue cup in front of her. The brown wall backdrop and other occupied seats with people seated and standing along various parts of the theater create the typical theater environment.\n\nThe two are engaged in a light-hearted exchange about the movie while enjoying snacks and popcorn. Jerry brings a piece of popcorn to his mouth in a playful moment. Throughout their conversation, they seem to be sharing their thoughts and reactions to what they're watching, with their easy rapport evident even in this casual setting.\n\nThe scene effectively captures a slice-of-life moment of two close friends enjoying a night out at the movies together, highlighting their chemistry and casual style of interaction. The combination of their dialogue and shared snacks creates an authentic representation of a quintessential Seinfeld evening.",
+      "input_tokens": 1798,
+      "output_tokens": 228,
+      "characters": {
+        "jerry": 3,
+        "elaine": 2
+      },
+      "duration_s": 5,
+      "clip_size_mb": 3.1
+    },
+    {
+      "elapsed_s": 5.01,
+      "output_text": "In a theater with red seats and a brown wall, Carrie and Elaine talk while watching a movie. Carrie, wearing a black jacket, hands Elaine a tub of popcorn which Elaine accepts. Elaine holds a blue cup with United Artists branding while eating popcorn. She leans toward her drinking floss to say, \"I can't stand that it was the same person in everything,\" then adds, \"My god, not like always the role of an honest woman.\" The scene shows Carrie flossing as Elaine talks about being a.f-----d about having achieved more success than the fortunate \"3%,\" while they remain intent on the film playing in the background.",
+      "input_tokens": 2334,
+      "output_tokens": 132,
+      "characters": {
+        "elaine": 5
+      },
+      "duration_s": 15,
+      "clip_size_mb": 6.8
+    },
+    {
+      "duration_s": 30,
+      "clip_size_mb": 12.5,
+      "error": "500 Server Error: Internal Server Error for url: http://127.0.0.1:8100/v1/chat/completions"
+    },
+    {
+      "duration_s": 60,
+      "clip_size_mb": 23.7,
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    }
+  ]
+}

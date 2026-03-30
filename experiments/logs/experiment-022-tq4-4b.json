@@ -1,0 +1,32 @@
+{
+  "experiment": "022-clip-duration-comparison",
+  "date": "2026-03-29 16:44:00",
+  "tag": "tq4-4b",
+  "model_id": "allenai/Molmo2-4B",
+  "max_new_tokens": 512,
+  "episode": "Seinfeld - S05E12 - The Stall - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1371.3,
+  "start_offset_s": 120,
+  "clips": [
+    {
+      "duration_s": 5,
+      "clip_size_mb": 3.1,
+      "error": "500 Server Error: Internal Server Error for url: http://127.0.0.1:8100/v1/chat/completions"
+    },
+    {
+      "duration_s": 15,
+      "clip_size_mb": 6.8,
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    },
+    {
+      "duration_s": 30,
+      "clip_size_mb": 12.5,
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    },
+    {
+      "duration_s": 60,
+      "clip_size_mb": 23.7,
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    }
+  ]
+}

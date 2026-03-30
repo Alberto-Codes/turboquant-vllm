@@ -1,0 +1,39 @@
+{
+  "experiment": "022-clip-duration-comparison",
+  "date": "2026-03-29 19:12:15",
+  "tag": "tq4-v121",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 512,
+  "episode": "Seinfeld - S05E12 - The Stall - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1371.3,
+  "start_offset_s": 120,
+  "clips": [
+    {
+      "elapsed_s": 8.02,
+      "output_text": "In this clip from Seinfeld, Jerry and Elaine are sitting together in a movie theater watching a film. The red theater seats and the pop culture setting create a casual evening atmosphere. Jerry is on the left wearing his blue shirt, holding a blue popcorn bucket with white \"United Artists\" text visible, and at one point he reaches into the bucket to grab popcorn. Elaine, on the right, also has a blue cup in front of her. The brown wall backdrop and other occupied seats with people seated and standing along various parts of the theater create the typical theater environment.\n\nThe two are engaged in a light-hearted exchange about the movie while enjoying snacks and popcorn. Jerry brings a piece of popcorn to his mouth in a playful moment. Throughout their conversation, they seem to be sharing their thoughts and reactions to what they're watching, with their easy rapport evident even in this casual setting.\n\nThe scene effectively captures a slice-of-life moment of two close friends enjoying a night out at the movies together, highlighting their chemistry and casual style of interaction. The combination of their dialogue and shared snacks creates an authentic representation of a quintessential Seinfeld evening.",
+      "input_tokens": 1798,
+      "output_tokens": 228,
+      "characters": {
+        "jerry": 3,
+        "elaine": 2
+      },
+      "duration_s": 5,
+      "clip_size_mb": 3.1
+    },
+    {
+      "duration_s": 15,
+      "clip_size_mb": 6.8,
+      "error": "500 Server Error: Internal Server Error for url: http://127.0.0.1:8100/v1/chat/completions"
+    },
+    {
+      "duration_s": 30,
+      "clip_size_mb": 12.5,
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    },
+    {
+      "duration_s": 60,
+      "clip_size_mb": 23.7,
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+    }
+  ]
+}
