@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.2](https://github.com/Alberto-Codes/turboquant-vllm/compare/v1.2.1...v1.2.2) (2026-03-30)
+
+
+### Bug Fixes
+
+* **vllm:** wire decode decompress to bounded paged scratch buffers ([#45](https://github.com/Alberto-Codes/turboquant-vllm/issues/45)) ([00645d5](https://github.com/Alberto-Codes/turboquant-vllm/commit/00645d546995ad4fbec2dcb6d9ee5979d4e0dab9))
+
+
+### Documentation
+
+* **vllm:** update TQ4MetadataBuilder docstring for conditional CG ([00645d5](https://github.com/Alberto-Codes/turboquant-vllm/commit/00645d546995ad4fbec2dcb6d9ee5979d4e0dab9))
+
 ## [1.2.1](https://github.com/Alberto-Codes/turboquant-vllm/compare/v1.2.0...v1.2.1) (2026-03-30)
 
 
