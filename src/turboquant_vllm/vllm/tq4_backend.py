@@ -166,11 +166,12 @@ class TQ4FullAttentionSpec(FullAttentionSpec):
 
 
 class TQ4MetadataBuilder(FlashAttentionMetadataBuilder):
-    """Metadata builder for TQ4 with single-token-decode CUDA graph support.
+    """Metadata builder for TQ4 with conditional CUDA graph support.
 
-    TQ4 only supports CUDA graphs for single-token decode (the prefill
-    path has dynamic allocations).  Inherits all metadata-building logic
-    from Flash Attention; only the CUDA graph support level differs.
+    CUDA graphs are supported for single-token decode only when the fused
+    paged kernel is available; otherwise CG support is NEVER (the paged
+    decompress path has dynamic allocations).  Inherits all metadata-building
+    logic from Flash Attention; only the CUDA graph support level differs.
     """
 
     @classmethod
