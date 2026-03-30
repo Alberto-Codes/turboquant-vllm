@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/Alberto-Codes/turboquant-vllm/compare/v1.2.0...v1.2.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* **vllm:** wire prefill decompress to bounded paged scratch buffers ([#43](https://github.com/Alberto-Codes/turboquant-vllm/issues/43)) ([ad73c2d](https://github.com/Alberto-Codes/turboquant-vllm/commit/ad73c2d8dec95b88ac4f23f27375a098e2ddd34c))
+
 ## [1.2.0](https://github.com/Alberto-Codes/turboquant-vllm/compare/v1.1.1...v1.2.0) (2026-03-29)
 
 
