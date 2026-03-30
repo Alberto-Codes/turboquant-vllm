@@ -33,9 +33,18 @@ pytestmark = [pytest.mark.unit]
 class TestCUDAGraphBufferPreallocation:
     """Tests for D7 CUDA graph buffer pre-allocation."""
 
-    def test_get_cudagraph_support_returns_never_without_fused(self) -> None:
+    def test_get_cudagraph_support_returns_never_without_fused(self, mocker) -> None:
         """TQ4 builder reports NEVER when fused kernel unavailable."""
         from vllm.v1.attention.backend import AttentionCGSupport
+
+        mocker.patch(
+            "turboquant_vllm.vllm.tq4_backend._parse_fused_paged_env",
+            return_value=False,
+        )
+        mocker.patch(
+            "turboquant_vllm.vllm.tq4_backend._fused_paged_kernel_available",
+            False,
+        )
 
         result = TQ4MetadataBuilder.get_cudagraph_support(None, None)
         assert result == AttentionCGSupport.NEVER
@@ -393,9 +402,18 @@ class TestBoundedDecodeBuffers:
 class TestConditionalCGSupport:
     """Tests for conditional CUDA graph support (AC 4)."""
 
-    def test_cg_support_never_without_fused(self) -> None:
+    def test_cg_support_never_without_fused(self, mocker) -> None:
         """Returns NEVER when fused kernel unavailable."""
         from vllm.v1.attention.backend import AttentionCGSupport
+
+        mocker.patch(
+            "turboquant_vllm.vllm.tq4_backend._parse_fused_paged_env",
+            return_value=False,
+        )
+        mocker.patch(
+            "turboquant_vllm.vllm.tq4_backend._fused_paged_kernel_available",
+            False,
+        )
 
         result = TQ4MetadataBuilder.get_cudagraph_support(None, None)
         assert result == AttentionCGSupport.NEVER
