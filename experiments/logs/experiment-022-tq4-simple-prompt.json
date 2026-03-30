@@ -1,0 +1,52 @@
+{
+  "experiment": "022-clip-duration-comparison",
+  "date": "2026-03-30 05:57:35",
+  "tag": "tq4-simple-prompt",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 512,
+  "prompt": "What is happening in this clip?",
+  "episode": "Seinfeld - S05E12 - The Stall - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1371.3,
+  "start_offset_s": 120,
+  "clips": [
+    {
+      "elapsed_s": 10.21,
+      "output_text": "In this clip, Jerry and Elaine are having a conversation while watching a movie together at a theater. They're sitting on the red theater seats, absorbed in a discussion across the aisle. Jerry is holding a blue \"United Artists\" cup of popcorn in his left hand, taking steady bites and showing easy enjoyment, while Elaine occasionally reaches into her cup to grab popcorn as they continue talking. One of them has their palms up, expressing something emphatically during their exchange.\n\nThe scene captures a moment of a casual date night or leisure outing, with their relaxed body language and steady focus on the screen reflecting a comfortable and intimate interaction. The blue popcorn cup serves as a recurring visual element in the scene, adding to the casual movie-going atmosphere.\n\nIn the foreground, they maintain their lively discussion seemingly unaffected by surrounding patrons, while several others in the theater appear disengaged\u2014as one man is seen looking down, perhaps toward his phone, and another keeps his eyes fixed on the screen like a character from the movie. The theater itself features red seats and brown walls, creating a classic cinema ambiance that frames Jerry, Elaine, and their theatergoing companions.",
+      "input_tokens": 1775,
+      "output_tokens": 229,
+      "characters": {
+        "jerry": 3,
+        "elaine": 3
+      },
+      "duration_s": 5,
+      "clip_size_mb": 3.1
+    },
+    {
+      "elapsed_s": 3.94,
+      "output_text": "The two friends are sharing a movie theater experience together. They're sitting side by side in the red theater seats, with the woman actively engaging in conversation while eating popcorn. She's gesturing animatedly with her free hand as she talks, while the man beside her participates by eating his popcorn from the blue United Artists cup.",
+      "input_tokens": 2311,
+      "output_tokens": 66,
+      "characters": {},
+      "duration_s": 15,
+      "clip_size_mb": 6.8
+    },
+    {
+      "elapsed_s": 7.38,
+      "output_text": "This clip appears to be from a Simpsons episode likely set in a theater setting. The scene centers on Homer Simpson eating popcorn while reacting to something that causes a sudden, unexpected outburst or surprise moment. He's flanked by two seated individuals on either side while other audience members in the background are focused on the screen. At one point, the focus shifts to a frustrated man and woman sitting together, with the man turning to and addressing the other woman next to him while holding a blue cup with white text and a green stripe. Their body language\u2014particularly the woman's rolling her eyes\u2014suggests they're experiencing some kind of annoyance, disagreement, or reaction to what they're watching. The overall atmosphere around them and the behavior of the other characters indicate this is likely something unexpected or somewhat troubling occurring on the screen during this theater or movie-watching scene.",
+      "input_tokens": 2586,
+      "output_tokens": 173,
+      "characters": {},
+      "duration_s": 30,
+      "clip_size_mb": 12.5
+    },
+    {
+      "elapsed_s": 4.37,
+      "output_text": "This is a movie theater scene featuring different reactions to what appears to be an awkward or emotional moment on screen. The video shows multiple reactions: some people react with disgust or shock, others laugh it off, some continue watching without noticing, and some appear confused, bewildered, or cheerful about what they're seeing.",
+      "input_tokens": 2680,
+      "output_tokens": 64,
+      "characters": {},
+      "duration_s": 60,
+      "clip_size_mb": 23.7
+    }
+  ]
+}

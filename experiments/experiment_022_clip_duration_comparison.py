@@ -181,6 +181,12 @@ def main() -> None:
         help="Run tag: 'baseline' or 'tq4' (used in output filename)",
     )
     parser.add_argument(
+        "--prompt",
+        type=str,
+        default=_PROMPT,
+        help="Prompt to send with each clip (default: detailed scene description)",
+    )
+    parser.add_argument(
         "--start-offset",
         type=float,
         default=_START_OFFSET_S,
@@ -217,6 +223,7 @@ def main() -> None:
         "tag": args.tag,
         "model_id": args.model,
         "max_new_tokens": args.max_new_tokens,
+        "prompt": args.prompt,
         "episode": args.episode.name,
         "episode_duration_s": round(episode_duration, 1),
         "start_offset_s": args.start_offset,
@@ -245,7 +252,7 @@ def main() -> None:
                     clip_path,
                     args.vllm_url,
                     args.model,
-                    _PROMPT,
+                    args.prompt,
                     args.max_new_tokens,
                 )
                 result["duration_s"] = dur

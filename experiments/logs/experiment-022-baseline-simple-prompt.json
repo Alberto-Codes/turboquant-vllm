@@ -1,0 +1,52 @@
+{
+  "experiment": "022-clip-duration-comparison",
+  "date": "2026-03-30 05:54:19",
+  "tag": "baseline-simple-prompt",
+  "model_id": "allenai/Molmo2-8B",
+  "max_new_tokens": 512,
+  "prompt": "What is happening in this clip?",
+  "episode": "Seinfeld - S05E12 - The Stall - [WEBDL-720P][AAC 2.0][H264]-NTB.mkv",
+  "episode_duration_s": 1371.3,
+  "start_offset_s": 120,
+  "clips": [
+    {
+      "elapsed_s": 9.0,
+      "output_text": "In this clip, Jerry and Elaine are having a conversation while sitting side by side at a movie theater. They're on the red theater seats, absorbed in a discussion across the aisle. Jerry is holding a blue \"United Artists\" cup of popcorn in his lap, lifting it between bites and showing it to Elaine at various points.\n\nElaine appears to be doing most of the talking during their exchange. She's gesturing expressively with open hands, often moving them up and down as she makes a point. While she does the talking, Jerry is focusing on his popcorn, eating with his eyes partially closed and occasionally glancing up while chewing. He takes his time savoring each bite, lifting the cup of popcorn between bites and turning it toward Elaine as they speak.\n\nThe conversation has a lively, animated quality as Elaine continues to gesture frequently while explaining something to Jerry, who maintains more of a relaxed, observant demeanor while enjoying his snack.",
+      "input_tokens": 1775,
+      "output_tokens": 191,
+      "characters": {
+        "jerry": 4,
+        "elaine": 5
+      },
+      "duration_s": 5,
+      "clip_size_mb": 3.1
+    },
+    {
+      "elapsed_s": 3.46,
+      "output_text": "A man and a woman are sitting together at a theater watching a movie. The man has a blue cup in front of him, is eating popcorn, and is chewing with his mouth open. The two people are talking to each other as they watch the film.",
+      "input_tokens": 2311,
+      "output_tokens": 53,
+      "characters": {},
+      "duration_s": 15,
+      "clip_size_mb": 6.8
+    },
+    {
+      "elapsed_s": 3.28,
+      "output_text": "In this scene, two couples are having animated conversations and reacting emotionally while watching a movie in a theater.",
+      "input_tokens": 2586,
+      "output_tokens": 22,
+      "characters": {},
+      "duration_s": 30,
+      "clip_size_mb": 12.5
+    },
+    {
+      "elapsed_s": 6.46,
+      "output_text": "The clip shows a group of friends watching a film at a movie theater. Multiple couples share the red seats, all reacting with engaged expressions and visible popcorn buckets. Throughout the scene, their reactions become increasingly unexpected and shocked as the movie unfolds. While it appears to be a typical cinema experience at first, the film being shown clearly contains surprising or intense moments that catch all the viewers off guard, prompting various energetic and vocal responses from the audience members.",
+      "input_tokens": 2680,
+      "output_tokens": 90,
+      "characters": {},
+      "duration_s": 60,
+      "clip_size_mb": 23.7
+    }
+  ]
+}
