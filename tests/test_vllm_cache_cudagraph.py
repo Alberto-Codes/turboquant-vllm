@@ -1,12 +1,11 @@
 """Tests for D7 CUDA graph buffer pre-allocation in TQ4 backend.
 
 Extracted from ``test_vllm_cache.py`` (Test Maturity Priority 1) to keep
-both files under the 500-line module gate.
+both files under the 500-line module gate.  Paged decompress tests are
+in ``test_vllm_paged_decompress.py``.
 """
 
 from __future__ import annotations
-
-import logging
 
 import pytest
 
@@ -34,12 +33,12 @@ pytestmark = [pytest.mark.unit]
 class TestCUDAGraphBufferPreallocation:
     """Tests for D7 CUDA graph buffer pre-allocation."""
 
-    def test_get_cudagraph_support_returns_single_token_decode(self) -> None:
-        """TQ4 builder reports UNIFORM_SINGLE_TOKEN_DECODE (AC 2)."""
+    def test_get_cudagraph_support_returns_never_without_fused(self) -> None:
+        """TQ4 builder reports NEVER when fused kernel unavailable."""
         from vllm.v1.attention.backend import AttentionCGSupport
 
         result = TQ4MetadataBuilder.get_cudagraph_support(None, None)
-        assert result == AttentionCGSupport.UNIFORM_SINGLE_TOKEN_DECODE
+        assert result == AttentionCGSupport.NEVER
 
     def test_backend_returns_tq4_builder(self) -> None:
         """TQ4AttentionBackend.get_builder_cls() returns TQ4MetadataBuilder."""
@@ -329,7 +328,7 @@ class TestCUDAGraphBufferPreallocation:
         assert impl._cg_decompress_v.shape == (max_tokens, H, D)
 
     def test_prefill_buffers_fused_paged_mode(self, tq4_quantizer) -> None:
-        """Prefill buffers same size regardless of fused_paged flag (AC 1)."""
+        """Prefill and decompress buffers same size regardless of fused flag."""
         impl_nonfused = make_impl(tq4_quantizer)
         impl_fused = make_impl(tq4_quantizer)
         impl_fused._fused_paged_available = True
@@ -343,209 +342,92 @@ class TestCUDAGraphBufferPreallocation:
         assert impl_nonfused._cg_prefill_k.shape == impl_fused._cg_prefill_k.shape
         assert impl_nonfused._cg_prefill_v.shape == impl_fused._cg_prefill_v.shape
 
-        # But decompress buffers differ (fused downsizes them)
+        # Decompress buffers also same: both bounded by min(max_model_len, max_tokens)
         assert (
             impl_nonfused._cg_decompress_k.shape[0]
-            > impl_fused._cg_decompress_k.shape[0]
+            == impl_fused._cg_decompress_k.shape[0]
         )
 
 
-class TestPagedDecompress:
-    """Tests for _decompress_cache_paged method (AC 2-7)."""
+class TestBoundedDecodeBuffers:
+    """Tests for hotfix-2: decode buffers bounded by max_model_len (AC 1)."""
 
-    def test_paged_decompress_common_case(self, tq4_quantizer) -> None:
-        """Paged decompress of 5 unique blocks from a 100-block cache (AC 2)."""
+    def test_decode_buffers_bounded_by_max_model_len(self, tq4_quantizer) -> None:
+        """Decode buffers shaped min(max_model_len, max_tokens) (AC 1)."""
         impl = make_impl(tq4_quantizer)
-        kv_cache = make_cache(num_blocks=100)
+        # 500 blocks * 16 = 8000 tokens > max_model_len=6144
+        kv_cache = make_cache(num_blocks=500)
         impl._init_cg_buffers(kv_cache, compute_dtype=torch.float16)
 
-        # Write data to specific blocks (blocks 10, 20, 30, 40, 50)
-        target_blocks = [10, 20, 30, 40, 50]
-        for blk in target_blocks:
-            for pos in range(BLOCK_SIZE):
-                slot = blk * BLOCK_SIZE + pos
-                key = torch.randn(1, NUM_KV_HEADS, HEAD_SIZE)
-                value = torch.randn(1, NUM_KV_HEADS, HEAD_SIZE)
-                impl._compress_and_store(key, value, kv_cache, torch.tensor([slot]))
+        H = NUM_KV_HEADS
+        D = HEAD_SIZE
+        expected = min(impl._max_model_len, 500 * BLOCK_SIZE)
+        assert impl._cg_decompress_k.shape == (expected, H, D)
+        assert impl._cg_decompress_v.shape == (expected, H, D)
 
-        # Build a block_table referencing only those 5 blocks
-        block_table = torch.tensor([target_blocks], dtype=torch.int32)
-        seq_lens = torch.tensor([5 * BLOCK_SIZE], dtype=torch.int32)
+    def test_decode_buffers_same_regardless_of_fused(self, tq4_quantizer) -> None:
+        """Fused flag no longer affects decode buffer sizing (AC 1 regression)."""
+        impl_off = make_impl(tq4_quantizer)
+        impl_on = make_impl(tq4_quantizer)
+        impl_on._fused_paged_available = True
 
-        k_paged, v_paged, remap_bt = impl._decompress_cache_paged(
-            kv_cache,
-            block_table,
-            seq_lens,
-            torch.float16,
-            out_k=impl._cg_prefill_k,
-            out_v=impl._cg_prefill_v,
-        )
+        kv_cache = make_cache(num_blocks=500)
+        impl_off._init_cg_buffers(kv_cache, compute_dtype=torch.float16)
+        impl_on._init_cg_buffers(kv_cache, compute_dtype=torch.float16)
 
-        # Should contain exactly 5 decompressed blocks
-        assert k_paged.shape == (5, BLOCK_SIZE, NUM_KV_HEADS, HEAD_SIZE)
-        assert v_paged.shape == (5, BLOCK_SIZE, NUM_KV_HEADS, HEAD_SIZE)
+        assert impl_off._cg_decompress_k.shape == impl_on._cg_decompress_k.shape
 
-        # Verify cosine parity with full decompress reference
-        k_full, v_full = impl._decompress_cache(
-            kv_cache, torch.float16, apply_rotation=False
-        )
-        for i, blk in enumerate(target_blocks):
-            assert torch.equal(k_paged[i], k_full[blk]), (
-                f"Block {blk}: paged K differs from full decompress"
-            )
-            assert torch.equal(v_paged[i], v_full[blk]), (
-                f"Block {blk}: paged V differs from full decompress"
-            )
-
-    def test_remapped_block_table_correctness(self, tq4_quantizer) -> None:
-        """Remapped block table maps logical blocks to compact indices (AC 2)."""
+    def test_prefill_buffers_not_modified(self, tq4_quantizer) -> None:
+        """Prefill buffers unchanged by this hotfix (AC 1)."""
         impl = make_impl(tq4_quantizer)
-        kv_cache = make_cache(num_blocks=20)
+        kv_cache = make_cache(num_blocks=500)
         impl._init_cg_buffers(kv_cache, compute_dtype=torch.float16)
 
-        # Sequence using blocks 5, 10, 15 (non-contiguous)
-        block_table = torch.tensor([[5, 10, 15]], dtype=torch.int32)
-        seq_lens = torch.tensor([3 * BLOCK_SIZE], dtype=torch.int32)
+        prefill_tokens = min(impl._max_prefill_len, 500 * BLOCK_SIZE)
+        H = NUM_KV_HEADS
+        D = HEAD_SIZE
+        assert impl._cg_prefill_k.shape == (prefill_tokens, H, D)
+        assert impl._cg_prefill_v.shape == (prefill_tokens, H, D)
 
-        k_paged, v_paged, remap_bt = impl._decompress_cache_paged(
-            kv_cache,
-            block_table,
-            seq_lens,
-            torch.float16,
-            out_k=impl._cg_prefill_k,
-            out_v=impl._cg_prefill_v,
+
+class TestConditionalCGSupport:
+    """Tests for conditional CUDA graph support (AC 4)."""
+
+    def test_cg_support_never_without_fused(self) -> None:
+        """Returns NEVER when fused kernel unavailable."""
+        from vllm.v1.attention.backend import AttentionCGSupport
+
+        result = TQ4MetadataBuilder.get_cudagraph_support(None, None)
+        assert result == AttentionCGSupport.NEVER
+
+    def test_cg_support_single_token_with_fused(self, mocker) -> None:
+        """Returns UNIFORM_SINGLE_TOKEN_DECODE when fused env+import OK."""
+        from vllm.v1.attention.backend import AttentionCGSupport
+
+        mocker.patch(
+            "turboquant_vllm.vllm.tq4_backend._parse_fused_paged_env",
+            return_value=True,
+        )
+        mocker.patch(
+            "turboquant_vllm.vllm.tq4_backend._fused_paged_kernel_available",
+            True,
         )
 
-        # unique sorted = [5, 10, 15] -> compact [0, 1, 2]
-        expected_remap = torch.tensor([[0, 1, 2]], dtype=torch.int32)
-        assert torch.equal(remap_bt, expected_remap), (
-            f"Expected remapped block table {expected_remap}, got {remap_bt}"
+        result = TQ4MetadataBuilder.get_cudagraph_support(None, None)
+        assert result == AttentionCGSupport.UNIFORM_SINGLE_TOKEN_DECODE
+
+    def test_cg_support_never_when_env_off(self, mocker) -> None:
+        """Returns NEVER when env var is off even if kernel available."""
+        from vllm.v1.attention.backend import AttentionCGSupport
+
+        mocker.patch(
+            "turboquant_vllm.vllm.tq4_backend._parse_fused_paged_env",
+            return_value=False,
+        )
+        mocker.patch(
+            "turboquant_vllm.vllm.tq4_backend._fused_paged_kernel_available",
+            True,
         )
 
-        # Verify Flash Attention would read same data:
-        # k_paged[remap_bt[0, j]] should equal full_decompress[block_table[0, j]]
-        k_full, _ = impl._decompress_cache(
-            kv_cache, torch.float16, apply_rotation=False
-        )
-        for j in range(3):
-            compact_idx = int(remap_bt[0, j])
-            original_idx = int(block_table[0, j])
-            assert torch.equal(k_paged[compact_idx], k_full[original_idx])
-
-    def test_paged_decompress_fallback(self, tq4_quantizer) -> None:
-        """Dynamic fallback when unique blocks exceed max_prefill_blocks (AC 2)."""
-        impl = make_impl(tq4_quantizer)
-        kv_cache = make_cache(num_blocks=200)
-        impl._init_cg_buffers(kv_cache, compute_dtype=torch.float16)
-
-        # Force fallback: reference more blocks than max_prefill_blocks
-        num_blocks_needed = impl._max_prefill_blocks + 5
-        block_indices = list(range(num_blocks_needed))
-        block_table = torch.tensor([block_indices], dtype=torch.int32)
-        seq_lens = torch.tensor([num_blocks_needed * BLOCK_SIZE], dtype=torch.int32)
-
-        k_paged, v_paged, remap_bt = impl._decompress_cache_paged(
-            kv_cache,
-            block_table,
-            seq_lens,
-            torch.float16,
-            out_k=impl._cg_prefill_k,
-            out_v=impl._cg_prefill_v,
-        )
-
-        # Should still return correctly shaped output (dynamically allocated)
-        assert k_paged.shape == (
-            num_blocks_needed,
-            BLOCK_SIZE,
-            NUM_KV_HEADS,
-            HEAD_SIZE,
-        )
-        assert v_paged.shape == k_paged.shape
-
-    def test_decompress_cache_backward_compat(self, tq4_quantizer) -> None:
-        """Existing _decompress_cache method unchanged (AC 5)."""
-        impl = make_impl(tq4_quantizer)
-        kv_cache = make_cache(num_blocks=4)
-
-        key = torch.randn(3, NUM_KV_HEADS, HEAD_SIZE)
-        value = torch.randn(3, NUM_KV_HEADS, HEAD_SIZE)
-        impl._compress_and_store(key, value, kv_cache, torch.tensor([0, 5, 33]))
-
-        # Dynamic allocation (no out=)
-        k_dyn, v_dyn = impl._decompress_cache(
-            kv_cache, torch.float32, apply_rotation=False
-        )
-        assert k_dyn.shape == (4, BLOCK_SIZE, NUM_KV_HEADS, HEAD_SIZE)
-
-        # With out= buffers
-        impl._init_cg_buffers(kv_cache, compute_dtype=torch.float32)
-        k_pre, v_pre = impl._decompress_cache(
-            kv_cache,
-            torch.float32,
-            apply_rotation=False,
-            out_k=impl._cg_decompress_k,
-            out_v=impl._cg_decompress_v,
-        )
-        assert torch.equal(k_dyn, k_pre)
-        assert torch.equal(v_dyn, v_pre)
-
-    def test_multi_sequence_batch_dedup(self, tq4_quantizer) -> None:
-        """Multi-sequence batch with overlapping physical blocks (AC 2)."""
-        impl = make_impl(tq4_quantizer)
-        kv_cache = make_cache(num_blocks=20)
-        impl._init_cg_buffers(kv_cache, compute_dtype=torch.float16)
-
-        # Two sequences sharing block 5, padding with zeros in unused slots
-        # Seq 0: blocks [3, 5], seq_len=2*BS
-        # Seq 1: blocks [5, 7], seq_len=2*BS
-        block_table = torch.tensor([[3, 5, 0], [5, 7, 0]], dtype=torch.int32)
-        seq_lens = torch.tensor([2 * BLOCK_SIZE, 2 * BLOCK_SIZE], dtype=torch.int32)
-
-        k_paged, v_paged, remap_bt = impl._decompress_cache_paged(
-            kv_cache,
-            block_table,
-            seq_lens,
-            torch.float16,
-            out_k=impl._cg_prefill_k,
-            out_v=impl._cg_prefill_v,
-        )
-
-        # Unique blocks: {3, 5, 7} -> 3 compact blocks
-        assert k_paged.shape[0] == 3
-
-        # Block 5 appears in both sequences but decompressed only once
-        # remap_bt should map: 3->0, 5->1, 7->2
-        assert remap_bt[0, 0] == 0  # block 3 -> compact 0
-        assert remap_bt[0, 1] == 1  # block 5 -> compact 1
-        assert remap_bt[1, 0] == 1  # block 5 -> compact 1 (same)
-        assert remap_bt[1, 1] == 2  # block 7 -> compact 2
-
-        # Padding columns (beyond blocks_needed) must be zero (safe sentinel)
-        assert remap_bt[0, 2] == 0
-        assert remap_bt[1, 2] == 0
-
-    def test_paged_decompress_fallback_logs_warning(
-        self, tq4_quantizer, caplog
-    ) -> None:
-        """Warning logged when fallback to dynamic allocation (AC 2)."""
-        impl = make_impl(tq4_quantizer)
-        kv_cache = make_cache(num_blocks=200)
-        impl._init_cg_buffers(kv_cache, compute_dtype=torch.float16)
-
-        num_blocks_needed = impl._max_prefill_blocks + 1
-        block_table = torch.tensor([list(range(num_blocks_needed))], dtype=torch.int32)
-        seq_lens = torch.tensor([num_blocks_needed * BLOCK_SIZE], dtype=torch.int32)
-
-        with caplog.at_level(
-            logging.WARNING, logger="turboquant_vllm.vllm.tq4_backend"
-        ):
-            impl._decompress_cache_paged(
-                kv_cache,
-                block_table,
-                seq_lens,
-                torch.float16,
-                out_k=impl._cg_prefill_k,
-                out_v=impl._cg_prefill_v,
-            )
-
-        assert any("dynamic fallback" in msg for msg in caplog.messages)
+        result = TQ4MetadataBuilder.get_cudagraph_support(None, None)
+        assert result == AttentionCGSupport.NEVER

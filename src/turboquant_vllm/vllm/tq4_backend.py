@@ -166,11 +166,12 @@ class TQ4FullAttentionSpec(FullAttentionSpec):
 
 
 class TQ4MetadataBuilder(FlashAttentionMetadataBuilder):
-    """Metadata builder for TQ4 with single-token-decode CUDA graph support.
+    """Metadata builder for TQ4 with conditional CUDA graph support.
 
-    TQ4 only supports CUDA graphs for single-token decode (the prefill
-    path has dynamic allocations).  Inherits all metadata-building logic
-    from Flash Attention; only the CUDA graph support level differs.
+    CUDA graphs are supported for single-token decode only when the fused
+    paged kernel is available; otherwise CG support is NEVER (the paged
+    decompress path has dynamic allocations).  Inherits all metadata-building
+    logic from Flash Attention; only the CUDA graph support level differs.
     """
 
     @classmethod
@@ -179,10 +180,18 @@ class TQ4MetadataBuilder(FlashAttentionMetadataBuilder):
         vllm_config: object,
         kv_cache_spec: object,
     ) -> AttentionCGSupport:
-        """Report single-token-decode CUDA graph support (D7 mod 3)."""
+        """Report CUDA graph support: single-token decode when fused available.
+
+        When fused paged decode is available, decode goes through
+        ``_fused_decode_path`` (CG-safe).  Otherwise, decode uses
+        ``_decompress_cache_paged`` which has 10+ non-CG-safe operations
+        (torch.unique, boolean indexing, dynamic allocations).
+        """
         from vllm.v1.attention.backend import AttentionCGSupport
 
-        return AttentionCGSupport.UNIFORM_SINGLE_TOKEN_DECODE
+        if _parse_fused_paged_env() and _fused_paged_kernel_available:
+            return AttentionCGSupport.UNIFORM_SINGLE_TOKEN_DECODE
+        return AttentionCGSupport.NEVER
 
 
 class TQ4AttentionBackend(FlashAttentionBackend):
@@ -334,6 +343,12 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             else 2048
         )
 
+        # Decode buffer bound: max_model_len caps decompress buffer instead
+        # of full cache capacity.  Fallback 6144 matches Molmo2 default.
+        self._max_model_len = (
+            vllm_config.model_config.max_model_len if vllm_config is not None else 6144
+        )
+
         logger.info(
             "TQ4AttentionImpl: %d KV heads, head_size=%d, "
             "%d bytes/token (%.2fx compression vs FP16)",
@@ -370,15 +385,9 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         H = self.num_kv_heads
         D = self.head_size
 
-        # Decompress buffers: when fused decode is available, decode skips
-        # decompression entirely — only prefill needs these buffers.
-        # Downsize from (max_blocks*block_size, H, D) to (max_prefill_len, H, D).
-        if self._fused_paged_available:
-            decompress_tokens = min(self._max_prefill_len, max_tokens)
-            buffer_source = "max_prefill_len"
-        else:
-            decompress_tokens = max_tokens
-            buffer_source = "full_cache"
+        # Decompress buffers: bounded by max_model_len so the paged
+        # decompress path never allocates full-cache-sized FP16 tensors.
+        decompress_tokens = min(self._max_model_len, max_tokens)
 
         self._cg_decompress_k = torch.empty(
             decompress_tokens, H, D, dtype=compute_dtype, device=device
@@ -423,13 +432,11 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         prefill_mib = prefill_tokens * H * D * dtype_bytes / (1024 * 1024)
         logger.info(
             "TQ4 CUDA graph buffers allocated: decompress=%s "
-            "(fused_paged=%s, tokens=%d, source=%s), "
+            "(tokens=%d, source=max_model_len), "
             "decompress=2×%.1f MiB, prefill=%s (2×%.1f MiB, %d blocks), "
             "compress+row+q_rot=%.1f KiB",
             self._cg_decompress_k.shape,
-            self._fused_paged_available,
             decompress_tokens,
-            buffer_source,
             decompress_tokens * H * D * dtype_bytes / (1024 * 1024),
             self._cg_prefill_k.shape,
             prefill_mib,
@@ -627,16 +634,18 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         unique_blocks = torch.unique(valid_block_indices, sorted=True)
         num_unique = unique_blocks.numel()
 
-        # Capacity check: use pre-allocated buffers or dynamic fallback
-        if num_unique <= self._max_prefill_blocks:
+        # Capacity check: derive from buffer shape so method works with
+        # any pre-allocated buffer (prefill or decode sized).
+        max_blocks_capacity = out_k.shape[0] // BS
+        if num_unique <= max_blocks_capacity:
             k_buf = out_k
             v_buf = out_v
         else:
             logger.warning(
-                "Prefill paged decompress: %d unique blocks exceed "
+                "Paged decompress: %d unique blocks exceed "
                 "pre-allocated capacity (%d blocks), using dynamic fallback",
                 num_unique,
-                self._max_prefill_blocks,
+                max_blocks_capacity,
             )
             fallback_tokens = num_unique * BS
             k_buf = torch.empty(
@@ -694,8 +703,8 @@ class TQ4AttentionImpl(FlashAttentionImpl):
 
     def _tq4_decode(
         self, query, key, value, kv_cache, attn_metadata
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """Decode path: compress, rotate Q, decompress using pre-allocated buffers."""
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Decode path: compress, rotate Q, paged decompress with bounded buffers."""
         if key is not None and value is not None:
             self._compress_and_store(
                 key,
@@ -711,14 +720,15 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         torch.matmul(q_slice.float(), self._tq4_rotation.T, out=q_rot_buf)
         self._cg_q_rot_cast[:1].copy_(q_rot_buf)
 
-        key_cache, value_cache = self._decompress_cache(
+        key_cache, value_cache, remapped_bt = self._decompress_cache_paged(
             kv_cache,
+            attn_metadata.block_table,
+            attn_metadata.seq_lens,
             query.dtype,
-            apply_rotation=False,
             out_k=self._cg_decompress_k,
             out_v=self._cg_decompress_v,
         )
-        return self._cg_q_rot_cast[:1], key_cache, value_cache
+        return self._cg_q_rot_cast[:1], key_cache, value_cache, remapped_bt
 
     def _tq4_prefill(
         self, query, key, value, kv_cache, attn_metadata
@@ -903,10 +913,9 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             )
 
         if is_decode:
-            q_rot, key_cache, value_cache = self._tq4_decode(
+            q_rot, key_cache, value_cache, fa_block_table = self._tq4_decode(
                 query, key, value, kv_cache, attn_metadata
             )
-            fa_block_table = attn_metadata.block_table
         else:
             q_rot, key_cache, value_cache, fa_block_table = self._tq4_prefill(
                 query, key, value, kv_cache, attn_metadata

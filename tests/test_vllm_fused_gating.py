@@ -70,6 +70,7 @@ def _make_impl(quantizer, *, fused_paged_available=False, max_prefill_len=2048):
     impl._fused_paged_available = fused_paged_available
     impl._int8_prefill_available = False
     impl._max_prefill_len = max_prefill_len
+    impl._max_model_len = 6144
 
     return impl
 
@@ -273,7 +274,12 @@ class TestDecodePathSelector:
         mocker.patch.object(
             impl,
             "_tq4_decode",
-            return_value=(torch.zeros(1), torch.zeros(1), torch.zeros(1)),
+            return_value=(
+                torch.zeros(1),
+                torch.zeros(1),
+                torch.zeros(1),
+                torch.zeros(1, dtype=torch.int32),
+            ),
         )
         mocker.patch("vllm.v1.attention.backends.fa_utils.flash_attn_varlen_func")
 
@@ -304,35 +310,31 @@ class TestDecodePathSelector:
 
 
 class TestBufferDownsizing:
-    """Decompress buffer sizing based on fused kernel availability."""
+    """Decompress buffer sizing bounded by max_model_len."""
 
-    def test_decompress_buffers_full_size_when_fused_disabled(
-        self, tq4_quantizer
-    ) -> None:
-        """Decompress buffers are (max_blocks*block_size, H, D) when fused is off."""
+    def test_decompress_buffers_bounded_when_cache_small(self, tq4_quantizer) -> None:
+        """Decompress buffers are min(max_model_len, max_tokens) — cache smaller."""
         num_blocks = 100
         impl = _make_impl(tq4_quantizer, fused_paged_available=False)
         kv_cache = _make_cache(num_blocks)
         impl._init_cg_buffers(kv_cache, torch.bfloat16)
 
+        # max_tokens = 1600 < max_model_len = 6144, so uses max_tokens
         expected_tokens = num_blocks * BLOCK_SIZE
         assert impl._cg_decompress_k.shape == (expected_tokens, NUM_KV_HEADS, HEAD_SIZE)
         assert impl._cg_decompress_v.shape == (expected_tokens, NUM_KV_HEADS, HEAD_SIZE)
 
-    def test_decompress_buffers_downsized_when_fused_enabled(
-        self, tq4_quantizer
-    ) -> None:
-        """Decompress buffers are (max_prefill_len, H, D) when fused is on."""
+    def test_decompress_buffers_same_regardless_of_fused(self, tq4_quantizer) -> None:
+        """Decompress buffers identical for fused=True and fused=False."""
         num_blocks = 100
-        max_prefill = 512
-        impl = _make_impl(
-            tq4_quantizer, fused_paged_available=True, max_prefill_len=max_prefill
-        )
+        impl_nonfused = _make_impl(tq4_quantizer, fused_paged_available=False)
+        impl_fused = _make_impl(tq4_quantizer, fused_paged_available=True)
         kv_cache = _make_cache(num_blocks)
-        impl._init_cg_buffers(kv_cache, torch.bfloat16)
+        impl_nonfused._init_cg_buffers(kv_cache, torch.bfloat16)
+        impl_fused._init_cg_buffers(kv_cache, torch.bfloat16)
 
-        assert impl._cg_decompress_k.shape == (max_prefill, NUM_KV_HEADS, HEAD_SIZE)
-        assert impl._cg_decompress_v.shape == (max_prefill, NUM_KV_HEADS, HEAD_SIZE)
+        assert impl_nonfused._cg_decompress_k.shape == impl_fused._cg_decompress_k.shape
+        assert impl_nonfused._cg_decompress_v.shape == impl_fused._cg_decompress_v.shape
 
     def test_max_prefill_len_fallback_default(self, tq4_quantizer) -> None:
         """_max_prefill_len defaults to 2048 when vllm_config is None."""
@@ -340,28 +342,25 @@ class TestBufferDownsizing:
         assert impl._max_prefill_len == 2048
 
     def test_buffer_downsizing_vram_savings(self, tq4_quantizer) -> None:
-        """Downsized buffers are significantly smaller than full-size."""
-        num_blocks = 4000  # typical Molmo2 config
-        max_prefill = 2048
-        impl_full = _make_impl(tq4_quantizer, fused_paged_available=False)
-        impl_fused = _make_impl(
-            tq4_quantizer, fused_paged_available=True, max_prefill_len=max_prefill
-        )
+        """Bounded buffers significantly smaller than full cache on large configs."""
+        num_blocks = 4000  # typical Molmo2 config: 64000 tokens
+        impl = _make_impl(tq4_quantizer, fused_paged_available=False)
         kv_cache = _make_cache(num_blocks)
-        impl_full._init_cg_buffers(kv_cache, torch.bfloat16)
-        impl_fused._init_cg_buffers(kv_cache, torch.bfloat16)
+        impl._init_cg_buffers(kv_cache, torch.bfloat16)
 
+        # max_model_len=6144 << 64000, so buffer is bounded
+        bounded_bytes = (
+            impl._cg_decompress_k.nelement() * impl._cg_decompress_k.element_size()
+        )
         full_bytes = (
-            impl_full._cg_decompress_k.nelement()
-            * impl_full._cg_decompress_k.element_size()
-        )
-        fused_bytes = (
-            impl_fused._cg_decompress_k.nelement()
-            * impl_fused._cg_decompress_k.element_size()
+            num_blocks
+            * BLOCK_SIZE
+            * NUM_KV_HEADS
+            * HEAD_SIZE
+            * impl._cg_decompress_k.element_size()
         )
 
-        # Downsized should be at least 90% smaller
-        savings = 1.0 - fused_bytes / full_bytes
+        savings = 1.0 - bounded_bytes / full_bytes
         assert savings > 0.9, f"Expected >90% VRAM savings, got {savings:.1%}"
 
 

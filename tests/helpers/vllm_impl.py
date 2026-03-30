@@ -44,6 +44,7 @@ def make_impl(quantizer: TurboQuantMSE) -> TQ4AttentionImpl:
     impl._cg_buffers_ready = False
     impl._fused_paged_available = False
     impl._max_prefill_len = 2048
+    impl._max_model_len = 6144
 
     half_D = HEAD_SIZE // 2
     impl._half_D = half_D

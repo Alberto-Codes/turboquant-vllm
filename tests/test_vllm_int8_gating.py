@@ -68,6 +68,7 @@ def _make_impl(
     impl._fused_paged_available = fused_paged_available
     impl._int8_prefill_available = int8_prefill_available
     impl._max_prefill_len = max_prefill_len
+    impl._max_model_len = 6144
 
     return impl
 
