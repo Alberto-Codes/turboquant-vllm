@@ -696,13 +696,13 @@ class CompressedDynamicCache:
             fp32 ``[batch, heads, seq, 1]``.
 
         Raises:
-            ValueError: If ``layer_idx`` refers to an SWA-bypassed layer
-                with no compressed data.
+            ValueError: If ``layer_idx`` refers to a layer with no
+                compressed data (not yet updated, or SWA-bypassed).
         """
-        if (
-            layer_idx >= len(self._compressed_keys)
-            or self._compressed_keys[layer_idx] is None
-        ):
+        if layer_idx >= len(self._compressed_keys):
+            msg = f"Layer {layer_idx} has no compressed data (not yet updated)"
+            raise ValueError(msg)
+        if self._compressed_keys[layer_idx] is None:
             msg = f"Layer {layer_idx} has no compressed data (SWA-bypassed layer)"
             raise ValueError(msg)
         k = self._compressed_keys[layer_idx]

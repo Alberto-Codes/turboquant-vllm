@@ -198,8 +198,8 @@ class TestSWABypass:
         k_p, k_n, v_p, v_n = cdc.get_compressed(0)
         assert k_p is not None
 
-        # SWA layer raises
-        with pytest.raises(ValueError, match="SWA-bypassed layer"):
+        # SWA layer raises (may hit bounds check or None check)
+        with pytest.raises(ValueError, match="no compressed data"):
             cdc.get_compressed(1)
 
     def test_vram_bytes_excludes_swa_layers(self, device: torch.device) -> None:
