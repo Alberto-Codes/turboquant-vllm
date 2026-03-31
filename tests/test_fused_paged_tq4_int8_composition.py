@@ -60,7 +60,7 @@ class TestInt8Prefill36LayerComposition:
     def test_36_layer_per_layer_cosine(
         self, device: str, tq4_quantizer: TurboQuantMSE
     ) -> None:
-        """Per-layer cosine >0.997 across 36 layers with 1024-token prefill."""
+        """Per-layer cosine >0.990 across 36 layers with 1024-token prefill."""
         H_Q, H_KV = 28, 4
         num_layers = 36
         seq_len = 1024
