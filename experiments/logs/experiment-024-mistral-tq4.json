@@ -1,0 +1,51 @@
+{
+  "experiment": "024-zero-change-model-probe",
+  "date": "2026-03-30 13:45:54",
+  "tag": "mistral-tq4",
+  "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+  "max_new_tokens": 256,
+  "prompts": [
+    {
+      "elapsed_s": 8.47,
+      "output_text": " The three laws of thermodynamics are fundamental principles that describe the behavior of energy in a system. Here's a brief explanation of each:\n\n1. Zeroth Law of Thermodynamics: If two systems, A and B, are each in thermal equilibrium with a third system, C, then systems A and B are in thermal equilibrium with each other. In simpler terms, if you can compare the temperature of system A with system C, and system B with system C, and they both match, then system A and B will also match in temperature. This law allows us to define temperature and establish a temperature scale.\n\n2. First Law of Thermodynamics (Law of Energy Conservation): Energy cannot be created or destroyed, only transferred or changed from one form to another. This law is also known as the Law of Conservation of Energy. In a closed system, the change in the internal energy (U) is equal to the heat (Q) added to the system minus the work (W) done by the system. Mathematically, \u0394U = Q - W.\n\n3. Second Law of Thermodynamics: The total entropy (a measure of disorder or randomness) of an isolated",
+      "input_tokens": 18,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "factual",
+      "prompt": "What are the three laws of thermodynamics? Explain each briefly."
+    },
+    {
+      "elapsed_s": 1.02,
+      "output_text": " Nine sheep are left. The question states that \"all but 9\" die, which means that the remaining number of sheep is 9.",
+      "input_tokens": 23,
+      "output_tokens": 31,
+      "finish_reason": "stop",
+      "prompt_id": "reasoning",
+      "prompt": "A farmer has 17 sheep. All but 9 die. How many sheep are left?"
+    },
+    {
+      "elapsed_s": 0.88,
+      "output_text": " Errors flash,\n\nIn the labyrinth of lines,\n\nPeace in each fix.",
+      "input_tokens": 12,
+      "output_tokens": 23,
+      "finish_reason": "stop",
+      "prompt_id": "creative",
+      "prompt": "Write a haiku about debugging code."
+    },
+    {
+      "elapsed_s": 7.78,
+      "output_text": " TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are two primary transport layer protocols used for internet communication. Here are five key differences between them:\n\n1. **Connection-Oriented vs. Connectionless:** TCP is a connection-oriented protocol, which means it establishes a reliable, ordered, and full-duplex connection between the sender and receiver before data transfer. On the other hand, UDP is a connectionless protocol, which means it does not establish a dedicated connection; instead, it sends data in the form of datagrams.\n\n2. **Reliability:** TCP ensures reliable data transfer by providing mechanisms such as acknowledgments, retransmission, and flow control. If data is lost, corrupted, or not received, TCP will retransmit the data. In contrast, UDP does not guarantee the delivery of packets; it simply sends them and does not retransmit if they are lost or corrupted.\n\n3. **Error Checking:** TCP uses a checksum to verify the integrity of the data. If an error is detected, the data is retransmitted. UDP, however, does not perform error checking or retransmission.\n\n4",
+      "input_tokens": 37,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "long_context",
+      "prompt": "Summarize the key differences between TCP and UDP protocols. Include at least 5 specific technical differences and explain when you would choose one over the other."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "verdict": "PASS"
+  }
+}

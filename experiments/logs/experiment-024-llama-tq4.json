@@ -1,0 +1,51 @@
+{
+  "experiment": "024-zero-change-model-probe",
+  "date": "2026-03-30 13:40:26",
+  "tag": "llama-tq4",
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "max_new_tokens": 256,
+  "prompts": [
+    {
+      "elapsed_s": 8.88,
+      "output_text": "The three laws of thermodynamics are fundamental principles that describe the relationships between heat, work, and energy. Here's a brief explanation of each:\n\n1. **Zeroth Law of Thermodynamics**: This law states that if two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other. In simpler terms, it allows us to define a temperature scale, such as the Celsius or Kelvin scale, which enables us to compare the temperatures of different systems.\n\n2. **First Law of Thermodynamics (Law of Energy Conservation)**: This law states that energy cannot be created or destroyed, only converted from one form to another. Mathematically, it's expressed as \u0394E = Q - W, where \u0394E is the change in energy, Q is the heat added to the system, and W is the work done on the system. This law highlights the importance of energy conservation in thermodynamic processes.\n\n3. **Second Law of Thermodynamics**: This law states that the total entropy (a measure of disorder or randomness) of an isolated system always increases over time. In other words, as energy is transferred or transformed from one form to another, some of it becomes unavailable to do useful work because it becomes random and dispersed. This law explains why it",
+      "input_tokens": 48,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "factual",
+      "prompt": "What are the three laws of thermodynamics? Explain each briefly."
+    },
+    {
+      "elapsed_s": 2.23,
+      "output_text": "To find the number of sheep left, we need to subtract the number of sheep that died from the total number of sheep.\n\nTotal number of sheep = 17\nNumber of sheep that died = 17 - 9 = 8\n\nSo, the number of sheep left is 8 + 9 = 17 - 8 = 9",
+      "input_tokens": 54,
+      "output_tokens": 71,
+      "finish_reason": "stop",
+      "prompt_id": "reasoning",
+      "prompt": "A farmer has 17 sheep. All but 9 die. How many sheep are left?"
+    },
+    {
+      "elapsed_s": 0.62,
+      "output_text": "Lines of code entwined\n Errors hidden, patience worn\nLogic's gentle dance",
+      "input_tokens": 43,
+      "output_tokens": 18,
+      "finish_reason": "stop",
+      "prompt_id": "creative",
+      "prompt": "Write a haiku about debugging code."
+    },
+    {
+      "elapsed_s": 8.2,
+      "output_text": "**TCP (Transmission Control Protocol) vs UDP (User Datagram Protocol)**\n\nTCP and UDP are two fundamental transport-layer protocols used in the Internet Protocol Suite. While both protocols enable data transfer between devices, they differ significantly in their approach, design, and application.\n\n**Key Technical Differences:**\n\n1.  **Connection-Oriented vs Connectionless:**\n    *   TCP: Establishes a connection between the sender and receiver before data transfer, ensuring reliable data transfer.\n    *   UDP: Does not establish a connection, sending data packets independently without guaranteeing delivery or order.\n\n2.  **Error Handling:**\n    *   TCP: Uses acknowledgments (ACKs) and retransmissions to ensure data integrity and reliability.\n    *   UDP: Does not use ACKs or retransmissions, relying on the application layer to handle errors.\n\n3.  **Packet Ordering:**\n    *   TCP: Ensures packets are delivered in the correct order, using sequence numbers and acknowledgments.\n    *   UDP: Does not guarantee packet order, leaving it to the application layer to reorder packets if necessary.\n\n4.  **Packet Loss and Corruption:**\n    *   TCP: Handles packet loss and corruption by retransmitting lost or corrupted packets.\n    *",
+      "input_tokens": 66,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "long_context",
+      "prompt": "Summarize the key differences between TCP and UDP protocols. Include at least 5 specific technical differences and explain when you would choose one over the other."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "verdict": "PASS"
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "experiment": "024-zero-change-model-probe",
+  "date": "2026-03-30 14:05:26",
+  "tag": "llama-baseline-ext",
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "max_new_tokens": 256,
+  "prompts": [
+    {
+      "elapsed_s": 4.43,
+      "output_text": "The three laws of thermodynamics are fundamental principles that describe the relationships between heat, work, and energy. Here's a brief explanation of each:\n\n1. **Zeroth Law of Thermodynamics**: This law states that if two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other. In simpler terms, it allows us to define a temperature scale, such as the Celsius or Kelvin scale, which measures the thermal energy of a system.\n\n2. **First Law of Thermodynamics (Law of Energy Conservation)**: This law states that energy cannot be created or destroyed, only converted from one form to another. Mathematically, it's expressed as \u0394E = Q - W, where \u0394E is the change in energy, Q is the heat added to the system, and W is the work done on the system.\n\n3. **Second Law of Thermodynamics**: This law states that the total entropy (a measure of disorder or randomness) of a closed system will always increase over time, except in reversible processes. In simpler terms, it means that energy will become less organized and more dispersed as it is transferred or transformed from one form to another.\n\n4. **Third Law of Thermodynamics**: This law states that as the temperature of a system",
+      "input_tokens": 48,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "factual",
+      "prompt": "What are the three laws of thermodynamics? Explain each briefly."
+    },
+    {
+      "elapsed_s": 1.01,
+      "output_text": "To find the number of sheep left, we need to subtract the number of sheep that died from the total number of sheep.\n\nTotal number of sheep = 17\nNumber of sheep that died = 17 - 9 = 8\n\nSo, the number of sheep left is 9.",
+      "input_tokens": 54,
+      "output_tokens": 60,
+      "finish_reason": "stop",
+      "prompt_id": "reasoning",
+      "prompt": "A farmer has 17 sheep. All but 9 die. How many sheep are left?"
+    },
+    {
+      "elapsed_s": 0.32,
+      "output_text": "Lines of code entwined\n Errors hidden, patience worn\nLogic's gentle dance",
+      "input_tokens": 43,
+      "output_tokens": 18,
+      "finish_reason": "stop",
+      "prompt_id": "creative",
+      "prompt": "Write a haiku about debugging code."
+    },
+    {
+      "elapsed_s": 4.43,
+      "output_text": "**TCP (Transmission Control Protocol) vs UDP (User Datagram Protocol)**\n\nTCP and UDP are two fundamental transport-layer protocols used in the Internet Protocol Suite (TCP/IP). While both protocols enable data transfer between devices, they differ significantly in their approach, design, and application.\n\n**Key Technical Differences:**\n\n1.  **Connection-Oriented vs Connectionless:**\n    *   TCP is a connection-oriented protocol, which means it establishes a connection between the sender and receiver before data transfer begins. This connection is maintained throughout the data transfer process.\n    *   UDP is a connectionless protocol, which means it does not establish a connection before data transfer. Each packet is sent independently, and the receiver does not acknowledge receipt.\n2.  **Reliability:**\n    *   TCP ensures reliable data transfer by using sequence numbers, acknowledgments, and retransmissions. If a packet is lost or corrupted, TCP retransmits it.\n    *   UDP does not guarantee reliable data transfer. If a packet is lost or corrupted, it is not retransmitted.\n3.  **Order of Delivery:**\n    *   TCP ensures that packets are delivered in the correct order. If packets are received out of order, TCP reorders them.\n    *   UDP does",
+      "input_tokens": 66,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "long_context",
+      "prompt": "Summarize the key differences between TCP and UDP protocols. Include at least 5 specific technical differences and explain when you would choose one over the other."
+    }
+  ],
+  "long_passage": {
+    "elapsed_s": 2.6,
+    "output_text": "1. Kepler-442b's orbital period is 112.3 days.\n\n2. Kepler-442b receives about 73% of the solar flux that Earth receives from the Sun.\n\n3. The host star's metallicity [Fe/H] value is -0.37, indicating it is metal-poor compared to the Sun.\n\n4. The discovery team was led by Guillermo Torres of the Harvard-Smithsonian Center for Astrophysics.\n\n5. Kepler-442b is considered more habitable than Kepler-438b because its host star is a K-type star, which is less luminous and more stable than the M-dwarf star of Kepler-438b, providing a more stable radiation environment.",
+    "input_tokens": 958,
+    "output_tokens": 143,
+    "finish_reason": "stop",
+    "prompt_id": "long_passage",
+    "facts_correct": 5,
+    "facts_detail": {
+      "orbital_period": true,
+      "solar_flux_73pct": true,
+      "metallicity": true,
+      "discovery_lead": true,
+      "kepler438_comparison": true
+    }
+  },
+  "multi_turn": [
+    {
+      "turn": 1,
+      "elapsed_s": 4.42,
+      "input_tokens": 50,
+      "output_tokens": 256,
+      "output_text": "Japan in April can be a wonderful experience, with mild temperatures and beautiful cherry blossoms (sakura) in full bloom. Here are some essential things to know before your trip:\n\n1. **Weather:** April is a great time to visit Japan, with temperatures ranging from 10\u00b0C to 20\u00b0C (50\u00b0F to 68\u00b0F). However, it can be chilly in the mornings and evenings, so pack layers.\n2. **Cherry Blossoms (Sakura):** The cherry blossom season typically starts in late March and peaks in early April. Popular spots like Ueno Park in Tokyo and Maruyama Park in Kyoto are usually crowded during this time.\n3. **Golden Week:** Japan has a week-long holiday called Golden Week, which starts on April 29th and ends on May 5th. Many businesses and attractions may be closed or have limited hours during this time.\n4. **Travel:** Japan has a well-developed public transportation system, including trains, buses, and subways. Consider purchasing a Japan Rail Pass for long-distance travel.\n5. **Food:** Try some of Japan's delicious seasonal foods, such as:\n\t* Cherry blossom-themed sweets and drinks\n\t* Spring vegetables like asparagus and strawberries\n\t* Fresh seafood",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 2,
+      "elapsed_s": 4.51,
+      "input_tokens": 344,
+      "output_tokens": 256,
+      "output_text": "Kyoto is a treasure trove of temples and shrines, each with its own unique history and architecture. Here are the top 5 temples to visit in Kyoto, along with what makes each one special:\n\n1. **Kinkaku-ji (Golden Pavilion)**:\n\t* Location: Kinkakuji, Kyoto\n\t* Unique feature: The temple's stunning golden exterior, which reflects beautifully in the surrounding pond.\n\t* History: Built in 1397 as a retirement villa for the Shogun, it was later converted into a temple.\n2. **Fushimi Inari Shrine**:\n\t* Location: 68 Fukakusa Yabunouchi-cho, Fushimi-ku, Kyoto\n\t* Unique feature: The thousands of vermilion torii gates that form a tunnel up the mountain.\n\t* History: Dedicated to the Shinto god of rice, Inari Okami, the shrine has been in existence since the 8th century.\n3. **Kiyomizu-dera Temple**:\n\t* Location: 1-294 Kiyomizu, Higashiyama-ku, Kyoto\n\t* Unique feature: The wooden stage protruding over the valley, offering breathtaking views of the city",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 3,
+      "elapsed_s": 4.43,
+      "input_tokens": 639,
+      "output_tokens": 256,
+      "output_text": "**Kiyomizu-dera Temple** is a must-visit, and timing is everything to make the most of your experience.\n\n**Best time to visit:** The temple is most beautiful during the early morning or late afternoon when the sun is not too harsh. Try to visit around 9:00 AM or 3:00 PM to avoid the midday crowds. If you're interested in watching the sunset, the temple is particularly stunning during this time.\n\n**Nearby restaurant recommendation:** For lunch, I recommend **Ganko Sushi** (, located near the temple. They offer a variety of traditional Japanese dishes, including sushi, tempura, and kaiseki (multi-course) meals. Try their seasonal specials, which often feature local ingredients.\n\nAlternatively, you can also try **Kikunoi**, a renowned restaurant located near the temple. They offer a range of traditional Japanese cuisine, including kaiseki and shojin-ryori (Buddhist vegetarian cuisine). However, be prepared for a higher price tag and a more formal atmosphere.\n\n**Tips:**\n\n* Be sure to arrive early to secure a spot on the wooden stage, as it can get crowded quickly.\n* Wear comfortable shoes, as you'll be doing a lot of walking and",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 4,
+      "elapsed_s": 4.44,
+      "input_tokens": 936,
+      "output_tokens": 256,
+      "output_text": "Based on your interest in Zen meditation, I would recommend **Kiyomizu-dera Temple** over **Kinkaku-ji (Golden Pavilion)**.\n\n**Kiyomizu-dera Temple** has a strong connection to Zen Buddhism, as it was founded in 778 AD by the Buddhist priest Enchin, who was a student of the famous Chinese monk, Saicho. The temple is also home to the Jishu Shrine, which is dedicated to the god of love and matchmaking, but also has a strong connection to Zen Buddhism.\n\n**Kinkaku-ji (Golden Pavilion)**, on the other hand, is a more secular temple, and while it has a beautiful and serene atmosphere, it is not particularly associated with Zen meditation.\n\n**Kiyomizu-dera Temple** offers a more immersive experience for those interested in Zen meditation, with its:\n\n* **Sutra copying**: You can participate in traditional sutra copying, a practice that is still observed at the temple today.\n* **Meditation rooms**: The temple has several meditation rooms, including the famous **Otowa Waterfall**, where you can sit and meditate in a peaceful atmosphere.\n* **Zen gardens**: The temple's gardens are designed to promote mindfulness and contemplation, making them",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 5,
+      "elapsed_s": 3.13,
+      "input_tokens": 1224,
+      "output_tokens": 178,
+      "output_text": "Here's a summary of our conversation:\n\n* We discussed planning a trip to Japan in April, with a focus on visiting Kyoto. I provided tips on the weather, cherry blossoms, and Golden Week.\n* I recommended the top 5 temples to visit in Kyoto, including Kinkaku-ji (Golden Pavilion), Fushimi Inari Shrine, and Kiyomizu-dera Temple. I highlighted the unique features of each temple, including the stunning golden exterior of Kinkaku-ji and the thousands of vermilion torii gates at Fushimi Inari Shrine.\n* We narrowed down the options to Kiyomizu-dera Temple and Kinkaku-ji (Golden Pavilion) for someone interested in Zen meditation, and I recommended Kiyomizu-dera Temple due to its strong connection to Zen Buddhism and its serene atmosphere, which is conducive to meditation.",
+      "finish_reason": "stop"
+    }
+  ],
+  "multi_turn_coherence": {
+    "mentions_kyoto": true,
+    "mentions_temple": true,
+    "has_bullets": false
+  },
+  "summary": {
+    "short_prompts_passed": 4,
+    "long_passage": "PASS",
+    "multi_turn": "PASS",
+    "total_passed": 6,
+    "total_tests": 6,
+    "verdict": "PASS"
+  }
+}

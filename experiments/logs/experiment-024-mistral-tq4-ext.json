@@ -1,0 +1,116 @@
+{
+  "experiment": "024-zero-change-model-probe",
+  "date": "2026-03-30 14:08:52",
+  "tag": "mistral-tq4-ext",
+  "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+  "max_new_tokens": 256,
+  "prompts": [
+    {
+      "elapsed_s": 8.82,
+      "output_text": " The three laws of thermodynamics are fundamental principles that describe the behavior of energy in a system. Here's a brief explanation of each:\n\n1. Zeroth Law of Thermodynamics: If two systems, A and B, are each in thermal equilibrium with a third system, C, then systems A and B are in thermal equilibrium with each other. In simpler terms, if you can compare the temperature of system A with system C, and system B with system C, and they both match, then system A and B will also match in temperature. This law allows us to define temperature and establish a temperature scale.\n\n2. First Law of Thermodynamics (Law of Energy Conservation): Energy cannot be created or destroyed, only transferred or changed from one form to another. This law is also known as the Law of Conservation of Energy. In a closed system, the change in the internal energy (U) is equal to the heat (Q) added to the system minus the work (W) done by the system. Mathematically, \u0394U = Q - W.\n\n3. Second Law of Thermodynamics: The total entropy (a measure of disorder or randomness) of an isolated",
+      "input_tokens": 18,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "factual",
+      "prompt": "What are the three laws of thermodynamics? Explain each briefly."
+    },
+    {
+      "elapsed_s": 0.92,
+      "output_text": " Nine sheep are left. The question states that \"all but 9\" die, which means that the remaining number of sheep is 9.",
+      "input_tokens": 23,
+      "output_tokens": 31,
+      "finish_reason": "stop",
+      "prompt_id": "reasoning",
+      "prompt": "A farmer has 17 sheep. All but 9 die. How many sheep are left?"
+    },
+    {
+      "elapsed_s": 0.76,
+      "output_text": " Errors flash,\n\nIn the labyrinth of lines,\n\nPeace in each fix.",
+      "input_tokens": 12,
+      "output_tokens": 23,
+      "finish_reason": "stop",
+      "prompt_id": "creative",
+      "prompt": "Write a haiku about debugging code."
+    },
+    {
+      "elapsed_s": 8.01,
+      "output_text": " TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are two primary transport layer protocols used for internet communication. Here are five key differences between them:\n\n1. **Connection-Oriented vs. Connectionless:** TCP is a connection-oriented protocol, which means it establishes a reliable, ordered, and full-duplex connection between the sender and receiver before data transfer. On the other hand, UDP is a connectionless protocol, which means it does not establish a dedicated connection; instead, it sends data in the form of datagrams.\n\n2. **Reliability:** TCP ensures reliable data transfer by providing mechanisms such as acknowledgments, retransmission, and flow control. If data is lost, corrupted, or not received, TCP will retransmit the data. In contrast, UDP does not guarantee the delivery of packets; it simply sends them and does not retransmit if they are lost or corrupted.\n\n3. **Error Checking:** TCP uses a checksum to verify the integrity of the data. If an error is detected, the data is retransmitted. UDP, however, does not perform error checking or retransmission.\n\n4",
+      "input_tokens": 37,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "long_context",
+      "prompt": "Summarize the key differences between TCP and UDP protocols. Include at least 5 specific technical differences and explain when you would choose one over the other."
+    }
+  ],
+  "long_passage": {
+    "elapsed_s": 5.31,
+    "output_text": " 1. Kepler-442b's orbital period is 112.3 days.\n2. Kepler-442b receives approximately 73% of Earth's solar flux.\n3. The host star's metallicity [Fe/H] value is -0.37.\n4. The discovery team was led by Guillermo Torres, and they are from the Harvard-Smithsonian Center for Astrophysics.\n5. Kepler-442b is considered more habitable than Kepler-438b because its K-type host provides a more stable radiation environment compared to the active M-dwarf star that Kepler-438b orbits, which is prone to superflares that could strip its atmosphere.",
+    "input_tokens": 1127,
+    "output_tokens": 173,
+    "finish_reason": "stop",
+    "prompt_id": "long_passage",
+    "facts_correct": 5,
+    "facts_detail": {
+      "orbital_period": true,
+      "solar_flux_73pct": true,
+      "metallicity": true,
+      "discovery_lead": true,
+      "kepler438_comparison": true
+    }
+  },
+  "multi_turn": [
+    {
+      "turn": 1,
+      "elapsed_s": 7.84,
+      "input_tokens": 19,
+      "output_tokens": 256,
+      "output_text": " That's an exciting plan! Here are some things you might find useful for your trip to Japan in April:\n\n1. **Weather**: April is one of the cherry blossom (Sakura) seasons, so you'll get to see beautiful blooms across the country. However, the weather can still be unpredictable, with temperatures ranging from 10\u00b0C (50\u00b0F) to 20\u00b0C (68\u00b0F). It's a good idea to pack layers.\n\n2. **Cherry Blossom Forecast**: The blooming of cherry blossoms can vary each year, but usually, it starts in the south and moves north. You can check the forecast on various websites to plan your trip to catch the blooms.\n\n3. **Holidays**: Golden Week, one of Japan's busiest holiday seasons, falls in late April or early May. If you're planning to visit during this time, be prepared for crowded attractions and higher prices.\n\n4. **Festivals**: April is also a month with many traditional festivals (Matsuri). The Sanja Matsuri in Asakusa, Tokyo,",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 2,
+      "elapsed_s": 8.06,
+      "input_tokens": 309,
+      "output_tokens": 256,
+      "output_text": " Kyoto is a city rich in history and culture, and it's home to numerous temples. Here are five must-visit temples in Kyoto, each with its unique charm:\n\n1. **Kiyomizu-dera**: Kiyomizu-dera is one of the most famous temples in Japan, located on a hill in eastern Kyoto. It was founded in 778 and is known for its stunning wooden main hall, offering panoramic views of the city. The temple is also famous for its cherry blossoms and autumn foliage.\n\n2. **Fushimi Inari Taisha**: Fushimi Inari Taisha is famous for its thousands of vermilion torii gates that form tunnels along the trails up Mount Inari. The trail leads to the summit of the mountain, offering beautiful views of Kyoto.\n\n3. **Kinkaku-ji (Golden Pavilion)**: Kinkaku-ji is a beautiful Zen temple that was originally built as a retirement villa for a shogun. The top two floors are completely covered in gold leaf, making it a stunning sight, especially when reflected in the pond surrounding it",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 3,
+      "elapsed_s": 7.84,
+      "input_tokens": 600,
+      "output_tokens": 256,
+      "output_text": " For Kinkaku-ji (Golden Pavilion), the best time to visit is early in the morning or late afternoon to avoid the crowds and enjoy the beautiful reflections on the pond. The temple is open from 9:00 AM to 5:00 PM, and the last entry is at 4:30 PM.\n\nAs for nearby restaurants, there are several options around Kinkaku-ji. Here are a few recommendations:\n\n1. **Gion Karyo**: A traditional Kyoto-style restaurant offering a variety of kaiseki (traditional multi-course meal) dishes. It's about a 10-minute walk from Kinkaku-ji.\n\n2. **Kinkaku-ji Yudofu Kawai**: A restaurant specializing in tofu dishes, located near Kinkaku-ji. It's a great option if you're looking for a light lunch.\n\n3. **Cafe Kinkaku**: A cafe located right across the street from Kinkaku-ji, offering a variety of drinks and light meals. It's a convenient option if you want to grab something quick before or after visiting the",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 4,
+      "elapsed_s": 7.08,
+      "input_tokens": 896,
+      "output_tokens": 229,
+      "output_text": "  Both Kiyomizu-dera and Ryoan-ji are famous Zen temples, but they offer different experiences.\n\nKiyomizu-dera is a large temple complex with several buildings and beautiful gardens. While it has a strong connection to Zen Buddhism, it's more known for its architecture and stunning views. There are guided meditation sessions available, but they are not the main focus of the temple.\n\nRyoan-ji, on the other hand, is famous for its rock garden, which is considered one of the most famous Zen gardens in Japan. The garden consists of 15 rocks arranged in a rectangular formation on white gravel, inviting visitors to contemplate its design and meaning. The temple also has a small Zen meditation hall where visitors can participate in a short meditation session.\n\nIf you're specifically interested in Zen meditation, Ryoan-ji would be a better choice as it offers a more focused Zen experience through its rock garden and meditation sessions. However, both temples are worth visiting for their unique charm and historical significance.",
+      "finish_reason": "stop"
+    },
+    {
+      "turn": 5,
+      "elapsed_s": 3.24,
+      "input_tokens": 1150,
+      "output_tokens": 102,
+      "output_text": " 1. In April, Kyoto is a great destination to see cherry blossoms and visit traditional temples.\n2. Must-visit temples in Kyoto include Kiyomizu-dera, Fushimi Inari Taisha, Kinkaku-ji (Golden Pavilion), and Ryoan-ji.\n3. For Zen meditation enthusiasts, Ryoan-ji offers a more focused Zen experience with its rock garden and meditation sessions.",
+      "finish_reason": "stop"
+    }
+  ],
+  "multi_turn_coherence": {
+    "mentions_kyoto": true,
+    "mentions_temple": true,
+    "has_bullets": true
+  },
+  "summary": {
+    "short_prompts_passed": 4,
+    "long_passage": "PASS",
+    "multi_turn": "PASS",
+    "total_passed": 6,
+    "total_tests": 6,
+    "verdict": "PASS"
+  }
+}

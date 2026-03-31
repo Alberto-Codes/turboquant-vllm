@@ -1,0 +1,51 @@
+{
+  "experiment": "024-zero-change-model-probe",
+  "date": "2026-03-30 13:39:01",
+  "tag": "llama-baseline",
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "max_new_tokens": 256,
+  "prompts": [
+    {
+      "elapsed_s": 4.47,
+      "output_text": "The three laws of thermodynamics are fundamental principles that describe the relationships between heat, work, and energy. Here's a brief explanation of each:\n\n1. **Zeroth Law of Thermodynamics**: This law states that if two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other. In simpler terms, it allows us to define a temperature scale, such as the Celsius or Kelvin scale, which measures the thermal energy of a system.\n\n2. **First Law of Thermodynamics (Law of Energy Conservation)**: This law states that energy cannot be created or destroyed, only converted from one form to another. Mathematically, it's expressed as \u0394E = Q - W, where \u0394E is the change in energy, Q is the heat added to the system, and W is the work done on the system.\n\n3. **Second Law of Thermodynamics**: This law states that the total entropy (a measure of disorder or randomness) of a closed system will always increase over time, except in reversible processes. In simpler terms, it means that energy will become less organized and more dispersed as it is transferred or transformed from one form to another.\n\n4. **Third Law of Thermodynamics**: This law states that as the temperature of a system",
+      "input_tokens": 48,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "factual",
+      "prompt": "What are the three laws of thermodynamics? Explain each briefly."
+    },
+    {
+      "elapsed_s": 1.03,
+      "output_text": "To find the number of sheep left, we need to subtract the number of sheep that died from the total number of sheep.\n\nTotal number of sheep = 17\nNumber of sheep that died = 17 - 9 = 8\n\nSo, the number of sheep left is 9.",
+      "input_tokens": 54,
+      "output_tokens": 60,
+      "finish_reason": "stop",
+      "prompt_id": "reasoning",
+      "prompt": "A farmer has 17 sheep. All but 9 die. How many sheep are left?"
+    },
+    {
+      "elapsed_s": 0.32,
+      "output_text": "Lines of code entwined\n Errors hidden, patience worn\nLogic's gentle dance",
+      "input_tokens": 43,
+      "output_tokens": 18,
+      "finish_reason": "stop",
+      "prompt_id": "creative",
+      "prompt": "Write a haiku about debugging code."
+    },
+    {
+      "elapsed_s": 4.54,
+      "output_text": "**TCP (Transmission Control Protocol) vs UDP (User Datagram Protocol)**\n\nTCP and UDP are two fundamental transport-layer protocols used in the Internet Protocol Suite (TCP/IP). While both protocols enable data transfer between devices, they differ significantly in their approach, design, and application.\n\n**Key Technical Differences:**\n\n1.  **Connection-Oriented vs Connectionless:**\n    *   TCP is a connection-oriented protocol, which means it establishes a connection between the sender and receiver before data transfer begins. This connection is maintained throughout the data transfer process.\n    *   UDP is a connectionless protocol, which means it does not establish a connection before data transfer. Each packet is sent independently, and the receiver does not acknowledge receipt.\n2.  **Reliability:**\n    *   TCP ensures reliable data transfer by using sequence numbers, acknowledgments, and retransmissions. If a packet is lost or corrupted, TCP retransmits it.\n    *   UDP does not guarantee reliable data transfer. If a packet is lost or corrupted, it is not retransmitted.\n3.  **Order of Delivery:**\n    *   TCP ensures that packets are delivered in the correct order. If packets are received out of order, TCP reorders them.\n    *   UDP does",
+      "input_tokens": 66,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "long_context",
+      "prompt": "Summarize the key differences between TCP and UDP protocols. Include at least 5 specific technical differences and explain when you would choose one over the other."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "verdict": "PASS"
+  }
+}

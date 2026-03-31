@@ -1,0 +1,116 @@
+{
+  "experiment": "024-zero-change-model-probe",
+  "date": "2026-03-30 14:07:07",
+  "tag": "mistral-baseline-ext",
+  "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+  "max_new_tokens": 256,
+  "prompts": [
+    {
+      "elapsed_s": 4.35,
+      "output_text": " The three laws of thermodynamics are fundamental principles that govern the behavior of energy and its transformation in physical systems. Here's a brief explanation of each law:\n\n1. Zeroth Law of Thermodynamics: If two systems are each in thermal equilibrium with a third, they are in thermal equilibrium with each other. This law establishes the concept of temperature and allows us to compare the temperatures of different systems.\n\n2. First Law of Thermodynamics (Law of Energy Conservation): Energy cannot be created or destroyed, only transferred or changed from one form to another. In a closed system, the change in the internal energy (U) of the system is equal to the heat (Q) added to the system minus the work (W) done by the system: \u0394U = Q - W.\n\n3. Second Law of Thermodynamics: The total entropy (a measure of disorder or randomness) of an isolated system can never decrease over time, and is constant only when all processes have come to a complete stop. In other words, energy tends to disperse and become less useful for work. This law explains why heat naturally flows from hot objects to cold objects, and why engines cannot",
+      "input_tokens": 18,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "factual",
+      "prompt": "What are the three laws of thermodynamics? Explain each briefly."
+    },
+    {
+      "elapsed_s": 0.47,
+      "output_text": " Nine sheep are left. The question states that all but 9 die, which means that the remaining number of sheep is 9.",
+      "input_tokens": 23,
+      "output_tokens": 29,
+      "finish_reason": "stop",
+      "prompt_id": "reasoning",
+      "prompt": "A farmer has 17 sheep. All but 9 die. How many sheep are left?"
+    },
+    {
+      "elapsed_s": 1.47,
+      "output_text": " Errors dance, lines intertwine,\n\nSilent night, logic finds,\n\nCode now sings in rhyme.\n\nThis haiku attempts to capture the struggle and eventual triumph of debugging code, where errors (represented as \"dancers\") disrupt the smooth flow of the code, but with patience and logic, the code eventually works harmoniously (represented as \"singing in rhyme\").",
+      "input_tokens": 12,
+      "output_tokens": 91,
+      "finish_reason": "stop",
+      "prompt_id": "creative",
+      "prompt": "Write a haiku about debugging code."
+    },
+    {
+      "elapsed_s": 4.22,
+      "output_text": " TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are two primary transport layer protocols used in internet communications. Here are five key technical differences between them, along with scenarios where one might be preferred over the other:\n\n1. **Connection-oriented vs. connectionless:** TCP is a connection-oriented protocol, which means it establishes a reliable, ordered, and full-duplex connection between the sender and receiver before data transfer. In contrast, UDP is a connectionless protocol, which means it does not establish a dedicated connection; instead, it sends data packets independently.\n\n2. **Reliability:** TCP ensures the delivery of data packets by retransmitting lost or corrupted packets, implementing error checking, and reordering packets if necessary. UDP, on the other hand, does not guarantee the delivery of packets or their order. It simply sends the data and leaves it to the application to handle any errors or missing packets.\n\n3. **Flow control and congestion control:** TCP includes flow control and congestion control mechanisms to prevent network congestion and ensure a steady data transfer rate. UDP does not have these mechanisms, making it more suitable for applications that can handle",
+      "input_tokens": 37,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "long_context",
+      "prompt": "Summarize the key differences between TCP and UDP protocols. Include at least 5 specific technical differences and explain when you would choose one over the other."
+    }
+  ],
+  "long_passage": {
+    "elapsed_s": 3.03,
+    "output_text": " 1. Kepler-442b's orbital period is 112.3 days.\n2. Kepler-442b receives approximately 73% of the solar flux that Earth receives from the Sun.\n3. The host star's metallicity [Fe/H] value is -0.37.\n4. Guillermo Torres led the discovery team, and they are from the Harvard-Smithsonian Center for Astrophysics.\n5. Kepler-442b is considered more habitable than Kepler-438b because its K-type host provides a more stable radiation environment compared to the active M-dwarf star that Kepler-438b orbits, which is prone to superflares that could strip its atmosphere.",
+    "input_tokens": 1127,
+    "output_tokens": 175,
+    "finish_reason": "stop",
+    "prompt_id": "long_passage",
+    "facts_correct": 5,
+    "facts_detail": {
+      "orbital_period": true,
+      "solar_flux_73pct": true,
+      "metallicity": true,
+      "discovery_lead": true,
+      "kepler438_comparison": true
+    }
+  },
+  "multi_turn": [
+    {
+      "turn": 1,
+      "elapsed_s": 4.2,
+      "input_tokens": 19,
+      "output_tokens": 256,
+      "output_text": " That's an exciting plan! Japan in April is a beautiful time to visit, with cherry blossoms blooming and the start of the spring season. Here are some tips to help you prepare for your trip:\n\n1. **Cherry Blossom Forecast**: Check the cherry blossom forecast to plan your trip around the blooming period. The blooming period varies each year, but it usually happens in late March to early April.\n\n2. **Book Accommodation in Advance**: April is a popular travel month in Japan, so it's a good idea to book your accommodation well in advance.\n\n3. **Clothing**: The weather can be quite variable, so pack layers. You might want to include a light jacket or sweater for cooler evenings and a raincoat or umbrella for potential rain showers.\n\n4. **Transportation**: Japan's public transportation system is efficient and extensive, but it can be crowded, especially during peak travel times. Consider getting a Japan Rail Pass if you plan to travel extensively by train.\n\n5. **Etiquette**: Japanese culture values politeness and respect. Some things to keep in mind include",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 2,
+      "elapsed_s": 4.33,
+      "input_tokens": 309,
+      "output_tokens": 256,
+      "output_text": " Kyoto is a city rich in history and culture, and it's home to numerous temples and shrines. Here are five must-visit temples in Kyoto, each with its unique charm:\n\n1. **Kiyomizu-dera**: Kiyomizu-dera is one of the most famous temples in Japan, located on a hill in eastern Kyoto. It was founded in 778 and is known for its stunning wooden main hall, which offers panoramic views of the city. The temple is also famous for its cherry blossom and autumn foliage seasons.\n\n2. **Fushimi Inari Taisha**: Fushimi Inari Taisha is famous for its thousands of vermilion torii gates that form a tunnel along a mountain trail. The trail leads to the summit of Mount Inari, where the main shrine is located. The trail is long, but the views from the top are worth the climb.\n\n3. **Kinkaku-ji (Golden Pavilion)**: Kinkaku-ji is a beautiful Zen temple that is covered in gold leaf. It was originally built as a retirement villa for a shogun",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 3,
+      "elapsed_s": 3.34,
+      "input_tokens": 600,
+      "output_tokens": 207,
+      "output_text": "  For Kinkaku-ji (Golden Pavilion), the best time to visit is early in the morning or late in the afternoon to avoid the crowds and enjoy the beautiful reflections on the pond. The temple is open from 9:00 AM to 5:00 PM, and the last admission is at 4:30 PM.\n\nAs for lunch, there are several restaurants near Kinkaku-ji. One popular option is \"Gion Namba,\" which serves traditional Kyoto cuisine, including kaiseki (a multi-course meal featuring seasonal ingredients). It's located about a 10-minute walk from Kinkaku-ji. Another option is \"Kinkaku-ji Cafe,\" which offers a variety of sandwiches, salads, and desserts, and has a beautiful view of the temple. It's located on the grounds of the temple, so you can enjoy your meal while taking in the stunning views.",
+      "finish_reason": "stop"
+    },
+    {
+      "turn": 4,
+      "elapsed_s": 3.69,
+      "input_tokens": 845,
+      "output_tokens": 222,
+      "output_text": "   For someone interested in Zen meditation, the fourth temple I listed, Ryoan-ji, would be a better choice. Ryoan-ji is a Zen temple that is famous for its rock garden, which consists of 15 rocks arranged in a simple, minimalist design. The rocks are placed in a rectangular sand garden, and the garden is surrounded by a low wall. The garden is said to represent the universe and the infinite nature of Zen.\n\nThe temple's rock garden is a popular spot for meditation, and visitors are encouraged to sit and contemplate the rocks for a while. The garden's simplicity and tranquility make it an ideal place for meditation and reflection.\n\nIn contrast, Kiyomizu-dera is a Buddhist temple that is known for its stunning wooden main hall and panoramic views of Kyoto. While it is a beautiful temple, it is not specifically associated with Zen meditation.\n\nSo, if you are interested in Zen meditation, Ryoan-ji would be a better choice for you.",
+      "finish_reason": "stop"
+    },
+    {
+      "turn": 5,
+      "elapsed_s": 1.55,
+      "input_tokens": 1092,
+      "output_tokens": 89,
+      "output_text": " * Visit Kiyomizu-dera for stunning views of Kyoto and cherry blossom and autumn foliage seasons.\n* Visit Fushimi Inari Taisha for a trail of thousands of vermilion torii gates leading to the summit of Mount Inari.\n* Visit Ryoan-ji for a Zen temple famous for its rock garden, which is a popular spot for meditation and reflection.",
+      "finish_reason": "stop"
+    }
+  ],
+  "multi_turn_coherence": {
+    "mentions_kyoto": true,
+    "mentions_temple": true,
+    "has_bullets": false
+  },
+  "summary": {
+    "short_prompts_passed": 4,
+    "long_passage": "PASS",
+    "multi_turn": "PASS",
+    "total_passed": 6,
+    "total_tests": 6,
+    "verdict": "PASS"
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "experiment": "024-zero-change-model-probe",
+  "date": "2026-03-30 14:36:33",
+  "tag": "llama-tq4-8k",
+  "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "max_new_tokens": 256,
+  "prompts": [
+    {
+      "elapsed_s": 8.57,
+      "output_text": "The three laws of thermodynamics are fundamental principles that describe the relationships between heat, work, and energy. Here's a brief explanation of each:\n\n1. **Zeroth Law of Thermodynamics**: This law states that if two systems are in thermal equilibrium with a third system, then they are also in thermal equilibrium with each other. In simpler terms, it allows us to define a temperature scale, such as the Celsius or Kelvin scale, which enables us to compare the temperatures of different systems.\n\n2. **First Law of Thermodynamics (Law of Energy Conservation)**: This law states that energy cannot be created or destroyed, only converted from one form to another. Mathematically, it's expressed as \u0394E = Q - W, where \u0394E is the change in energy, Q is the heat added to the system, and W is the work done on the system. This law highlights the importance of energy conservation in thermodynamic processes.\n\n3. **Second Law of Thermodynamics**: This law states that the total entropy (a measure of disorder or randomness) of an isolated system always increases over time. In other words, as energy is transferred or transformed from one form to another, some of it becomes unavailable to do useful work because it becomes random and dispersed. This law explains why it",
+      "input_tokens": 48,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "factual",
+      "prompt": "What are the three laws of thermodynamics? Explain each briefly."
+    },
+    {
+      "elapsed_s": 2.39,
+      "output_text": "To find the number of sheep left, we need to subtract the number of sheep that died from the total number of sheep.\n\nTotal number of sheep = 17\nNumber of sheep that died = 17 - 9 = 8\n\nSo, the number of sheep left is 8 + 9 = 17 - 8 = 9",
+      "input_tokens": 54,
+      "output_tokens": 71,
+      "finish_reason": "stop",
+      "prompt_id": "reasoning",
+      "prompt": "A farmer has 17 sheep. All but 9 die. How many sheep are left?"
+    },
+    {
+      "elapsed_s": 0.52,
+      "output_text": "Lines of code entwined\n Errors hidden, patience worn\nLogic's gentle dance",
+      "input_tokens": 43,
+      "output_tokens": 18,
+      "finish_reason": "stop",
+      "prompt_id": "creative",
+      "prompt": "Write a haiku about debugging code."
+    },
+    {
+      "elapsed_s": 7.9,
+      "output_text": "**TCP (Transmission Control Protocol) vs UDP (User Datagram Protocol)**\n\nTCP and UDP are two fundamental transport-layer protocols used in the Internet Protocol Suite. While both protocols enable data transfer between devices, they differ significantly in their approach, design, and application.\n\n**Key Technical Differences:**\n\n1.  **Connection-Oriented vs Connectionless:**\n    *   TCP: Establishes a connection between the sender and receiver before data transfer, ensuring reliable data transfer.\n    *   UDP: Does not establish a connection, sending data packets independently without guaranteeing delivery or order.\n\n2.  **Error Handling:**\n    *   TCP: Uses acknowledgments (ACKs) and retransmissions to ensure data integrity and reliability.\n    *   UDP: Does not use ACKs or retransmissions, relying on the application layer to handle errors.\n\n3.  **Packet Ordering:**\n    *   TCP: Ensures packets are delivered in the correct order, using sequence numbers and acknowledgments.\n    *   UDP: Does not guarantee packet order, leaving it to the application layer to reorder packets if necessary.\n\n4.  **Packet Loss and Corruption:**\n    *   TCP: Handles packet loss and corruption by retransmitting lost or corrupted packets.\n    *",
+      "input_tokens": 66,
+      "output_tokens": 256,
+      "finish_reason": "length",
+      "prompt_id": "long_context",
+      "prompt": "Summarize the key differences between TCP and UDP protocols. Include at least 5 specific technical differences and explain when you would choose one over the other."
+    }
+  ],
+  "long_passage": {
+    "elapsed_s": 4.5,
+    "output_text": "1. Kepler-442b's orbital period is 112.3 days.\n2. Kepler-442b receives about 73% of the solar flux that Earth receives from the Sun.\n3. The host star's metallicity [Fe/H] value is -0.37.\n4. Guillermo Torres led the discovery team, and he is from the Harvard-Smithsonian Center for Astrophysics.\n5. Kepler-442b is considered more habitable than Kepler-438b because its host star is a K-type star, which is less luminous and more stable than the M-dwarf star that Kepler-438b orbits. This stability is considered favorable for the development of complex life.",
+    "input_tokens": 958,
+    "output_tokens": 140,
+    "finish_reason": "stop",
+    "prompt_id": "long_passage",
+    "facts_correct": 5,
+    "facts_detail": {
+      "orbital_period": true,
+      "solar_flux_73pct": true,
+      "metallicity": true,
+      "discovery_lead": true,
+      "kepler438_comparison": true
+    }
+  },
+  "multi_turn": [
+    {
+      "turn": 1,
+      "elapsed_s": 8.12,
+      "input_tokens": 50,
+      "output_tokens": 256,
+      "output_text": "Japan in April can be a wonderful time to visit, with mild temperatures and beautiful cherry blossoms (sakura) in full bloom. Here are some key things to know before your trip:\n\n**Weather:**\n\n* April is a great time to visit Japan, with temperatures ranging from 10\u00b0C to 20\u00b0C (50\u00b0F to 68\u00b0F) in most parts of the country.\n* It's still a bit chilly in the mornings and evenings, so pack layers for your trip.\n* Rainfall is relatively low in April, but it's always a good idea to bring an umbrella.\n\n**Cherry Blossoms (Sakura):**\n\n* April is the peak season for cherry blossoms in Japan, with the blooming period usually lasting from late March to early May.\n* Popular spots for cherry blossom viewing (hanami) include Ueno Park in Tokyo, Maruyama Park in Kyoto, and Mount Yoshino in Nara.\n* Be prepared for large crowds and long lines at popular spots.\n\n**Festivals and Events:**\n\n* April is a great time to experience Japan's vibrant festival culture, with many events taking place throughout the country.\n* Some popular festivals in April include the Cherry Blossom Festival in Tokyo, the Golden Week holidays (April ",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 2,
+      "elapsed_s": 7.89,
+      "input_tokens": 343,
+      "output_tokens": 256,
+      "output_text": "Kyoto is a treasure trove of temples and shrines, each with its own unique history and architecture. Here are the top 5 temples to visit in Kyoto, along with what makes each unique:\n\n**1. Kinkaku-ji Temple (Golden Pavilion)**\n\n* Location: 1 Kinkaku, Kyoto 601-1155, Japan\n* Unique feature: The temple's stunning golden exterior, which is covered in thin layers of gold leaf, creating a breathtakingly beautiful effect.\n* History: The temple was built in 1397 as a retirement villa for the Shogun Ashikaga Yoshimitsu, and was later converted into a temple in 1408.\n* Must-see: The temple's serene gardens and the reflection of the golden pavilion in the pond.\n\n**2. Fushimi Inari Shrine**\n\n* Location: 68 Fukakusa Yabunouchi-cho, Fushimi-ku, Kyoto 612-0882, Japan\n* Unique feature: The thousands of vermilion torii gates that form a tunnel up the mountain, creating a breathtakingly beautiful and iconic image.\n* History: The shrine was built in 711 AD and is dedicated to the Shinto god of rice and prosperity.\n",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 3,
+      "elapsed_s": 7.96,
+      "input_tokens": 638,
+      "output_tokens": 256,
+      "output_text": "For the third temple I mentioned, **Kiyomizu-dera Temple**, here are some tips on the best time to visit and a nearby restaurant recommendation:\n\n**Best Time to Visit:**\n\n* Early morning (around 8-9 am) is a great time to visit Kiyomizu-dera Temple, as the sun is not too strong and the crowds are smaller.\n* Avoid visiting during peak hours (usually between 11 am and 3 pm) when the temple is busiest.\n* If you want to see the sunset, visit around 5-6 pm, but be prepared for larger crowds.\n\n**Nearby Restaurant Recommendation:**\n\n* **Ganko Sushi**: This restaurant is located near the temple and serves delicious and fresh sushi. Try their classic maki rolls or their seasonal specials.\n* **Address:** 1-1 Kiyomizu, Higashiyama-ku, Kyoto 605-0862, Japan\n* **Phone:** +81 75-561-1111\n* **Price Range:** \u00a52,000 - \u00a55,000 (around $18-$45 USD) per person for a meal.\n\n**Tips:**\n\n* Be sure to try some of the local specialties, such as yudofu",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 4,
+      "elapsed_s": 8.09,
+      "input_tokens": 935,
+      "output_tokens": 256,
+      "output_text": "Based on your interest in Zen meditation, I would recommend **Shoren-in Temple** (the fourth temple I listed) over **Kinkaku-ji Temple** (the first temple I listed).\n\n**Shoren-in Temple:**\n\n* Shoren-in is a Zen temple that is part of the Myoshin-ji complex, which is one of the largest and most influential Zen temples in Japan.\n* The temple has a long history of Zen practice and is home to many monks who are dedicated to the study and practice of Zen meditation.\n* The temple's atmosphere is peaceful and serene, making it an ideal place for meditation and contemplation.\n* Visitors can participate in a traditional Zen tea ceremony, which is a unique and meaningful experience.\n\n**Kinkaku-ji Temple:**\n\n* While Kinkaku-ji is a beautiful and iconic temple, it is not primarily a Zen temple.\n* The temple's focus is more on its stunning architecture and gardens, rather than Zen practice.\n* The temple can be quite crowded, which may not be conducive to a peaceful meditation experience.\n\nOverall, if you're interested in Zen meditation, Shoren-in Temple is a better choice. Its peaceful atmosphere and rich history of Zen practice make it an ideal place to deepen your understanding of",
+      "finish_reason": "length"
+    },
+    {
+      "turn": 5,
+      "elapsed_s": 4.86,
+      "input_tokens": 1223,
+      "output_tokens": 153,
+      "output_text": "Here's a summary of our conversation:\n\n* We discussed planning a trip to Japan in April, with a focus on visiting Kyoto. I provided tips on the weather, cherry blossoms, and festivals in April.\n* I recommended the top 5 temples to visit in Kyoto, including Kinkaku-ji Temple (Golden Pavilion), Fushimi Inari Shrine, Kiyomizu-dera Temple, and Shoren-in Temple. I highlighted the unique features of each temple and provided information on the best time to visit and nearby restaurants.\n* We compared Kinkaku-ji Temple and Shoren-in Temple, and I recommended Shoren-in Temple as a better choice for someone interested in Zen meditation due to its peaceful atmosphere and rich history of Zen practice.",
+      "finish_reason": "stop"
+    }
+  ],
+  "multi_turn_coherence": {
+    "mentions_kyoto": true,
+    "mentions_temple": true,
+    "has_bullets": false
+  },
+  "summary": {
+    "short_prompts_passed": 4,
+    "long_passage": "PASS",
+    "multi_turn": "PASS",
+    "total_passed": 6,
+    "total_tests": 6,
+    "verdict": "PASS"
+  }
+}
