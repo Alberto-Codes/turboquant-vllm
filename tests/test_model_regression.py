@@ -31,6 +31,7 @@ REGRESSION_MODELS = [
     pytest.param("meta-llama/Llama-3.1-8B", id="llama-3.1-8b"),
     pytest.param("Qwen/Qwen2.5-3B", id="qwen2.5-3b"),
     pytest.param("microsoft/phi-4", id="phi-4"),
+    pytest.param("microsoft/Phi-3-mini-4k-instruct", id="phi-3-mini"),
 ]
 
 

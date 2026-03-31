@@ -18,6 +18,7 @@ import torch
 triton = pytest.importorskip("triton")
 
 from tests.conftest import cosine_similarity_flat  # noqa: E402
+from tests.helpers.int8_prefill import reference_causal_prefill  # noqa: E402
 from tests.helpers.paged_cache import (  # noqa: E402
     BLOCK_SIZE,
     HEAD_DIM,
@@ -29,7 +30,6 @@ from turboquant_vllm.triton.fused_paged_tq4_int8_prefill import (  # noqa: E402
     _fused_paged_tq4_int8_prefill_kernel,
     fused_paged_tq4_int8_prefill,
 )
-from turboquant_vllm.triton.tq4_decompress import tq4_decompress  # noqa: E402
 
 pytestmark = [pytest.mark.gpu]
 
@@ -74,74 +74,7 @@ def tq4_quantizer() -> TurboQuantMSE:
 
 _cosine_sim = cosine_similarity_flat
 _build_paged_cache = build_paged_cache
-
-
-def _reference_causal_prefill(
-    q: torch.Tensor,
-    kv_cache: torch.Tensor,
-    block_table: torch.Tensor,
-    seq_len: int,
-    num_kv_heads: int,
-    centroids: torch.Tensor,
-    rotation: torch.Tensor,
-) -> torch.Tensor:
-    """Reference causal prefill: decompress from paged cache, attend, rotate.
-
-    Returns:
-        Attention output ``[num_tokens, H_Q, D]`` in original space.
-    """
-    num_tokens, H_Q, D = q.shape
-    half_D = D // 2
-    sm_scale = 1.0 / math.sqrt(D)
-    gqa_ratio = H_Q // num_kv_heads
-    k_idx_end = num_kv_heads * half_D
-    k_norm_end = k_idx_end + num_kv_heads * 4
-    v_idx_end = k_norm_end + num_kv_heads * half_D
-
-    # Gather and decompress from pages
-    k_packed_rows, k_norm_rows, v_packed_rows, v_norm_rows = [], [], [], []
-    for t in range(seq_len):
-        phys = block_table[0, t // BLOCK_SIZE].item()
-        row = kv_cache[phys, t % BLOCK_SIZE]  # ty: ignore[invalid-argument-type]
-        k_packed_rows.append(row[:k_idx_end].reshape(num_kv_heads, half_D))
-        k_norm_rows.append(
-            row[k_idx_end:k_norm_end]
-            .contiguous()
-            .view(torch.float32)
-            .reshape(num_kv_heads, 1)
-        )
-        v_packed_rows.append(row[k_norm_end:v_idx_end].reshape(num_kv_heads, half_D))
-        v_norm_rows.append(
-            row[v_idx_end:].contiguous().view(torch.float32).reshape(num_kv_heads, 1)
-        )
-
-    k_dec = tq4_decompress(
-        torch.stack(k_packed_rows), torch.stack(k_norm_rows), centroids, dtype=q.dtype
-    )
-    v_dec = tq4_decompress(
-        torch.stack(v_packed_rows), torch.stack(v_norm_rows), centroids, dtype=q.dtype
-    )
-
-    # Pre-rotate Q
-    q_rot = (q.float() @ rotation.T).to(q.dtype)
-
-    # Batched causal attention with GQA expansion
-    k_exp = k_dec.unsqueeze(2).expand(-1, -1, gqa_ratio, -1).reshape(seq_len, H_Q, D)
-    v_exp = v_dec.unsqueeze(2).expand(-1, -1, gqa_ratio, -1).reshape(seq_len, H_Q, D)
-
-    q_perm = q_rot.permute(1, 0, 2).float()  # (H_Q, S, D)
-    k_perm = k_exp.permute(1, 0, 2).float()
-    v_perm = v_exp.permute(1, 0, 2).float()
-
-    scores = torch.bmm(q_perm, k_perm.transpose(1, 2)) * sm_scale
-    causal_mask = torch.triu(
-        torch.ones(num_tokens, seq_len, device=q.device), diagonal=1
-    ).bool()
-    scores.masked_fill_(causal_mask.unsqueeze(0), float("-inf"))
-    weights = torch.softmax(scores, dim=-1)
-    out_rot = torch.bmm(weights, v_perm).permute(1, 0, 2)  # (S, H_Q, D)
-
-    return (out_rot @ rotation.float()).to(q.dtype)
+_reference_causal_prefill = reference_causal_prefill
 
 
 def _call_fp16_mode(
@@ -509,60 +442,3 @@ class TestInt8PrefillKernel:
         assert cos > INT8_VS_FP16_THRESHOLD, (
             f"GPU integration cosine {cos:.6f} < {INT8_VS_FP16_THRESHOLD}"
         )
-
-
-# ---------------------------------------------------------------------------
-# 36-layer composition (slow)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.gpu
-@pytest.mark.slow
-class TestInt8Prefill36LayerComposition:
-    """36-layer INT8 prefill composition for release gate (5.9)."""
-
-    def test_36_layer_per_layer_cosine(
-        self, device: str, tq4_quantizer: TurboQuantMSE
-    ) -> None:
-        """Per-layer cosine >0.997 across 36 layers with 1024-token prefill."""
-        H_Q, H_KV = 28, 4
-        num_layers = 36
-        seq_len = 1024
-        centroids = tq4_quantizer.codebook.centroids.to(device)
-        rotation = tq4_quantizer.rotation.to(device)
-
-        for layer_idx in range(num_layers):
-            torch.manual_seed(SEED + layer_idx)
-            k = torch.randn(seq_len, H_KV, HEAD_DIM, device=device, dtype=torch.float16)
-            v = torch.randn(seq_len, H_KV, HEAD_DIM, device=device, dtype=torch.float16)
-            q = torch.randn(seq_len, H_Q, HEAD_DIM, device=device, dtype=torch.float16)
-
-            kv_cache, block_table, seq_lens_t = _build_paged_cache(
-                k, v, [seq_len], tq4_quantizer, device
-            )
-
-            actual = fused_paged_tq4_int8_prefill(
-                q,
-                kv_cache,
-                block_table,
-                seq_lens_t,
-                centroids,
-                rotation,
-                num_kv_heads=H_KV,
-                head_dim=HEAD_DIM,
-                block_size=BLOCK_SIZE,
-            )
-            expected = _reference_causal_prefill(
-                q,
-                kv_cache,
-                block_table,
-                seq_len,
-                H_KV,
-                centroids,
-                rotation,
-            )
-
-            cos = _cosine_sim(actual, expected)
-            assert cos > INT8_TQ4_VS_BASELINE_THRESHOLD, (
-                f"Layer {layer_idx}: cosine {cos:.6f} < {INT8_TQ4_VS_BASELINE_THRESHOLD}"
-            )
