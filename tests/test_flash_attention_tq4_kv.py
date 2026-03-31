@@ -13,6 +13,7 @@ import torch
 
 from turboquant_vllm.quantizer import TurboQuantMSE
 from turboquant_vllm.triton.flash_attention_tq4_kv import (
+    _AUTOTUNE_CONFIGS,
     triton_flash_attention_tq4_kv,
 )
 from turboquant_vllm.triton.tq4_compress import tq4_compress
@@ -108,6 +109,25 @@ class TestTQ4KVFlashAttention:
             fused_fn=_fused,
             is_causal=is_causal,
         )
+
+
+# ---------------------------------------------------------------------------
+# Autotune config validation (Story 5.5)
+# ---------------------------------------------------------------------------
+
+
+class TestAutotuneConfigs:
+    """Verify autotune search space covers required BLOCK_M values."""
+
+    def test_block_m_32_in_configs(self) -> None:
+        """BLOCK_M=32 must exist for head_dim=256 SRAM optimization."""
+        block_m_values = {c.kwargs["BLOCK_M"] for c in _AUTOTUNE_CONFIGS}
+        assert 32 in block_m_values
+
+    def test_original_block_m_values_preserved(self) -> None:
+        """Original BLOCK_M values (16, 64, 128) must remain in configs."""
+        block_m_values = {c.kwargs["BLOCK_M"] for c in _AUTOTUNE_CONFIGS}
+        assert {16, 64, 128}.issubset(block_m_values)
 
 
 # ---------------------------------------------------------------------------

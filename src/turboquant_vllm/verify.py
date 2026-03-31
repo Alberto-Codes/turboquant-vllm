@@ -4,8 +4,9 @@ Runs a 128-token random Gaussian prefill through CompressedDynamicCache and
 reports per-layer cosine similarity vs uncompressed DynamicCache. Outputs
 PASS/FAIL against a configurable threshold (default 0.99, compression quality tier).
 
-Validated model families (Molmo2, Mistral, Llama, Qwen2.5, Phi) report ``"validation": "VALIDATED"``
-in the output; unvalidated models report ``"UNVALIDATED"`` as a warning.
+Validated model families (Molmo2, Mistral, Llama, Qwen2.5, Phi, Gemma 2, Gemma 3)
+report ``"validation": "VALIDATED"`` in the output; unvalidated models report
+``"UNVALIDATED"`` as a warning.
 
 Usage:
     ```bash
@@ -44,6 +45,8 @@ VALIDATED_MODELS: dict[str, str] = {
     "llama": "Llama",
     "qwen2": "Qwen2.5",
     "phi3": "Phi",
+    "gemma2": "Gemma 2",
+    "gemma3": "Gemma 3",
 }
 
 COMPRESSION_QUALITY_THRESHOLD = (
@@ -88,7 +91,8 @@ def _run_verification(
 
     Loads the model, runs a 128-token random Gaussian prefill through both
     uncompressed and compressed caches, and computes per-layer cosine
-    similarity.
+    similarity. Caches are created with ``DynamicCache(config=config)`` for
+    SWA-aware layer instantiation (Gemma models).
 
     Args:
         model_id: HuggingFace model identifier.
@@ -148,6 +152,7 @@ def _run_verification(
     num_kv_heads = model_cfg["num_kv_heads"]
     num_layers = model_cfg["num_layers"]
     device = next(model.parameters()).device
+    text_config = getattr(config, "text_config", config)
 
     # 128-token random Gaussian prefill
     seq_len = 128
@@ -155,14 +160,16 @@ def _run_verification(
     fake_keys = torch.randn(input_shape, dtype=torch.bfloat16, device=device)
     fake_values = torch.randn(input_shape, dtype=torch.bfloat16, device=device)
 
-    # Uncompressed reference cache
-    ref_cache = DynamicCache()
+    # Uncompressed reference cache (config enables SWA layer types for Gemma)
+    ref_cache = DynamicCache(config=config)
     for layer_idx in range(num_layers):
         ref_cache.update(fake_keys, fake_values, layer_idx)
 
     # Compressed cache via context manager
-    compressed_cache = DynamicCache()
-    with CompressedDynamicCache(compressed_cache, head_dim=head_dim, bits=bits):
+    compressed_cache = DynamicCache(config=config)
+    with CompressedDynamicCache(
+        compressed_cache, head_dim=head_dim, bits=bits, model_config=text_config
+    ):
         for layer_idx in range(num_layers):
             compressed_cache.update(fake_keys, fake_values, layer_idx)
 

@@ -32,6 +32,8 @@ REGRESSION_MODELS = [
     pytest.param("Qwen/Qwen2.5-3B", id="qwen2.5-3b"),
     pytest.param("microsoft/phi-4", id="phi-4"),
     pytest.param("microsoft/Phi-3-mini-4k-instruct", id="phi-3-mini"),
+    pytest.param("google/gemma-2-2b", id="gemma-2-2b"),
+    pytest.param("google/gemma-3-4b-it", id="gemma-3-4b"),
 ]
 
 
@@ -76,12 +78,14 @@ def test_model_regression(model_id: str) -> None:
         fake_keys = torch.randn(input_shape, dtype=torch.bfloat16, device=device)
         fake_values = torch.randn(input_shape, dtype=torch.bfloat16, device=device)
 
-        ref_cache = DynamicCache()
+        ref_cache = DynamicCache(config=config)
         for layer_idx in range(num_layers):
             ref_cache.update(fake_keys, fake_values, layer_idx)
 
-        compressed_cache = DynamicCache()
-        with CompressedDynamicCache(compressed_cache, head_dim=head_dim, bits=4):
+        compressed_cache = DynamicCache(config=config)
+        with CompressedDynamicCache(
+            compressed_cache, head_dim=head_dim, bits=4, model_config=text_config
+        ):
             for layer_idx in range(num_layers):
                 compressed_cache.update(fake_keys, fake_values, layer_idx)
 

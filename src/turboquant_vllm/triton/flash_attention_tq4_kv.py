@@ -4,7 +4,8 @@ Phase 3 of the P5 roadmap. Both K and V tiles are decompressed inline
 from nibble-packed uint8 indices. The query is pre-rotated by ``Pi^T``
 and the output is post-rotated by ``Pi`` outside the kernel (since K and
 V share the same rotation matrix). Non-power-of-two HEAD_DIM (e.g., 96)
-is supported via padded tl.arange + masking.
+is supported via padded tl.arange + masking. Autotune configs include
+BLOCK_M values 16, 32, 64, 128 to cover head_dim up to 256.
 
 Attributes:
     triton_flash_attention_tq4_kv: Python wrapper that pre-rotates Q,
@@ -59,7 +60,7 @@ def _next_pow2(n: int) -> int:
 
 _AUTOTUNE_CONFIGS = [
     triton.Config({"BLOCK_M": BM, "BLOCK_N": BN}, num_stages=s, num_warps=w)
-    for BM in [16, 64, 128]
+    for BM in [16, 32, 64, 128]
     for BN in [32, 64]
     for s in [2, 3]
     for w in [4, 8]

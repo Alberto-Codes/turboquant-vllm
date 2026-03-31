@@ -262,6 +262,14 @@ class TestValidatedModels:
         assert "phi3" in VALIDATED_MODELS
         assert VALIDATED_MODELS["phi3"] == "Phi"
 
+    def test_gemma2_exact_match(self) -> None:
+        assert "gemma2" in VALIDATED_MODELS
+        assert VALIDATED_MODELS["gemma2"] == "Gemma 2"
+
+    def test_gemma3_exact_match(self) -> None:
+        assert "gemma3" in VALIDATED_MODELS
+        assert VALIDATED_MODELS["gemma3"] == "Gemma 3"
+
     def test_unvalidated_for_unknown_type(self) -> None:
         assert "gpt2" not in VALIDATED_MODELS
 
