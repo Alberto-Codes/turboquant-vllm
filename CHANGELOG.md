@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.3.0](https://github.com/Alberto-Codes/turboquant-vllm/compare/v1.2.2...v1.3.0) (2026-03-31)
+
+
+### Features
+
+* **kv-cache:** add sliding window attention bypass for Gemma models ([#53](https://github.com/Alberto-Codes/turboquant-vllm/issues/53)) ([ee5300e](https://github.com/Alberto-Codes/turboquant-vllm/commit/ee5300e30954d69ed2c0efa5d41ee9c2821a0441))
+* **triton:** add head_dim 64/96 kernel support with non-pow2 padding ([#52](https://github.com/Alberto-Codes/turboquant-vllm/issues/52)) ([44edd60](https://github.com/Alberto-Codes/turboquant-vllm/commit/44edd603f481d9dfc99af6173211bc3e034bc7c1))
+* **verify:** add head_dim 256 support and validate Gemma-2/Gemma-3 ([#55](https://github.com/Alberto-Codes/turboquant-vllm/issues/55)) ([e0f5d45](https://github.com/Alberto-Codes/turboquant-vllm/commit/e0f5d45b63411f7f7fa83f8c2a55b2382a35e922))
+* **verify:** validate Phi-3-mini compression quality ([#54](https://github.com/Alberto-Codes/turboquant-vllm/issues/54)) ([f5fec46](https://github.com/Alberto-Codes/turboquant-vllm/commit/f5fec464ecf49d314cbf879e745ee81b9d7dc886))
+* **verify:** validate Qwen2.5-3B and Phi-4 compression quality ([#51](https://github.com/Alberto-Codes/turboquant-vllm/issues/51)) ([48243c9](https://github.com/Alberto-Codes/turboquant-vllm/commit/48243c97146f7f712e07531cd82ba844fe031721))
+
+
+### Bug Fixes
+
+* **benchmark:** add head_dim detection division guard ([#56](https://github.com/Alberto-Codes/turboquant-vllm/issues/56)) ([380a7eb](https://github.com/Alberto-Codes/turboquant-vllm/commit/380a7eb2554f5f81d419a7438967219df0db05ae))
+* **triton:** add defensive assertions and throughput penalty docs ([44edd60](https://github.com/Alberto-Codes/turboquant-vllm/commit/44edd603f481d9dfc99af6173211bc3e034bc7c1))
+* **vllm:** guard forward() against kv_cache=None during profiling ([#57](https://github.com/Alberto-Codes/turboquant-vllm/issues/57)) ([3c5fdde](https://github.com/Alberto-Codes/turboquant-vllm/commit/3c5fdde4d139662c389c62e2a2664a0b58a246a9))
+
+
+### Performance Improvements
+
+* **experiments:** add experiment 022 clip duration comparison ([#47](https://github.com/Alberto-Codes/turboquant-vllm/issues/47)) ([55503a9](https://github.com/Alberto-Codes/turboquant-vllm/commit/55503a9b7e48738e0c38e88264ee2361e376899e))
+* **experiments:** add experiment 023 frame count sweep ([#49](https://github.com/Alberto-Codes/turboquant-vllm/issues/49)) ([d025208](https://github.com/Alberto-Codes/turboquant-vllm/commit/d0252089cd8cd75aff9019fea82b19e74d3b6be1))
+* **experiments:** add experiment 024 zero-change model probe ([#50](https://github.com/Alberto-Codes/turboquant-vllm/issues/50)) ([d11fc3a](https://github.com/Alberto-Codes/turboquant-vllm/commit/d11fc3a88cc97dd08e5b5027a9f7c5d5db8c8116))
+
+
+### Documentation
+
+* **roadmap:** add experiment 023 frame count sweep findings ([d025208](https://github.com/Alberto-Codes/turboquant-vllm/commit/d0252089cd8cd75aff9019fea82b19e74d3b6be1))
+
 ## [1.2.2](https://github.com/Alberto-Codes/turboquant-vllm/compare/v1.2.1...v1.2.2) (2026-03-30)
 
 

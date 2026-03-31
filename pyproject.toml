@@ -1,6 +1,6 @@
 [project]
 name = "turboquant-vllm"
-version = "1.2.2"
+version = "1.3.0"
 description = "TurboQuant KV cache compression for vLLM — fused Triton kernels, 3.76x compression, 3.7x faster decode on RTX 4090"
 readme = "README.md"
 license = { text = "Apache-2.0" }
