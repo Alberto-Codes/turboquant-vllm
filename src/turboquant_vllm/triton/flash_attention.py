@@ -263,8 +263,7 @@ def triton_flash_attention(
     """Compute scaled dot-product attention using Triton Flash Attention.
 
     Non-power-of-two head dimensions (e.g., 96) are supported via padded
-    tile loads and boundary masking inside the kernel.  ``head_dim`` must
-    be even.
+    tile loads and boundary masking inside the kernel.
 
     Args:
         q: Query tensor ``[batch, num_q_heads, seq_q, head_dim]``.
@@ -285,7 +284,6 @@ def triton_flash_attention(
     B, H_Q, N_Q, D = q.shape
     _, H_KV, N_KV, _ = k.shape
 
-    assert D % 2 == 0, f"HEAD_DIM must be even, got {D}"
     assert q.dtype == k.dtype == v.dtype, "Q, K, V must have the same dtype"
     assert q.dtype in (
         torch.float16,
