@@ -279,6 +279,12 @@ class CompressedDynamicCache:
     Float32 norms are required — fp16 causes output degradation at
     10K+ token sequences due to accumulated precision loss.
 
+    For models with mixed global and sliding window attention layers
+    (e.g. Gemma-2, Gemma-3), SWA layers automatically bypass compression
+    via the ``is_sliding`` attribute on ``DynamicSlidingWindowLayer``.
+    Only global attention layers are compressed. Pass ``model_config``
+    to enable a diagnostic warning when the cache lacks SWA metadata.
+
     Integration strategy: non-invasive method replacement (same pattern
     as TurboQuantKVCache). Patches ``update()`` and ``get_seq_length()``
     on the wrapped DynamicCache. Supports the context manager protocol
@@ -313,6 +319,7 @@ class CompressedDynamicCache:
         bits: int = 3,
         *,
         seed: int = 42,
+        model_config: Any = None,
     ) -> None:
         """Initialize the compressed KV cache wrapper.
 
@@ -326,6 +333,9 @@ class CompressedDynamicCache:
             bits: Quantization bits per coordinate (default 3). Use 4
                 for nibble-packed storage (3.76x compression).
             seed: Random seed for reproducibility.
+            model_config: Optional model config (e.g. ``model.config``).
+                When provided, enables detection of misconfigured caches
+                for models with mixed global/SWA layers (e.g. Gemma).
 
         Raises:
             ValueError: If ``bits=4`` and ``head_dim`` is odd.
@@ -333,6 +343,9 @@ class CompressedDynamicCache:
         Warns:
             UserWarning: If ``cache`` is already wrapped by a TurboQuant
                 wrapper. Call ``restore()`` on the existing wrapper first.
+            UserWarning: If ``model_config`` has ``layer_types`` with
+                sliding attention entries but the cache lacks SWA layers.
+                Pass ``DynamicCache(config=model.config)`` to fix.
         """
         if bits == 4 and head_dim % 2 != 0:
             msg = f"bits=4 requires even head_dim for nibble packing, got {head_dim}"
@@ -347,8 +360,8 @@ class CompressedDynamicCache:
         self.key_compressor = TurboQuantCompressorMSE(head_dim, bits, seed=seed)
         self.value_compressor = TurboQuantCompressorMSE(head_dim, bits, seed=seed)
 
-        self._compressed_keys: list[_CompressedLayer] = []
-        self._compressed_values: list[_CompressedLayer] = []
+        self._compressed_keys: list[_CompressedLayer | None] = []
+        self._compressed_values: list[_CompressedLayer | None] = []
         self._decompressed_k: list[torch.Tensor | None] = []
         self._decompressed_v: list[torch.Tensor | None] = []
         self._original_dtype: torch.dtype = torch.bfloat16
@@ -362,6 +375,25 @@ class CompressedDynamicCache:
             warnings.warn(
                 "Cache is already wrapped by TurboQuant. "
                 "Call restore() on the existing wrapper first.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        # SWA detection: warn when config has mixed attention layers but
+        # cache was created without config (no SWA layer metadata).
+        # Checks layer_types (not sliding_window alone) to avoid false
+        # positives on Mistral-style uniform SWA configs.
+        layer_types = getattr(model_config, "layer_types", None)
+        if (
+            model_config is not None
+            and layer_types
+            and any("sliding" in lt for lt in layer_types)
+            and not any(getattr(layer, "is_sliding", False) for layer in cache.layers)
+        ):
+            warnings.warn(
+                "Cache appears to lack sliding window layer metadata. "
+                "Create cache with `DynamicCache(config=model.config)` "
+                "for correct Gemma support.",
                 UserWarning,
                 stacklevel=2,
             )
@@ -500,6 +532,9 @@ class CompressedDynamicCache:
         In ``fused_mode``, skips decompression entirely — the fused TQ4
         kernel reads compressed data via ``get_compressed()``.
 
+        Sliding window attention layers (``is_sliding=True``) bypass
+        compression entirely, delegating to the original cache update.
+
         Works with the ``DynamicCache.layers`` API (transformers >=4.57)
         where each layer is a ``DynamicLayer`` holding ``.keys`` and
         ``.values`` tensors.
@@ -514,6 +549,16 @@ class CompressedDynamicCache:
             Tuple of ``(keys, values)`` decompressed for attention use.
         """
         if not self.enabled:
+            return self._original_update(
+                key_states, value_states, layer_idx, cache_kwargs
+            )
+
+        # SWA bypass: sliding window layers are not compressed (D8b).
+        # DynamicSlidingWindowLayer.is_sliding is True; DynamicLayer is False.
+        # Guard prevents IndexError for lazy layers not yet in the list.
+        if layer_idx < len(self.cache.layers) and getattr(
+            self.cache.layers[layer_idx], "is_sliding", False
+        ):
             return self._original_update(
                 key_states, value_states, layer_idx, cache_kwargs
             )
@@ -535,17 +580,23 @@ class CompressedDynamicCache:
         new_ck = self._compress_tensor(self.key_compressor, key_states)
         new_cv = self._compress_tensor(self.value_compressor, value_states)
 
+        # Pad compressed storage for SWA-bypassed layers (None = no
+        # compressed data). Mirrors the _decompressed_k padding pattern.
+        while len(self._compressed_keys) <= layer_idx:
+            self._compressed_keys.append(None)
+            self._compressed_values.append(None)
+
         # Append to compressed storage
-        if layer_idx >= len(self._compressed_keys):
-            self._compressed_keys.append(new_ck)
-            self._compressed_values.append(new_cv)
+        if self._compressed_keys[layer_idx] is None:
+            self._compressed_keys[layer_idx] = new_ck
+            self._compressed_values[layer_idx] = new_cv
         else:
-            self._compressed_keys[layer_idx] = self._cat_layers(
-                self._compressed_keys[layer_idx], new_ck
-            )
-            self._compressed_values[layer_idx] = self._cat_layers(
-                self._compressed_values[layer_idx], new_cv
-            )
+            existing_k = self._compressed_keys[layer_idx]
+            existing_v = self._compressed_values[layer_idx]
+            assert existing_k is not None  # guaranteed by the if-branch above
+            assert existing_v is not None
+            self._compressed_keys[layer_idx] = self._cat_layers(existing_k, new_ck)
+            self._compressed_values[layer_idx] = self._cat_layers(existing_v, new_cv)
 
         # Fused mode: skip decompression entirely. The fused TQ4 kernel
         # reads compressed data via get_compressed(), so decompressed
@@ -605,6 +656,8 @@ class CompressedDynamicCache:
     def _compressed_get_seq_length(self, layer_idx: int = 0) -> int:
         """Return cached sequence length from compressed storage.
 
+        SWA-bypassed layers delegate to the original uncompressed cache.
+
         Args:
             layer_idx: Layer to query (default 0).
 
@@ -613,9 +666,18 @@ class CompressedDynamicCache:
         """
         if not self.enabled:
             return self._original_get_seq_length(layer_idx)
+        # SWA-bypassed layers: delegate to uncompressed cache whether
+        # the layer is within padded range (None entry) or beyond it.
+        if layer_idx < len(self.cache.layers) and getattr(
+            self.cache.layers[layer_idx], "is_sliding", False
+        ):
+            return self._original_get_seq_length(layer_idx)
         if layer_idx >= len(self._compressed_keys):
             return 0
-        return int(self._compressed_keys[layer_idx].indices.shape[-2])
+        entry = self._compressed_keys[layer_idx]
+        if entry is None:
+            return self._original_get_seq_length(layer_idx)
+        return int(entry.indices.shape[-2])
 
     def get_compressed(
         self, layer_idx: int
@@ -632,9 +694,21 @@ class CompressedDynamicCache:
             ``(k_packed, k_norms, v_packed, v_norms)`` where packed tensors
             are uint8 ``[batch, heads, seq, head_dim//2]`` and norms are
             fp32 ``[batch, heads, seq, 1]``.
+
+        Raises:
+            ValueError: If ``layer_idx`` refers to a layer with no
+                compressed data (not yet updated, or SWA-bypassed).
         """
+        if layer_idx >= len(self._compressed_keys):
+            msg = f"Layer {layer_idx} has no compressed data (not yet updated)"
+            raise ValueError(msg)
+        if self._compressed_keys[layer_idx] is None:
+            msg = f"Layer {layer_idx} has no compressed data (SWA-bypassed layer)"
+            raise ValueError(msg)
         k = self._compressed_keys[layer_idx]
         v = self._compressed_values[layer_idx]
+        assert k is not None  # guaranteed by the guard above
+        assert v is not None
         return k.indices, k.norms, v.indices, v.norms
 
     @property
@@ -694,11 +768,15 @@ class CompressedDynamicCache:
     def vram_bytes(self) -> int:
         """Calculate total VRAM used by compressed storage.
 
+        SWA-bypassed layers (None entries) are excluded from the total.
+
         Returns:
             Total bytes across all compressed layers (keys + values).
         """
         total = 0
         for layer in [*self._compressed_keys, *self._compressed_values]:
+            if layer is None:
+                continue
             total += layer.indices.nelement() * layer.indices.element_size()
             total += layer.norms.nelement() * layer.norms.element_size()
         return total
@@ -707,13 +785,16 @@ class CompressedDynamicCache:
         """Estimate FP16 VRAM that would be used without compression.
 
         Accounts for nibble-packed indices by doubling the last
-        dimension to recover the original head_dim.
+        dimension to recover the original head_dim. SWA-bypassed layers
+        (None entries) are excluded.
 
         Returns:
             Total bytes if keys and values were stored as FP16 tensors.
         """
         total = 0
         for layer in [*self._compressed_keys, *self._compressed_values]:
+            if layer is None:
+                continue
             b, h, s, d = layer.indices.shape
             # Nibble-packed indices have d = head_dim // 2
             if layer.packed:
@@ -725,24 +806,26 @@ class CompressedDynamicCache:
         """Return compression statistics for reporting.
 
         Reports the true ``head_dim`` (not the packed index dimension)
-        and includes a ``nibble_packed`` flag.
+        and includes a ``nibble_packed`` flag. Only counts compressed
+        (non-SWA) layers.
 
         Returns:
             Dict with layer count, sequence length, compressed/baseline
             sizes in MiB, compression ratio, packing mode, and VRAM savings.
         """
-        if not self._compressed_keys:
+        compressed_layers = [ck for ck in self._compressed_keys if ck is not None]
+        if not compressed_layers:
             return {}
 
         compressed_bytes = self.vram_bytes()
         baseline_bytes = self.baseline_vram_bytes()
         ratio = baseline_bytes / compressed_bytes if compressed_bytes > 0 else 0.0
 
-        layer = self._compressed_keys[0]
+        layer = compressed_layers[0]
         b, h, s, _ = layer.indices.shape
 
         return {
-            "num_layers": len(self._compressed_keys),
+            "num_layers": len(compressed_layers),
             "seq_len": s,
             "batch_size": b,
             "num_heads": h,

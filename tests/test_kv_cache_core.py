@@ -179,8 +179,12 @@ class TestCompressedDynamicCache:
 
         cache.update(torch.randn(1, 4, 1, DIM), torch.randn(1, 4, 1, DIM), layer_idx=0)
 
-        assert cc._compressed_keys[0].indices.dtype == torch.uint8
-        assert cc._compressed_values[0].indices.dtype == torch.uint8
+        ck = cc._compressed_keys[0]
+        cv = cc._compressed_values[0]
+        assert ck is not None
+        assert cv is not None
+        assert ck.indices.dtype == torch.uint8
+        assert cv.indices.dtype == torch.uint8
 
     def test_stores_fp32_norms(self) -> None:
         """Compressed storage should use fp32 for norms (fp16 causes degradation)."""
@@ -191,8 +195,12 @@ class TestCompressedDynamicCache:
 
         cache.update(torch.randn(1, 4, 1, DIM), torch.randn(1, 4, 1, DIM), layer_idx=0)
 
-        assert cc._compressed_keys[0].norms.dtype == torch.float32
-        assert cc._compressed_values[0].norms.dtype == torch.float32
+        ck = cc._compressed_keys[0]
+        cv = cc._compressed_values[0]
+        assert ck is not None
+        assert cv is not None
+        assert ck.norms.dtype == torch.float32
+        assert cv.norms.dtype == torch.float32
 
     def test_vram_savings(self, device: torch.device) -> None:
         """Compressed storage should be smaller than FP16 baseline."""

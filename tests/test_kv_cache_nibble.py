@@ -90,9 +90,11 @@ class TestNibblePacking:
         )
 
         # Packed: head_dim // 2 = 64 instead of 128
-        assert cc._compressed_keys[0].indices.shape == (1, 4, 10, DIM // 2)
-        assert cc._compressed_keys[0].indices.dtype == torch.uint8
-        assert cc._compressed_keys[0].packed is True
+        ck = cc._compressed_keys[0]
+        assert ck is not None
+        assert ck.indices.shape == (1, 4, 10, DIM // 2)
+        assert ck.indices.dtype == torch.uint8
+        assert ck.packed is True
 
     def test_nibble_pack_unpack_roundtrip(self, device: torch.device) -> None:
         """Pack then unpack should recover exact original indices."""
