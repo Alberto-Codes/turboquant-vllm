@@ -37,12 +37,11 @@ REGRESSION_MODELS = [
 ]
 
 # Asymmetric bit configs: (k_bits, v_bits, threshold, is_gated)
-# K4/V4: existing baseline, gated at 0.99
+# K4/V4 covered by test_model_regression() — not duplicated here.
 # K4/V3: random data gate at 0.97 (3-bit V on Gaussian data has inherently
 #         lower quality; AC3 release gate of 0.99 applies to real activations)
 # K4/V2: data collection only, no gate (publish whatever the numbers are)
 BITS_CONFIGS = [
-    pytest.param(4, 4, COMPRESSION_QUALITY_THRESHOLD, True, id="k4v4"),
     pytest.param(4, 3, 0.97, True, id="k4v3"),
     pytest.param(4, 2, 0.0, False, id="k4v2-data"),
 ]
@@ -146,5 +145,5 @@ def test_model_regression(model_id: str) -> None:
 def test_model_regression_asymmetric(
     model_id: str, k_bits: int, v_bits: int, threshold: float, gated: bool
 ) -> None:
-    """Quality matrix: 8 models x 3 configs (K4/V4, K4/V3, K4/V2)."""
+    """Asymmetric quality matrix: 8 models x 2 configs (K4/V3, K4/V2)."""
     _run_model_regression(model_id, k_bits, v_bits, threshold, gated=gated)

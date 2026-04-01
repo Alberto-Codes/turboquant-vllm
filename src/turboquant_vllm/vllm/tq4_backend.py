@@ -164,10 +164,18 @@ def _parse_kv_bits_env() -> tuple[int, int]:
         env vars are absent.
 
     Raises:
-        ValueError: If either env var value is not in {2, 3, 4, 5}.
+        ValueError: If either env var value is not a valid integer or
+            is not in {2, 3, 4, 5}.
     """
-    k_bits = int(os.environ.get("TQ4_K_BITS", str(TQ4_BITS)))
-    v_bits = int(os.environ.get("TQ4_V_BITS", str(TQ4_BITS)))
+    raw = {}
+    try:
+        raw["TQ4_K_BITS"] = os.environ.get("TQ4_K_BITS", str(TQ4_BITS))
+        k_bits = int(raw["TQ4_K_BITS"])
+        raw["TQ4_V_BITS"] = os.environ.get("TQ4_V_BITS", str(TQ4_BITS))
+        v_bits = int(raw["TQ4_V_BITS"])
+    except ValueError as exc:
+        msg = f"invalid env var value (expected integer): {raw} — {exc}"
+        raise ValueError(msg) from exc
     for name, val in (("TQ4_K_BITS", k_bits), ("TQ4_V_BITS", v_bits)):
         if val not in _VALID_BITS:
             msg = f"{name}={val} is invalid; must be one of {sorted(_VALID_BITS)}"
@@ -246,7 +254,12 @@ class TQ4MetadataBuilder(FlashAttentionMetadataBuilder):
         """
         from vllm.v1.attention.backend import AttentionCGSupport
 
-        if _parse_fused_paged_env() and _fused_paged_kernel_available:
+        k_bits, v_bits = _parse_kv_bits_env()
+        if (
+            _parse_fused_paged_env()
+            and _fused_paged_kernel_available
+            and k_bits == v_bits
+        ):
             return AttentionCGSupport.UNIFORM_SINGLE_TOKEN_DECODE
         return AttentionCGSupport.NEVER
 

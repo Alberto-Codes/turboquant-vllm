@@ -117,10 +117,10 @@ def _run_verification(
 
     Args:
         model_id: HuggingFace model identifier.
-        bits: Quantization bits per coordinate (3 or 4).
+        bits: Quantization bits per coordinate (2–5).
         threshold: Minimum cosine similarity for PASS.
-        k_bits: Key quantization bits (overrides ``bits`` for keys).
-        v_bits: Value quantization bits (overrides ``bits`` for values).
+        k_bits: Key quantization bits (2–5; overrides ``bits`` for keys).
+        v_bits: Value quantization bits (2–5; overrides ``bits`` for values).
 
     Returns:
         Dict with model, bits, k_bits, v_bits, status, validation,

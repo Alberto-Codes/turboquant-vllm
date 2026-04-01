@@ -855,13 +855,15 @@ class CompressedDynamicCache:
         """Return compression statistics for reporting.
 
         Reports per-component bit-widths, the true ``head_dim``, compression
-        ratio, and concrete VRAM estimates at representative context lengths
-        (4K, 16K, 32K tokens). Only counts compressed (non-SWA) layers.
+        ratio, and per-sequence VRAM estimates at representative context
+        lengths (4K, 16K, 32K tokens). Only counts compressed (non-SWA)
+        layers.  VRAM estimates are per sequence — multiply by batch size
+        for total memory.
 
         Returns:
             Dict with layer count, sequence length, per-component bit-widths,
             compressed/baseline sizes in MiB, compression ratio, VRAM savings,
-            and VRAM estimates at representative context lengths.
+            and per-sequence VRAM estimates at representative context lengths.
         """
         compressed_layers = [ck for ck in self._compressed_keys if ck is not None]
         if not compressed_layers:
@@ -880,7 +882,8 @@ class CompressedDynamicCache:
         v_bytes_per_th = _packed_size(self.v_bits, self.head_dim) + 4
         bytes_per_token = num_layers * h * (k_bytes_per_th + v_bytes_per_th)
 
-        # VRAM estimates at representative context lengths
+        # VRAM estimates at representative context lengths (per sequence —
+        # multiply by batch_size for total VRAM).
         vram_estimate: dict[int, float] = {}
         for ctx_len in (4096, 16384, 32768):
             vram_estimate[ctx_len] = round(bytes_per_token * ctx_len / (1024 * 1024), 2)
