@@ -1,0 +1,79 @@
+{
+  "experiment": "028-decode-oom-validation",
+  "date": "2026-03-31 23:01:41",
+  "tag": "qwen25-3b-tq4-085",
+  "model_id": "Qwen/Qwen2.5-3B-Instruct",
+  "max_new_tokens": 128,
+  "vram_idle_mib": 22372,
+  "vram_total_mib": 24564,
+  "single_prompt": {
+    "elapsed_s": 0.45,
+    "output_text": "2 + 2 equals 4. is is there anything else you would like to know?",
+    "input_tokens": 38,
+    "output_tokens": 20,
+    "finish_reason": "stop",
+    "vram_before_mib": 22372,
+    "vram_after_mib": 22372
+  },
+  "multi_turn": [
+    {
+      "elapsed_s": 4.04,
+      "output_text": "unicorn\nIt seems there might is been a misunderstanding here. The \"Three Laws of Thermodynamics\" are not a well-known or widely recognized set of principles in physics. However, there are indeedably three laws of thermodynamics that govern the behavior of energy matter and energy in the universe. Here are the three laws of thermodynamics:\n\n1. **Zeroth Thermodynamics Law**: This law states that energy energy cannot be created or destroyed it. In other words, the total energy in the universe is constant. This means that every process of energy in the universe must come from somewhere else and go to somewhere else.\n\n2. **First of",
+      "input_tokens": 42,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 1,
+      "vram_before_mib": 22372,
+      "vram_after_mib": 22372
+    },
+    {
+      "elapsed_s": 2.97,
+      "output_text": "I understand your confusion! It seems appears you're asking about the \"Second Law of Thermodynamics\" and entropy in information,, butHowever, it it's important to note that the the Second Law of Thermodynamics is a fundamental principle in classical of energy and heat energy, not information.. information. Let me explain:\n\n### First Law of Thermodynamicsodynamics:\nThe First Law Law Thermodynamics states that the total amount of energy in the universe universe remains the the is conservedent. This means that that that that that no of of energy can be created created or of out of the universe without some kind of cost.\n\n.\n\n.\n\n.\n\n",
+      "input_tokens": 194,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 2,
+      "vram_before_mib": 22372,
+      "vram_after_mib": 22372
+    },
+    {
+      "elapsed_s": 3.72,
+      "output_text": "Certainly! The First First Law of Thermodynamics is often often applied to to describe the conservation of energy in physical systems. Here's an example example to illustrate this:\n\n:\n\n:\n\n**Example: A Closed System with a a of Heat Transfer: and Work:**\n\nConsider a closed system, a a box with two two are two compartments compartments, each containing which contains has a different temperature temperatures of of of pressure. Let's assume that one compartment is the is is is is at a higher temperature than the other, and that is also that there is a barrier between between them.\n\n Over time, the barrier is removed, allowing the gas to to",
+      "input_tokens": 341,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 3,
+      "vram_before_mib": 22372,
+      "vram_after_mib": 22374
+    },
+    {
+      "elapsed_s": 3.99,
+      "output_text": "When learning and studying the the concepts laws of thermodynamics, there are are a few few few common mistakes and misunderstandingsings that that that can that can can are:\n\n1. **Misunder understanding of the First Law**: The the is is a common misconception that the First Law of Therm Thermodynamics is states that the total total of energy in the universe is conservedervedent. However, this is is not exactly true. The First Law Law actually of is more accurately stated as the conservationervation of the total the total total total of energy and mass of mass in the universe is conservedent. This distinction is important important to understand",
+      "input_tokens": 490,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 4,
+      "vram_before_mib": 22374,
+      "vram_after_mib": 22374
+    },
+    {
+      "elapsed_s": 3.04,
+      "output_text": "unicorn\nSure! Here are the key points summarized in three bullet points:\n\n:\n\n:\n\n:\n\n1. **Misunderstanding of the the Conservation**: The First Law of Thermodynamics is often misinterpreted to state that the the total of of energy is conservedent, rather than the total of of of energy and mass mass being being being conserved.\n\n2. **Misinterpretation of the Second Law**: The Second Law of Thermodynamics is often misunderstood to to to the idea that that that of the of of the of the of of of of of the of the of of the of the of the of the of the of of of the",
+      "input_tokens": 640,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 5,
+      "vram_before_mib": 22374,
+      "vram_after_mib": 22374
+    }
+  ],
+  "vram_peak_mib": 22374,
+  "vram_under_22gib": true,
+  "summary": {
+    "single_prompt": "PASS",
+    "multi_turn": "PASS",
+    "vram_under_22gib": "PASS",
+    "peak_vram_mib": 22374,
+    "verdict": "PASS"
+  }
+}

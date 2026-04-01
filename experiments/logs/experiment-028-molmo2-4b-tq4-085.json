@@ -1,0 +1,79 @@
+{
+  "experiment": "028-decode-oom-validation",
+  "date": "2026-03-31 23:11:52",
+  "tag": "molmo2-4b-tq4-085",
+  "model_id": "allenai/Molmo2-4B",
+  "max_new_tokens": 128,
+  "vram_idle_mib": 20110,
+  "vram_total_mib": 24564,
+  "single_prompt": {
+    "elapsed_s": 0.41,
+    "output_text": "Hello! 2 + 2 = 4.",
+    "input_tokens": 17,
+    "output_tokens": 12,
+    "finish_reason": "stop",
+    "vram_before_mib": 20110,
+    "vram_after_mib": 20912
+  },
+  "multi_turn": [
+    {
+      "elapsed_s": 4.06,
+      "output_text": "The three laws of thermodynamics are fundamental principles that describe the behavior of energy in physical systems. Here's a brief explanation of each:\n\n1. The First Law of Thermodynamics, also known as the Law of Energy Conservation, states that energy cannot be created or destroyed, only transformed from one form to another. In other words, the total amount of energy in an isolated system remains constant over time.\n\n2. The Second Law of Thermodynamics introduces the concept of entropy, which is a measure of disorder or randomness in a system. The Second Law states that the total entropy of an isolated system can never decrease over time, and it tends to",
+      "input_tokens": 21,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 1,
+      "vram_before_mib": 20912,
+      "vram_after_mib": 20912
+    },
+    {
+      "elapsed_s": 3.43,
+      "output_text": "The Second Law of Thermodynamics and the concept of entropy in information theory are closely related, as both deal with the concept of disorder or randomness in a system. In thermodynamics, entropy is a measure of the number of possible microstates (or microscopic configurations) that correspond to a macrostate (or macroscopic configuration) of a system. In information theory, entropy is a measure of the amount of information or uncertainty in a system.\n\nBoth entropy measures are used to quantify the amount of disorder or randomness in a system, and both have similar mathematical formulations. In thermodynamics, the entropy of a system is given by the Boltzmann equation",
+      "input_tokens": 174,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 2,
+      "vram_before_mib": 20912,
+      "vram_after_mib": 20914
+    },
+    {
+      "elapsed_s": 3.42,
+      "output_text": "A real-world engineering example where both the Second Law of Thermodynamics and entropy in information theory apply is in the design of a heat engine.\n\nA heat engine is a device that converts thermal energy into mechanical work. The Second Law of Thermodynamics states that the efficiency of a heat engine cannot exceed the Carnot efficiency, which is the maximum efficiency that can be achieved by any heat engine operating between two temperatures.\n\nThe Carnot efficiency is given by the equation:\n\n\u03b7 = 1 - Tc / Th\n\nwhere \u03b7 is the efficiency, Tc is the temperature of the cold cold reservoir, and Th is the temperature of the hot reservoir",
+      "input_tokens": 324,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 3,
+      "vram_before_mib": 20914,
+      "vram_after_mib": 20914
+    },
+    {
+      "elapsed_s": 4.05,
+      "output_text": "When learning the concepts of the Second Law of Thermodynamics and entropy in information theory, students often make several common mistakes:\n\n1. Confusing the Second Law with the First Law: Students may confuse the Second Law with the First Law of Thermodynamics, which states that energy cannot be created or destroyed. While both laws are important, they describe different aspects of energy and its behavior.\n\n2. Misunderstanding entropy: Students may misunderstand entropy as a measure of energy or as a measure of disorder. In reality, entropy is a measure of the number of possible microstates in a system, and it is not directly related to energy or disorder.\n\n",
+      "input_tokens": 474,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "turn": 4,
+      "vram_before_mib": 20914,
+      "vram_after_mib": 20914
+    },
+    {
+      "elapsed_s": 2.78,
+      "output_text": "\u2022 The Second Law of Thermodynamics states that the total entropy of an isolated system can never decrease over time, and it tends to increase.\n\u2022 Entropy in information theory is a measure of the amount of information or uncertainty in a system, and it has a similar mathematical formulation to entropy in thermodynamics.\n\u2022 A real-world engineering example where both concepts apply is in the design of a heat engine, where the Second Law of Thermodynamics and entropy in information theory are used to determine the maximum efficiency of the engine.",
+      "input_tokens": 625,
+      "output_tokens": 104,
+      "finish_reason": "stop",
+      "turn": 5,
+      "vram_before_mib": 20914,
+      "vram_after_mib": 20914
+    }
+  ],
+  "vram_peak_mib": 20914,
+  "vram_under_22gib": true,
+  "summary": {
+    "single_prompt": "PASS",
+    "multi_turn": "PASS",
+    "vram_under_22gib": "PASS",
+    "peak_vram_mib": 20914,
+    "verdict": "PASS"
+  }
+}

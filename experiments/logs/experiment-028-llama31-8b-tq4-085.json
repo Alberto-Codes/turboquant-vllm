@@ -1,0 +1,24 @@
+{
+  "experiment": "028-decode-oom-validation",
+  "date": "2026-03-31 23:09:18",
+  "tag": "llama31-8b-tq4-085",
+  "model_id": "meta-llama/Llama-3.1-8B",
+  "max_new_tokens": 128,
+  "vram_idle_mib": 22288,
+  "vram_total_mib": 24564,
+  "single_prompt": {
+    "error": "400 Client Error: Bad Request for url: http://127.0.0.1:8000/v1/chat/completions"
+  },
+  "multi_turn": {
+    "error": "400 Client Error: Bad Request for url: http://127.0.0.1:8000/v1/chat/completions"
+  },
+  "vram_peak_mib": 22288,
+  "vram_under_22gib": true,
+  "summary": {
+    "single_prompt": "FAIL",
+    "multi_turn": "FAIL",
+    "vram_under_22gib": "PASS",
+    "peak_vram_mib": 22288,
+    "verdict": "FAIL"
+  }
+}
