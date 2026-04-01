@@ -6,9 +6,9 @@
 
 # turboquant-vllm
 
-TurboQuant KV cache compression as a drop-in vLLM plugin. **3.76x compression, near-identical output quality, one CLI flag to enable.**
+TurboQuant KV cache compression as a drop-in vLLM plugin. **3.76x KV cache compression with asymmetric K/V support, validated across 8 models.**
 
-> First open-source TurboQuant implementation — paper to working vLLM plugin in 72 hours.
+> Implements Google's [TurboQuant](https://arxiv.org/abs/2504.19874) (ICLR 2026) — the first KV cache quantization method with provably near-optimal distortion rates.
 
 ## Install
 
@@ -27,10 +27,14 @@ uv add turboquant-vllm --extra vllm
 The TQ4 attention backend registers automatically via vLLM's plugin system:
 
 ```bash
-vllm serve allenai/Molmo2-4B --attention-backend CUSTOM
+vllm serve meta-llama/Llama-3.1-8B-Instruct --attention-backend CUSTOM
 ```
 
-No code changes required. The plugin compresses KV cache pages to 68 bytes/token/head (vs 256 bytes FP16).
+No code changes required. The plugin compresses KV cache pages to 68 bytes/token/head (vs 256 bytes FP16). For asymmetric K/V compression:
+
+```bash
+TQ4_K_BITS=4 TQ4_V_BITS=3 vllm serve meta-llama/Llama-3.1-8B-Instruct --attention-backend CUSTOM
+```
 
 ## Quick Start (HuggingFace)
 
@@ -39,22 +43,46 @@ from transformers import DynamicCache
 from turboquant_vllm import CompressedDynamicCache
 
 cache = DynamicCache()
-compressed = CompressedDynamicCache(cache, head_dim=128, bits=4)
+compressed = CompressedDynamicCache(cache, head_dim=128, k_bits=4, v_bits=3)
 
 # Pass cache (not the wrapper) to model.generate()
 # Compression happens transparently on every cache.update()
 ```
 
-## Benchmark Results
+## Compression Quality
 
-Molmo2-4B (bfloat16, 36 layers) on RTX 4090 — 11K visual tokens from 2fps video + 256 generation tokens:
+Per-layer minimum cosine similarity on real model activations (128-token prefill, RTX 4090):
 
-| Mode | KV Cache | Compression | Output Quality | Overhead |
-|------|----------|-------------|----------------|----------|
-| FP16 baseline | 1,639 MiB | 1.0x | -- | -- |
-| TQ3 (3-bit) | 845 MiB | 1.94x | ~95% cosine similarity | 2.35x |
-| TQ4 (full dequant) | 435 MiB | 3.76x | ~97% cosine similarity | 3.36x |
-| **TQ4 (incremental)** | **435 MiB** | **3.76x** | **~97% cosine, 100+ matching tokens** | **1.78x** |
+| Model | head_dim | K4/V4 cosine | K4/V3 cosine |
+|-------|----------|-------------|-------------|
+| Llama 3.1 8B | 128 | 0.9947 | 0.9823 |
+| Qwen2.5 3B | 128 | 0.9935 | 0.9823 |
+| Mistral 7B | 128 | 0.9947 | 0.9825 |
+| Phi-3-mini | 96 | 0.9950 | 0.9827 |
+| Phi-4 | 128 | 0.9945 | 0.9824 |
+| Gemma 2 2B | 256 | 0.9948 | 0.9823 |
+| Gemma 3 4B | 256 | 0.9911 | 0.9794 |
+| Molmo2 4B | 128 | 0.9943 | 0.9821 |
+
+Validate any model yourself with the verify CLI:
+
+```bash
+python -m turboquant_vllm.verify --model meta-llama/Llama-3.1-8B --bits 4
+python -m turboquant_vllm.verify --model meta-llama/Llama-3.1-8B --k-bits 4 --v-bits 3 --threshold 0.97
+```
+
+## Serving Performance
+
+Llama-3.1-8B-Instruct on RTX 4090, 200 concurrent requests ([Exp 029](experiments/logs)):
+
+| Metric | Baseline | TQ4 (K4/V4) | Delta |
+|--------|----------|-------------|-------|
+| Request throughput | 8.14 req/s | 7.55 req/s | -7.3% |
+| Output tok/s | 1,042 | 967 | -7.3% |
+| Median TTFT | 9,324 ms | 6,977 ms | **-25.2%** |
+| Median TPOT | 47.6 ms | 143.6 ms | +201% |
+
+TQ4 reduces time-to-first-token by 25% (smaller cache pages = faster prefill) but increases per-token decode latency ~3x due to online decompression. Net throughput impact is -7% at high concurrency. Best suited for memory-bound workloads: long contexts, high batch sizes, or limited VRAM.
 
 ## How It Works
 
@@ -69,8 +97,8 @@ Implements Google's [TurboQuant](https://arxiv.org/abs/2504.19874) algorithm (IC
 
 | Data | Compressed | Format |
 |------|-----------|--------|
-| Key cache vectors | Yes | uint8 nibble-packed indices + fp32 norms |
-| Value cache vectors | Yes | uint8 nibble-packed indices + fp32 norms |
+| Key cache vectors | Yes (k_bits, default 4) | uint8 nibble-packed indices + fp32 norms |
+| Value cache vectors | Yes (v_bits, default 4) | uint8 nibble-packed indices + fp32 norms |
 | Rotation matrices | No | Generated once per layer from fixed seed |
 | Lloyd-Max codebook | No | Computed once, shared across all layers |
 
@@ -79,10 +107,16 @@ Implements Google's [TurboQuant](https://arxiv.org/abs/2504.19874) algorithm (IC
 - [x] Core TurboQuant algorithm (Lloyd-Max, MSE quantizer, compressors)
 - [x] CompressedDynamicCache with incremental dequantization
 - [x] vLLM TQ4 attention backend plugin
-- [x] Fused Triton kernels (17.8x Q@K^T speedup, Flash Attention fusion)
+- [x] Fused Triton kernels (4.5x compress, 4x decompress speedup)
+- [x] Fused paged TQ4 decode with 8.5x HBM bandwidth reduction
+- [x] INT8 Q@K^T prefill path
+- [x] CUDA graph compatibility (buffer pre-allocation)
+- [x] Multi-model validation (8 families, head_dim 64/96/128/256)
+- [x] Sliding window attention bypass (Gemma 2/3)
+- [x] Asymmetric K/V compression (k_bits/v_bits)
+- [ ] Sparse V decompression for decode acceleration
 - [ ] Container image with turboquant-vllm baked in
 - [ ] Full Flash Attention fusion with fp32 online softmax
-- [ ] SageAttention-style INT8 path
 
 ## Documentation
 
