@@ -302,9 +302,10 @@ def _format_human_summary(result: dict[str, Any]) -> str:
 def main(argv: list[str] | None = None) -> None:
     """CLI entry point for the verify command.
 
-    Parses ``--model``, ``--bits`` (or ``--k-bits``/``--v-bits``),
+    Parses ``--model``, ``--bits`` (or ``--k-bits`` and ``--v-bits`` together),
     ``--threshold`` (default 0.99), and ``--json`` flags, runs verification,
-    and exits 0 (PASS) or 1 (FAIL).
+    and exits 0 (PASS) or 1 (FAIL).  ``--k-bits`` and ``--v-bits`` must be
+    used together; ``--bits`` cannot be combined with per-component flags.
 
     Args:
         argv: Command-line arguments. Uses sys.argv[1:] if None.
@@ -359,10 +360,12 @@ def main(argv: list[str] | None = None) -> None:
         parser.error("--bits cannot be used with --k-bits or --v-bits")
     if args.bits is None and args.k_bits is None and args.v_bits is None:
         parser.error("Specify --bits or --k-bits/--v-bits")
+    if (args.k_bits is None) != (args.v_bits is None):
+        parser.error("--k-bits and --v-bits must be used together")
 
     result = _run_verification(
         args.model,
-        args.bits if args.bits is not None else (args.k_bits or args.v_bits),
+        args.bits if args.bits is not None else args.k_bits,
         args.threshold,
         k_bits=args.k_bits,
         v_bits=args.v_bits,

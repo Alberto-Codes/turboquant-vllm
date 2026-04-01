@@ -192,17 +192,25 @@ class TestVerifyAsymmetricArgparse:
             main(["--model", "test/m"])
         assert exc_info.value.code != 0
 
-    def test_k_bits_only_defaults_v(self, mocker) -> None:
-        """--k-bits alone should pass v_bits=None to _run_verification."""
-        spy = mocker.patch(
+    def test_k_bits_only_without_v_bits_errors(self, mocker) -> None:
+        """--k-bits alone (without --v-bits) should error."""
+        mocker.patch(
             "turboquant_vllm.verify._run_verification",
-            return_value=_make_result(k_bits=4),
+            return_value=_make_result(),
         )
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit) as exc_info:
             main(["--model", "test/m", "--k-bits", "4"])
-        _, args, kwargs = spy.mock_calls[0]
-        assert kwargs["k_bits"] == 4
-        assert kwargs["v_bits"] is None
+        assert exc_info.value.code != 0
+
+    def test_v_bits_only_without_k_bits_errors(self, mocker) -> None:
+        """--v-bits alone (without --k-bits) should error."""
+        mocker.patch(
+            "turboquant_vllm.verify._run_verification",
+            return_value=_make_result(),
+        )
+        with pytest.raises(SystemExit) as exc_info:
+            main(["--model", "test/m", "--v-bits", "3"])
+        assert exc_info.value.code != 0
 
     def test_backward_compat_bits_only(self, mocker) -> None:
         """--bits alone should still work (backward compat)."""

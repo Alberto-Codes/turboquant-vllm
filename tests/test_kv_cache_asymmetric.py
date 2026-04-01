@@ -234,9 +234,9 @@ class TestAsymmetricStats:
         stats = cc.compression_stats()
         assert "vram_estimate" in stats
         estimates = stats["vram_estimate"]
-        assert "4096" in estimates or 4096 in estimates
-        assert "16384" in estimates or 16384 in estimates
-        assert "32768" in estimates or 32768 in estimates
+        assert 4096 in estimates
+        assert 16384 in estimates
+        assert 32768 in estimates
 
     def test_stats_backward_compat_symmetric(self) -> None:
         """Symmetric bits should still appear in stats for backward compat."""

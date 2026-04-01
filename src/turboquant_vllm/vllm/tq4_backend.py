@@ -153,15 +153,25 @@ except (ImportError, RuntimeError) as exc:
     logger.info("INT8 prefill kernel unavailable: %s", exc)
 
 
+_VALID_BITS = frozenset({2, 3, 4, 5})
+
+
 def _parse_kv_bits_env() -> tuple[int, int]:
     """Parse ``TQ4_K_BITS`` and ``TQ4_V_BITS`` environment variables.
 
     Returns:
         ``(k_bits, v_bits)`` — defaults to ``(TQ4_BITS, TQ4_BITS)`` when
         env vars are absent.
+
+    Raises:
+        ValueError: If either env var value is not in {2, 3, 4, 5}.
     """
     k_bits = int(os.environ.get("TQ4_K_BITS", str(TQ4_BITS)))
     v_bits = int(os.environ.get("TQ4_V_BITS", str(TQ4_BITS)))
+    for name, val in (("TQ4_K_BITS", k_bits), ("TQ4_V_BITS", v_bits)):
+        if val not in _VALID_BITS:
+            msg = f"{name}={val} is invalid; must be one of {sorted(_VALID_BITS)}"
+            raise ValueError(msg)
     return k_bits, v_bits
 
 
