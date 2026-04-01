@@ -61,18 +61,50 @@ TQ4_SEED = 42
 TQ4_NORM_BYTES = 4  # fp32
 
 
-def _tq4_bytes_per_token(head_dim: int) -> int:
-    """Packed byte count for one token, one KV head, one of K or V.
+def _packed_index_size(bits: int, head_dim: int) -> int:
+    """Index byte count for one token/head: nibble-packed at 4-bit, else unpacked.
+
+    Args:
+        bits: Quantization bits per coordinate.
+        head_dim: Dimension of each attention head.
 
     Returns:
-        Byte count: ``head_dim // 2`` (nibble-packed indices) + 4 (fp32 norm).
+        Number of uint8 bytes needed for one token's indices.
     """
-    return head_dim // 2 + TQ4_NORM_BYTES
+    if bits == 4:
+        return head_dim // 2
+    return head_dim
 
 
-def _tq4_bytes_per_token_kv(head_dim: int) -> int:
-    """Total packed bytes per token per KV head (K + V combined)."""
-    return 2 * _tq4_bytes_per_token(head_dim)
+def _tq4_bytes_per_token(head_dim: int, bits: int = TQ4_BITS) -> int:
+    """Packed byte count for one token, one KV head, one of K or V.
+
+    Args:
+        head_dim: Dimension of each attention head.
+        bits: Quantization bits per coordinate.
+
+    Returns:
+        Byte count: index bytes + 4 (fp32 norm).
+    """
+    return _packed_index_size(bits, head_dim) + TQ4_NORM_BYTES
+
+
+def _tq4_bytes_per_token_kv(
+    head_dim: int, k_bits: int = TQ4_BITS, v_bits: int = TQ4_BITS
+) -> int:
+    """Total packed bytes per token per KV head (K + V combined).
+
+    Args:
+        head_dim: Dimension of each attention head.
+        k_bits: Key quantization bits.
+        v_bits: Value quantization bits.
+
+    Returns:
+        Combined byte count for K and V.
+    """
+    return _tq4_bytes_per_token(head_dim, k_bits) + _tq4_bytes_per_token(
+        head_dim, v_bits
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -121,6 +153,36 @@ except (ImportError, RuntimeError) as exc:
     logger.info("INT8 prefill kernel unavailable: %s", exc)
 
 
+_VALID_BITS = frozenset({2, 3, 4, 5})
+
+
+def _parse_kv_bits_env() -> tuple[int, int]:
+    """Parse ``TQ4_K_BITS`` and ``TQ4_V_BITS`` environment variables.
+
+    Returns:
+        ``(k_bits, v_bits)`` — defaults to ``(TQ4_BITS, TQ4_BITS)`` when
+        env vars are absent.
+
+    Raises:
+        ValueError: If either env var value is not a valid integer or
+            is not in {2, 3, 4, 5}.
+    """
+    raw = {}
+    try:
+        raw["TQ4_K_BITS"] = os.environ.get("TQ4_K_BITS", str(TQ4_BITS))
+        k_bits = int(raw["TQ4_K_BITS"])
+        raw["TQ4_V_BITS"] = os.environ.get("TQ4_V_BITS", str(TQ4_BITS))
+        v_bits = int(raw["TQ4_V_BITS"])
+    except ValueError as exc:
+        msg = f"invalid env var value (expected integer): {raw} — {exc}"
+        raise ValueError(msg) from exc
+    for name, val in (("TQ4_K_BITS", k_bits), ("TQ4_V_BITS", v_bits)):
+        if val not in _VALID_BITS:
+            msg = f"{name}={val} is invalid; must be one of {sorted(_VALID_BITS)}"
+            raise ValueError(msg)
+    return k_bits, v_bits
+
+
 def _parse_int8_prefill_env() -> bool:
     """Parse ``TQ4_USE_INT8_PREFILL`` environment variable.
 
@@ -146,13 +208,16 @@ class TQ4FullAttentionSpec(FullAttentionSpec):
     """KV cache spec with TQ4 packed page size.
 
     Overrides ``real_page_size_bytes`` so the block allocator provisions
-    buffers sized for the packed TQ4 format (3.76x smaller than FP16).
+    buffers sized for the packed TQ4 format. Supports asymmetric K/V
+    bit-widths via ``TQ4_K_BITS`` / ``TQ4_V_BITS`` env vars.
     Follows the same pattern as ``MLAAttentionSpec`` which overrides
     page size for the 656-byte FlashMLA format.
     """
 
     @property
     def real_page_size_bytes(self) -> int:  # noqa: D102
+        # Triton kernels always nibble-pack, so page size is independent of
+        # bit-width (different codebook sizes don't change storage layout).
         return (
             self.block_size
             * self.num_kv_heads
@@ -189,7 +254,12 @@ class TQ4MetadataBuilder(FlashAttentionMetadataBuilder):
         """
         from vllm.v1.attention.backend import AttentionCGSupport
 
-        if _parse_fused_paged_env() and _fused_paged_kernel_available:
+        k_bits, v_bits = _parse_kv_bits_env()
+        if (
+            _parse_fused_paged_env()
+            and _fused_paged_kernel_available
+            and k_bits == v_bits
+        ):
             return AttentionCGSupport.UNIFORM_SINGLE_TOKEN_DECODE
         return AttentionCGSupport.NEVER
 
@@ -282,8 +352,19 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         head_size = self.head_size
         num_kv_heads = self.num_kv_heads
 
+        # Resolve per-component bit-widths from env vars
+        k_bits, v_bits = _parse_kv_bits_env()
+        self._k_bits = k_bits
+        self._v_bits = v_bits
+
         # TQ4 compression primitives (deterministic from seed, shared across layers)
-        quantizer = TurboQuantMSE(head_size, TQ4_BITS, seed=TQ4_SEED)
+        # Rotation matrix is dim-dependent only (not bits-dependent), so shared.
+        k_quantizer = TurboQuantMSE(head_size, k_bits, seed=TQ4_SEED)
+        v_quantizer = (
+            k_quantizer
+            if v_bits == k_bits
+            else TurboQuantMSE(head_size, v_bits, seed=TQ4_SEED)
+        )
 
         # Eagerly move primitives to the target device (D7 mod 5).
         # FlashAttentionImpl.__init__ doesn't expose device, but
@@ -297,21 +378,31 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             else torch.device("cpu")
         )
 
-        self._tq4_rotation = quantizer.rotation.to(device)  # (D, D) fp32
-        self._tq4_centroids = quantizer.codebook.centroids.to(device)  # (16,) fp32
-        self._tq4_boundaries = quantizer.codebook.boundaries.to(device)  # (15,) fp32
+        # Shared rotation (dim-dependent only, same seed → identical matrix)
+        self._tq4_rotation = k_quantizer.rotation.to(device)  # (D, D) fp32
         # Pre-split rotation.T for fused compress kernel (contiguous loads)
-        rot_t = quantizer.rotation.T.contiguous()
+        rot_t = k_quantizer.rotation.T.contiguous()
         self._tq4_rot_T_even = rot_t[:, 0::2].contiguous().to(device)  # (D, D//2) fp32
         self._tq4_rot_T_odd = rot_t[:, 1::2].contiguous().to(device)  # (D, D//2) fp32
 
+        # Per-component codebooks (may differ when k_bits != v_bits)
+        self._k_centroids = k_quantizer.codebook.centroids.to(device)
+        self._k_boundaries = k_quantizer.codebook.boundaries.to(device)
+        self._v_centroids = v_quantizer.codebook.centroids.to(device)
+        self._v_boundaries = v_quantizer.codebook.boundaries.to(device)
+
         # Byte layout offsets within the last dimension of the packed cache.
-        # Layout: [K_indices(H*D/2) | K_norms(H*4) | V_indices(H*D/2) | V_norms(H*4)]
-        half_D = head_size // 2
-        self._half_D = half_D
-        self._k_idx_end = num_kv_heads * half_D
+        # Layout: [K_indices | K_norms | V_indices | V_norms]
+        # The Triton compress kernel always nibble-packs (head_dim // 2 bytes
+        # per component), regardless of bit-width. Different codebook sizes
+        # provide quality improvement, not storage savings in the vLLM path.
+        k_idx_size = head_size // 2
+        v_idx_size = head_size // 2
+        self._k_idx_size = k_idx_size
+        self._v_idx_size = v_idx_size
+        self._k_idx_end = num_kv_heads * k_idx_size
         self._k_norm_end = self._k_idx_end + num_kv_heads * TQ4_NORM_BYTES
-        self._v_idx_end = self._k_norm_end + num_kv_heads * half_D
+        self._v_idx_end = self._k_norm_end + num_kv_heads * v_idx_size
         self._total_bytes = self._v_idx_end + num_kv_heads * TQ4_NORM_BYTES
 
         # CUDA graph scratch buffers (D7 mod 2) — lazy-allocated on first
@@ -321,9 +412,12 @@ class TQ4AttentionImpl(FlashAttentionImpl):
 
         # Fused paged decode feature gate (Story 6.3, AC 1+6).
         # Explicit opt-in via TQ4_USE_FUSED_PAGED env var AND successful
-        # kernel import.  Default is False (decompress-all path).
+        # kernel import.  Disabled for asymmetric configs — fused kernel
+        # uses a single codebook and cannot handle k_bits != v_bits.
         self._fused_paged_available = (
-            _parse_fused_paged_env() and _fused_paged_kernel_available
+            _parse_fused_paged_env()
+            and _fused_paged_kernel_available
+            and k_bits == v_bits
         )
 
         # INT8 prefill gate (Story 6.4): requires fused decode gate + its own
@@ -350,10 +444,12 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         )
 
         logger.info(
-            "TQ4AttentionImpl: %d KV heads, head_size=%d, "
+            "TQ4AttentionImpl: %d KV heads, head_size=%d, k_bits=%d, v_bits=%d, "
             "%d bytes/token (%.2fx compression vs FP16)",
             num_kv_heads,
             head_size,
+            k_bits,
+            v_bits,
             self._total_bytes,
             (2 * num_kv_heads * head_size * 2) / self._total_bytes,
         )
@@ -403,10 +499,11 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         self._cg_prefill_v = torch.empty_like(self._cg_prefill_k)
         self._max_prefill_blocks = prefill_tokens // block_size
 
-        # Compress output buffers for one decode step (single token)
-        half_D = self._half_D
+        # Compress output buffers for one decode step (single token).
+        # K and V may have different index sizes — allocate for the larger.
+        max_idx_size = max(self._k_idx_size, self._v_idx_size)
         self._cg_compress_packed = torch.empty(
-            1, H, half_D, dtype=torch.uint8, device=device
+            1, H, max_idx_size, dtype=torch.uint8, device=device
         )
         self._cg_compress_norms = torch.empty(
             1, H, 1, dtype=torch.float32, device=device
@@ -441,7 +538,8 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             self._cg_prefill_k.shape,
             prefill_mib,
             self._max_prefill_blocks,
-            (half_D * H + 4 * H + self.num_heads * D * 4 + self._total_bytes) / 1024,
+            (max_idx_size * H + 4 * H + self.num_heads * D * 4 + self._total_bytes)
+            / 1024,
         )
 
     # ----- packed cache operations (3c.4 - 3c.5) -----
@@ -484,7 +582,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             key,
             self._tq4_rot_T_even,
             self._tq4_rot_T_odd,
-            self._tq4_boundaries,
+            self._k_boundaries,
             out=compress_out,
         )
         row[:, : self._k_idx_end] = k_packed.reshape(N, -1)
@@ -496,7 +594,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             value,
             self._tq4_rot_T_even,
             self._tq4_rot_T_odd,
-            self._tq4_boundaries,
+            self._v_boundaries,
             out=compress_out,
         )
         row[:, self._k_norm_end : self._v_idx_end] = v_packed.reshape(N, -1)
@@ -541,13 +639,14 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         """
         NB, BS, _ = kv_cache.shape
         H = self.num_kv_heads
-        half_D = self._half_D
+        k_idx_size = self._k_idx_size
+        v_idx_size = self._v_idx_size
         D = self.head_size
 
         flat = kv_cache.reshape(NB * BS, self._total_bytes)
 
         # Extract K regions
-        k_packed = flat[:, : self._k_idx_end].contiguous().reshape(-1, H, half_D)
+        k_packed = flat[:, : self._k_idx_end].contiguous().reshape(-1, H, k_idx_size)
         k_norms = (
             flat[:, self._k_idx_end : self._k_norm_end]
             .contiguous()
@@ -559,7 +658,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         v_packed = (
             flat[:, self._k_norm_end : self._v_idx_end]
             .contiguous()
-            .reshape(-1, H, half_D)
+            .reshape(-1, H, v_idx_size)
         )
         v_norms = (
             flat[:, self._v_idx_end :]
@@ -570,10 +669,10 @@ class TQ4AttentionImpl(FlashAttentionImpl):
 
         # Fused Triton decompress (no rotation applied)
         key_out = tq4_decompress(
-            k_packed, k_norms, self._tq4_centroids, compute_dtype, out=out_k
+            k_packed, k_norms, self._k_centroids, compute_dtype, out=out_k
         )
         value_out = tq4_decompress(
-            v_packed, v_norms, self._tq4_centroids, compute_dtype, out=out_v
+            v_packed, v_norms, self._v_centroids, compute_dtype, out=out_v
         )
 
         # Optionally unrotate (backward compat for tests; forward() skips this)
@@ -618,7 +717,8 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         """
         NB, BS, _ = kv_cache.shape
         H = self.num_kv_heads
-        half_D = self._half_D
+        k_idx_size = self._k_idx_size
+        v_idx_size = self._v_idx_size
         D = self.head_size
 
         # Extract valid block indices from block_table using seq_lens
@@ -657,7 +757,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         selected = kv_cache[unique_blocks]  # (num_unique, BS, total_bytes)
         flat = selected.reshape(num_unique * BS, self._total_bytes)
 
-        k_packed = flat[:, : self._k_idx_end].contiguous().reshape(-1, H, half_D)
+        k_packed = flat[:, : self._k_idx_end].contiguous().reshape(-1, H, k_idx_size)
         k_norms = (
             flat[:, self._k_idx_end : self._k_norm_end]
             .contiguous()
@@ -667,7 +767,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         v_packed = (
             flat[:, self._k_norm_end : self._v_idx_end]
             .contiguous()
-            .reshape(-1, H, half_D)
+            .reshape(-1, H, v_idx_size)
         )
         v_norms = (
             flat[:, self._v_idx_end :]
@@ -681,10 +781,10 @@ class TQ4AttentionImpl(FlashAttentionImpl):
         v_out_slice = v_buf[: num_unique * BS]
 
         key_out = tq4_decompress(
-            k_packed, k_norms, self._tq4_centroids, compute_dtype, out=k_out_slice
+            k_packed, k_norms, self._k_centroids, compute_dtype, out=k_out_slice
         )
         value_out = tq4_decompress(
-            v_packed, v_norms, self._tq4_centroids, compute_dtype, out=v_out_slice
+            v_packed, v_norms, self._v_centroids, compute_dtype, out=v_out_slice
         )
 
         key_cache = key_out.reshape(num_unique, BS, H, D)
@@ -786,7 +886,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             kv_cache,
             attn_metadata.block_table,
             attn_metadata.seq_lens,
-            self._tq4_centroids,
+            self._k_centroids,
             self._tq4_rotation,
             self.num_kv_heads,
             self.head_size,
@@ -827,7 +927,7 @@ class TQ4AttentionImpl(FlashAttentionImpl):
             kv_cache,
             attn_metadata.block_table,
             attn_metadata.seq_lens,
-            self._tq4_centroids,
+            self._k_centroids,
             self._tq4_rotation,
             self.num_kv_heads,
             self.head_size,

@@ -402,3 +402,62 @@ class TestForwardKvCacheNone:
 
 # TestCUDAGraphBufferPreallocation moved to test_vllm_cache_cudagraph.py
 # (Test Maturity Priority 1 — split oversized test file)
+
+
+# ---------------------------------------------------------------------------
+# Story 10.2: Asymmetric K/V byte layout
+# ---------------------------------------------------------------------------
+
+
+class TestTQ4AsymmetricByteLayout:
+    """Validate TQ4 backend with asymmetric K/V bit-widths."""
+
+    def test_bytes_per_token_symmetric_default(self) -> None:
+        """Default (no bits args) should match original 136 bytes."""
+        assert _tq4_bytes_per_token_kv(128) == 136
+
+    def test_asymmetric_compress_decompress_roundtrip(self, tq4_quantizer) -> None:
+        """K4/V3 compress-decompress roundtrip should produce valid cosine.
+
+        In the vLLM path, Triton kernels always nibble-pack. K4/V3 uses the
+        same byte layout as K4/V4 — the difference is codebook quality, not
+        storage.
+        """
+        from turboquant_vllm.quantizer import TurboQuantMSE
+
+        v_quantizer = TurboQuantMSE(HEAD_SIZE, 3, seed=42)
+        impl = make_impl(tq4_quantizer, k_bits=4, v_bits=3, v_quantizer=v_quantizer)
+        total_bytes = impl._total_bytes
+        kv_cache = torch.zeros(2, BLOCK_SIZE, total_bytes, dtype=torch.uint8)
+
+        key = torch.randn(1, NUM_KV_HEADS, HEAD_SIZE)
+        value = torch.randn(1, NUM_KV_HEADS, HEAD_SIZE)
+
+        impl._compress_and_store(key, value, kv_cache, torch.tensor([0]))
+        key_cache, value_cache = impl._decompress_cache(kv_cache, torch.float32)
+
+        recon_k = key_cache[0, 0]
+        recon_v = value_cache[0, 0]
+
+        for h in range(NUM_KV_HEADS):
+            cos_k = torch.nn.functional.cosine_similarity(
+                key[0, h].unsqueeze(0), recon_k[h].unsqueeze(0)
+            ).item()
+            cos_v = torch.nn.functional.cosine_similarity(
+                value[0, h].unsqueeze(0), recon_v[h].unsqueeze(0)
+            ).item()
+            assert cos_k > 0.85, f"K head {h} cosine {cos_k:.4f} too low"
+            assert cos_v > 0.75, f"V head {h} cosine {cos_v:.4f} too low"
+
+    def test_asymmetric_same_byte_layout(self, tq4_quantizer) -> None:
+        """VLLM path: K4/V3 has same byte layout as K4/V4 (Triton always nibble-packs)."""
+        from turboquant_vllm.quantizer import TurboQuantMSE
+
+        v_quantizer = TurboQuantMSE(HEAD_SIZE, 3, seed=42)
+        impl_sym = make_impl(tq4_quantizer)
+        impl_asym = make_impl(
+            tq4_quantizer, k_bits=4, v_bits=3, v_quantizer=v_quantizer
+        )
+
+        # Triton always nibble-packs, so layout is identical
+        assert impl_asym._total_bytes == impl_sym._total_bytes

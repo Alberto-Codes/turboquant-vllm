@@ -1,0 +1,62 @@
+{
+  "Qwen/Qwen2.5-3B": [
+    {
+      "test": "factual",
+      "k4v4": "The capital of France is Paris.",
+      "k4v3": "The capital of France is Paris.",
+      "exact": true
+    },
+    {
+      "test": "reasoning",
+      "k4v4": "15. Explanation: 15 - 9 = 6. The farmer has 6 sheep left.",
+      "k4v3": "15. The question is a riddle. The answer is   15. The farmer still has 15 sheep.",
+      "exact": false
+    },
+    {
+      "test": "passage",
+      "k4v4": "Ming dynasty\nAnswer:\n\n Ming dynasty",
+      "k4v3": "Ming dynasty\nA. Correct\n Ming dynasty\nB. Incorrect\nAnswer: Ming dynasty\nAnswer: Ming dynasty",
+      "exact": false
+    }
+  ],
+  "google/gemma-2-2b": [
+    {
+      "test": "factual",
+      "k4v4": "Paris.\n\nWhat is the capital of the United States? Answer in one sentence: Washington, D.C.\n\nWhat is the capital of the United Kingdom? Answer in one sentence: London.\n\nWhat is the capital of Canada? A",
+      "k4v3": "Paris.\n\nWhat is the capital of France? Answer in one sentence: Paris.\n\nWhat is the capital of France? Answer in one sentence: Paris.\n\nWhat is the capital of France? Answer in one sentence: Paris.\n\nWha",
+      "exact": false
+    },
+    {
+      "test": "reasoning",
+      "k4v4": "6\n\nA farmer has 15 sheep. All but 9 run away. How many does he have? Answer: 6\n\nA farmer has 15 sheep. All but 9 run away. How many does he have? Answer: 6\n\nA farmer has 1",
+      "k4v3": "6\n\nA farmer has 15 sheep. All but 9 run away. How many does he have? Answer: 6\n\nA farmer has 15 sheep. All but 9 run away. How many does he have? Answer: 6\n\nA farmer has 1",
+      "exact": true
+    },
+    {
+      "test": "passage",
+      "k4v4": "The Ming dynasty.\n\nThe Ming dynasty was the last of the great dynasties of China. It lasted from 1368 to 1644. The Ming dynasty was the first dynasty to rule China from the capital at Beijing.\n\nThe Mi",
+      "k4v3": "The Ming dynasty.\n\nThe Ming dynasty was the last of the great dynasties of China. It lasted from 1368 to 1644. The Ming dynasty was the first dynasty to be ruled by a Chinese emperor.\n\nThe Ming dynast",
+      "exact": false
+    }
+  ],
+  "google/gemma-3-4b-it": [
+    {
+      "test": "factual",
+      "k4v4": "The capital of France is Paris.",
+      "k4v3": "The capital of France is Paris.",
+      "exact": true
+    },
+    {
+      "test": "reasoning",
+      "k4v4": "9\n\n**Explanation**\n\nThe problem states \"All but 9 run away.\" This means that 9 sheep *did not* run away. Therefore, the farmer is left with the 9 sheep that didn't leave.",
+      "k4v3": "9\n\n**Explanation**\n\nThe problem states \"all but 9 run away.\" This means that 9 sheep *did not* run away. Therefore, the farmer is left with the 9 sheep that didn't leave.",
+      "exact": false
+    },
+    {
+      "test": "passage",
+      "k4v4": "The Ming dynasty.\n\nThe Ming dynasty (1368-1644) undertook the most extensive construction of the Great Wall, largely in response to the threat posed by the Mongols. They rebuilt and extended the wall,",
+      "k4v3": "The Ming dynasty.\n\nThe Great Wall was built over centuries by various dynasties. The Qin dynasty (221-206 BC) connected existing walls and built new sections, but the most extensive and impressive sec",
+      "exact": false
+    }
+  ]
+}

@@ -51,15 +51,20 @@ def _make_impl(quantizer, *, fused_paged_available=False, max_prefill_len=2048):
     impl.scale = 1.0 / (HEAD_SIZE**0.5)
 
     impl._tq4_rotation = quantizer.rotation.clone()
-    impl._tq4_centroids = quantizer.codebook.centroids.clone()
-    impl._tq4_boundaries = quantizer.codebook.boundaries.clone()
+    impl._k_centroids = quantizer.codebook.centroids.clone()
+    impl._v_centroids = quantizer.codebook.centroids.clone()
+    impl._k_boundaries = quantizer.codebook.boundaries.clone()
+    impl._v_boundaries = quantizer.codebook.boundaries.clone()
     rot_t = quantizer.rotation.T.contiguous()
     impl._tq4_rot_T_even = rot_t[:, 0::2].contiguous()
     impl._tq4_rot_T_odd = rot_t[:, 1::2].contiguous()
     impl._cg_buffers_ready = False
 
     half_D = HEAD_SIZE // 2
-    impl._half_D = half_D
+    impl._k_idx_size = half_D
+    impl._v_idx_size = half_D
+    impl._k_bits = 4
+    impl._v_bits = 4
     impl._k_idx_end = NUM_KV_HEADS * half_D
     impl._k_norm_end = impl._k_idx_end + NUM_KV_HEADS * TQ4_NORM_BYTES
     impl._v_idx_end = impl._k_norm_end + NUM_KV_HEADS * half_D
@@ -110,8 +115,10 @@ class TestFusedPagedGPUIntegration:
         # Build impl on GPU
         impl = _make_impl(tq4_quantizer, fused_paged_available=False)
         impl._tq4_rotation = impl._tq4_rotation.to(device)
-        impl._tq4_centroids = impl._tq4_centroids.to(device)
-        impl._tq4_boundaries = impl._tq4_boundaries.to(device)
+        impl._k_centroids = impl._k_centroids.to(device)
+        impl._v_centroids = impl._v_centroids.to(device)
+        impl._k_boundaries = impl._k_boundaries.to(device)
+        impl._v_boundaries = impl._v_boundaries.to(device)
         impl._tq4_rot_T_even = impl._tq4_rot_T_even.to(device)
         impl._tq4_rot_T_odd = impl._tq4_rot_T_odd.to(device)
 
@@ -151,7 +158,7 @@ class TestFusedPagedGPUIntegration:
             kv_cache,
             block_table,
             seq_lens_t,
-            impl._tq4_centroids,
+            impl._k_centroids,
             impl._tq4_rotation,
             NUM_KV_HEADS,
             HEAD_SIZE,

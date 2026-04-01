@@ -8,8 +8,8 @@ Two integration modes:
 
 2. **CompressedDynamicCache** — Real VRAM savings.
    Stores uint8 indices + fp16 norms in compressed form. Dequantizes
-   lazily on each cache read (one layer at a time). Achieves ~2x
-   compression vs FP16 KV cache.
+   lazily on each cache read (one layer at a time). Supports
+   asymmetric K/V bit-widths via ``k_bits`` and ``v_bits`` parameters.
 
 Both use non-invasive method replacement: we save a reference to the
 original update() method and replace it with a wrapper. This avoids
@@ -52,6 +52,21 @@ from typing import Any
 import torch
 
 from turboquant_vllm.compressors import CompressedValues, TurboQuantCompressorMSE
+
+
+def _packed_size(bits: int, head_dim: int) -> int:
+    """Index byte count for one token/head: nibble-packed at 4-bit, else unpacked.
+
+    Args:
+        bits: Quantization bits per coordinate.
+        head_dim: Dimension of each attention head.
+
+    Returns:
+        Number of uint8 bytes needed for one token's indices.
+    """
+    if bits == 4:
+        return head_dim // 2
+    return head_dim
 
 
 class TurboQuantKVCache:
@@ -316,8 +331,10 @@ class CompressedDynamicCache:
         self,
         cache: Any,
         head_dim: int,
-        bits: int = 3,
+        bits: int | None = 3,
         *,
+        k_bits: int | None = None,
+        v_bits: int | None = None,
         seed: int = 42,
         model_config: Any = None,
     ) -> None:
@@ -326,19 +343,26 @@ class CompressedDynamicCache:
         Sets up compressors, internal storage for compressed representations,
         and incremental decompressed buffers. ``fused_mode`` starts disabled.
 
+        Keys and values can use different bit-widths via ``k_bits`` and
+        ``v_bits``.  When both are ``None``, ``bits`` applies to both
+        (backward compatible).  Any 4-bit component requires even
+        ``head_dim`` for nibble packing.
+
         Args:
             cache: A HuggingFace DynamicCache instance to wrap.
             head_dim: Dimension of each attention head. Must be even
-                when ``bits=4`` (required for nibble packing pairs).
-            bits: Quantization bits per coordinate (default 3). Use 4
-                for nibble-packed storage (3.76x compression).
+                when any component uses 4-bit (nibble packing).
+            bits: Shorthand for ``k_bits=bits, v_bits=bits``.
+            k_bits: Key quantization bits (overrides ``bits`` for keys).
+            v_bits: Value quantization bits (overrides ``bits`` for values).
             seed: Random seed for reproducibility.
             model_config: Optional model config (e.g. ``model.config``).
                 When provided, enables detection of misconfigured caches
                 for models with mixed global/SWA layers (e.g. Gemma).
 
         Raises:
-            ValueError: If ``bits=4`` and ``head_dim`` is odd.
+            ValueError: If no bit-width is specified (all three are None).
+            ValueError: If any 4-bit component has odd ``head_dim``.
 
         Warns:
             UserWarning: If ``cache`` is already wrapped by a TurboQuant
@@ -347,18 +371,35 @@ class CompressedDynamicCache:
                 sliding attention entries but the cache lacks SWA layers.
                 Pass ``DynamicCache(config=model.config)`` to fix.
         """
-        if bits == 4 and head_dim % 2 != 0:
-            msg = f"bits=4 requires even head_dim for nibble packing, got {head_dim}"
+        # Resolve per-component bit-widths
+        resolved_k = k_bits if k_bits is not None else bits
+        resolved_v = v_bits if v_bits is not None else bits
+
+        if resolved_k is None or resolved_v is None:
+            msg = (
+                "No bit-width specified. Provide `bits` as shorthand, "
+                "or `k_bits` and `v_bits` individually."
+            )
+            raise ValueError(msg)
+
+        if resolved_k == 4 and head_dim % 2 != 0:
+            msg = f"k_bits=4 requires even head_dim for nibble packing, got {head_dim}"
+            raise ValueError(msg)
+        if resolved_v == 4 and head_dim % 2 != 0:
+            msg = f"v_bits=4 requires even head_dim for nibble packing, got {head_dim}"
             raise ValueError(msg)
 
         self.cache = cache
         self.head_dim = head_dim
-        self.bits = bits
-        self._nibble_packed = bits == 4
+        self.bits = resolved_k  # backward compat: bits reflects k_bits
+        self.k_bits = resolved_k
+        self.v_bits = resolved_v
+        self._k_nibble_packed = resolved_k == 4
+        self._v_nibble_packed = resolved_v == 4
         self.enabled = True
 
-        self.key_compressor = TurboQuantCompressorMSE(head_dim, bits, seed=seed)
-        self.value_compressor = TurboQuantCompressorMSE(head_dim, bits, seed=seed)
+        self.key_compressor = TurboQuantCompressorMSE(head_dim, resolved_k, seed=seed)
+        self.value_compressor = TurboQuantCompressorMSE(head_dim, resolved_v, seed=seed)
 
         self._compressed_keys: list[_CompressedLayer | None] = []
         self._compressed_values: list[_CompressedLayer | None] = []
@@ -440,6 +481,8 @@ class CompressedDynamicCache:
         self,
         compressor: TurboQuantCompressorMSE,
         tensor: torch.Tensor,
+        *,
+        nibble_packed: bool,
     ) -> _CompressedLayer:
         """Compress a tensor to packed/unpacked indices + float32 norms.
 
@@ -450,6 +493,7 @@ class CompressedDynamicCache:
         Args:
             compressor: The MSE compressor instance.
             tensor: Input tensor, shape ``(batch, heads, seq_len, head_dim)``.
+            nibble_packed: Whether to nibble-pack indices (True for 4-bit).
 
         Returns:
             Compressed layer with indices and float32 norms.
@@ -457,13 +501,13 @@ class CompressedDynamicCache:
         compressed = compressor.compress(tensor)
         indices = compressed.indices.to(torch.uint8)
 
-        if self._nibble_packed:
+        if nibble_packed:
             indices = self._nibble_pack(indices)
 
         return _CompressedLayer(
             indices=indices,
             norms=compressed.norms.float(),
-            packed=self._nibble_packed,
+            packed=nibble_packed,
         )
 
     def _dequantize_layer(
@@ -527,8 +571,9 @@ class CompressedDynamicCache:
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Compress new tokens and optionally dequantize.
 
-        Stores compressed representations permanently. In normal mode,
-        uses incremental dequantization (only NEW tokens decompressed).
+        Stores compressed representations permanently using per-component
+        nibble-pack flags (K and V may use different bit-widths). In normal
+        mode, uses incremental dequantization (only NEW tokens decompressed).
         In ``fused_mode``, skips decompression entirely — the fused TQ4
         kernel reads compressed data via ``get_compressed()``.
 
@@ -577,8 +622,12 @@ class CompressedDynamicCache:
         # buffers match baseline VRAM for SDPA compatibility.
 
         # Compress new tokens to uint8 indices + fp32 norms
-        new_ck = self._compress_tensor(self.key_compressor, key_states)
-        new_cv = self._compress_tensor(self.value_compressor, value_states)
+        new_ck = self._compress_tensor(
+            self.key_compressor, key_states, nibble_packed=self._k_nibble_packed
+        )
+        new_cv = self._compress_tensor(
+            self.value_compressor, value_states, nibble_packed=self._v_nibble_packed
+        )
 
         # Pad compressed storage for SWA-bypassed layers (None = no
         # compressed data). Mirrors the _decompressed_k padding pattern.
@@ -805,13 +854,16 @@ class CompressedDynamicCache:
     def compression_stats(self) -> dict[str, Any]:
         """Return compression statistics for reporting.
 
-        Reports the true ``head_dim`` (not the packed index dimension)
-        and includes a ``nibble_packed`` flag. Only counts compressed
-        (non-SWA) layers.
+        Reports per-component bit-widths, the true ``head_dim``, compression
+        ratio, and per-sequence VRAM estimates at representative context
+        lengths (4K, 16K, 32K tokens). Only counts compressed (non-SWA)
+        layers.  VRAM estimates are per sequence — multiply by batch size
+        for total memory.
 
         Returns:
-            Dict with layer count, sequence length, compressed/baseline
-            sizes in MiB, compression ratio, packing mode, and VRAM savings.
+            Dict with layer count, sequence length, per-component bit-widths,
+            compressed/baseline sizes in MiB, compression ratio, VRAM savings,
+            and per-sequence VRAM estimates at representative context lengths.
         """
         compressed_layers = [ck for ck in self._compressed_keys if ck is not None]
         if not compressed_layers:
@@ -823,17 +875,33 @@ class CompressedDynamicCache:
 
         layer = compressed_layers[0]
         b, h, s, _ = layer.indices.shape
+        num_layers = len(compressed_layers)
+
+        # Per-token-per-head byte cost for each component
+        k_bytes_per_th = _packed_size(self.k_bits, self.head_dim) + 4  # indices + norm
+        v_bytes_per_th = _packed_size(self.v_bits, self.head_dim) + 4
+        bytes_per_token = num_layers * h * (k_bytes_per_th + v_bytes_per_th)
+
+        # VRAM estimates at representative context lengths (per sequence —
+        # multiply by batch_size for total VRAM).
+        vram_estimate: dict[int, float] = {}
+        for ctx_len in (4096, 16384, 32768):
+            vram_estimate[ctx_len] = round(bytes_per_token * ctx_len / (1024 * 1024), 2)
 
         return {
-            "num_layers": len(compressed_layers),
+            "num_layers": num_layers,
             "seq_len": s,
             "batch_size": b,
             "num_heads": h,
             "head_dim": self.head_dim,
             "bits": self.bits,
-            "nibble_packed": self._nibble_packed,
+            "k_bits": self.k_bits,
+            "v_bits": self.v_bits,
+            "k_nibble_packed": self._k_nibble_packed,
+            "v_nibble_packed": self._v_nibble_packed,
             "compressed_mib": compressed_bytes / (1024 * 1024),
             "baseline_mib": baseline_bytes / (1024 * 1024),
             "compression_ratio": round(ratio, 2),
             "savings_mib": (baseline_bytes - compressed_bytes) / (1024 * 1024),
+            "vram_estimate": vram_estimate,
         }

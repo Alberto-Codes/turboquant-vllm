@@ -104,6 +104,9 @@ def _run_verification(
     model_id: str,
     bits: int,
     threshold: float,
+    *,
+    k_bits: int | None = None,
+    v_bits: int | None = None,
 ) -> dict[str, Any]:
     """Run the verification protocol and return a result dict.
 
@@ -114,12 +117,14 @@ def _run_verification(
 
     Args:
         model_id: HuggingFace model identifier.
-        bits: Quantization bits per coordinate (3 or 4).
+        bits: Quantization bits per coordinate (2–5).
         threshold: Minimum cosine similarity for PASS.
+        k_bits: Key quantization bits (2–5; overrides ``bits`` for keys).
+        v_bits: Value quantization bits (2–5; overrides ``bits`` for values).
 
     Returns:
-        Dict with model, bits, status, validation, threshold,
-        per_layer_cosine, min_cosine, and versions fields.
+        Dict with model, bits, k_bits, v_bits, status, validation,
+        threshold, per_layer_cosine, min_cosine, and versions fields.
 
     Raises:
         RuntimeError: If cache layers are missing keys or values after
@@ -183,10 +188,19 @@ def _run_verification(
     for layer_idx in range(num_layers):
         ref_cache.update(fake_keys, fake_values, layer_idx)
 
+    # Resolve per-component bits
+    resolved_k = k_bits if k_bits is not None else bits
+    resolved_v = v_bits if v_bits is not None else bits
+
     # Compressed cache via context manager
     compressed_cache = DynamicCache(config=config)
     with CompressedDynamicCache(
-        compressed_cache, head_dim=head_dim, bits=bits, model_config=text_config
+        compressed_cache,
+        head_dim=head_dim,
+        bits=bits,
+        k_bits=k_bits,
+        v_bits=v_bits,
+        model_config=text_config,
     ):
         for layer_idx in range(num_layers):
             compressed_cache.update(fake_keys, fake_values, layer_idx)
@@ -231,6 +245,8 @@ def _run_verification(
     result: dict[str, Any] = {
         "model": model_id,
         "bits": bits,
+        "k_bits": resolved_k,
+        "v_bits": resolved_v,
         "status": status,
         "validation": validation,
         "threshold": threshold,
@@ -247,6 +263,8 @@ def _run_verification(
 def _format_human_summary(result: dict[str, Any]) -> str:
     """Format a human-readable verification summary.
 
+    Displays asymmetric K/V bits when ``k_bits != v_bits``.
+
     Args:
         result: Result dict from _run_verification.
 
@@ -255,7 +273,10 @@ def _format_human_summary(result: dict[str, Any]) -> str:
     """
     lines = []
     lines.append(f"Model: {result['model']}")
-    lines.append(f"Bits: {result['bits']}")
+    if result["k_bits"] != result["v_bits"]:
+        lines.append(f"K bits: {result['k_bits']}, V bits: {result['v_bits']}")
+    else:
+        lines.append(f"Bits: {result['bits']}")
     lines.append(f"Validation: {result['validation']}")
     if "family_name" in result:
         lines.append(f"Family: {result['family_name']}")
@@ -281,8 +302,10 @@ def _format_human_summary(result: dict[str, Any]) -> str:
 def main(argv: list[str] | None = None) -> None:
     """CLI entry point for the verify command.
 
-    Parses ``--model``, ``--bits`` (3 or 4), ``--threshold`` (default 0.99),
-    and ``--json`` flags, runs verification, and exits 0 (PASS) or 1 (FAIL).
+    Parses ``--model``, ``--bits`` (or ``--k-bits`` and ``--v-bits`` together),
+    ``--threshold`` (default 0.99), and ``--json`` flags, runs verification,
+    and exits 0 (PASS) or 1 (FAIL).  ``--k-bits`` and ``--v-bits`` must be
+    used together; ``--bits`` cannot be combined with per-component flags.
 
     Args:
         argv: Command-line arguments. Uses sys.argv[1:] if None.
@@ -298,9 +321,23 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--bits",
         type=int,
-        choices=[3, 4],
-        required=True,
-        help="Quantization bits per coordinate (3 or 4)",
+        choices=[2, 3, 4, 5],
+        default=None,
+        help="Quantization bits per coordinate (shorthand for --k-bits and --v-bits)",
+    )
+    parser.add_argument(
+        "--k-bits",
+        type=int,
+        choices=[2, 3, 4, 5],
+        default=None,
+        help="Key quantization bits (overrides --bits for keys)",
+    )
+    parser.add_argument(
+        "--v-bits",
+        type=int,
+        choices=[2, 3, 4, 5],
+        default=None,
+        help="Value quantization bits (overrides --bits for values)",
     )
     parser.add_argument(
         "--threshold",
@@ -318,7 +355,21 @@ def main(argv: list[str] | None = None) -> None:
 
     args = parser.parse_args(argv)
 
-    result = _run_verification(args.model, args.bits, args.threshold)
+    # Validate argument combinations
+    if args.bits is not None and (args.k_bits is not None or args.v_bits is not None):
+        parser.error("--bits cannot be used with --k-bits or --v-bits")
+    if args.bits is None and args.k_bits is None and args.v_bits is None:
+        parser.error("Specify --bits or --k-bits/--v-bits")
+    if (args.k_bits is None) != (args.v_bits is None):
+        parser.error("--k-bits and --v-bits must be used together")
+
+    result = _run_verification(
+        args.model,
+        args.bits if args.bits is not None else args.k_bits,
+        args.threshold,
+        k_bits=args.k_bits,
+        v_bits=args.v_bits,
+    )
     human_summary = _format_human_summary(result)
 
     if args.json_output:

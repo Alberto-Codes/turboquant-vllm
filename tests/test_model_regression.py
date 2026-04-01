@@ -36,10 +36,21 @@ REGRESSION_MODELS = [
     pytest.param("google/gemma-3-4b-it", id="gemma-3-4b"),
 ]
 
+# Asymmetric bit configs: (k_bits, v_bits, threshold, is_gated)
+# K4/V4 covered by test_model_regression() — not duplicated here.
+# K4/V3: random data gate at 0.97 (3-bit V on Gaussian data has inherently
+#         lower quality; AC3 release gate of 0.99 applies to real activations)
+# K4/V2: data collection only, no gate (publish whatever the numbers are)
+BITS_CONFIGS = [
+    pytest.param(4, 3, 0.97, True, id="k4v3"),
+    pytest.param(4, 2, 0.0, False, id="k4v2-data"),
+]
 
-@pytest.mark.parametrize("model_id", REGRESSION_MODELS)
-def test_model_regression(model_id: str) -> None:
-    """Validate compress-decompress cosine parity for a single model."""
+
+def _run_model_regression(
+    model_id: str, k_bits: int, v_bits: int, threshold: float, *, gated: bool
+) -> None:
+    """Run regression test for a single model + bit config."""
     config = AutoConfig.from_pretrained(model_id, trust_remote_code=True)
 
     is_vlm = hasattr(config, "text_config")
@@ -84,7 +95,11 @@ def test_model_regression(model_id: str) -> None:
 
         compressed_cache = DynamicCache(config=config)
         with CompressedDynamicCache(
-            compressed_cache, head_dim=head_dim, bits=4, model_config=text_config
+            compressed_cache,
+            head_dim=head_dim,
+            k_bits=k_bits,
+            v_bits=v_bits,
+            model_config=text_config,
         ):
             for layer_idx in range(num_layers):
                 compressed_cache.update(fake_keys, fake_values, layer_idx)
@@ -104,9 +119,11 @@ def test_model_regression(model_id: str) -> None:
                     ref_v.flatten().float(), comp_v.flatten().float(), dim=0
                 ).item()
                 layer_cos = min(k_cos, v_cos)
-                assert layer_cos >= COMPRESSION_QUALITY_THRESHOLD, (
-                    f"Layer {layer_idx}: cosine {layer_cos:.6f} < {COMPRESSION_QUALITY_THRESHOLD}"
-                )
+                if gated:
+                    assert layer_cos >= threshold, (
+                        f"Layer {layer_idx}: K{k_bits}/V{v_bits} cosine "
+                        f"{layer_cos:.6f} < {threshold}"
+                    )
     finally:
         try:
             model.to("cpu")  # ty: ignore[invalid-argument-type]
@@ -115,3 +132,18 @@ def test_model_regression(model_id: str) -> None:
         del model
         gc.collect()
         torch.cuda.empty_cache()
+
+
+@pytest.mark.parametrize("model_id", REGRESSION_MODELS)
+def test_model_regression(model_id: str) -> None:
+    """Validate K4/V4 compress-decompress cosine parity (existing baseline)."""
+    _run_model_regression(model_id, 4, 4, COMPRESSION_QUALITY_THRESHOLD, gated=True)
+
+
+@pytest.mark.parametrize("model_id", REGRESSION_MODELS)
+@pytest.mark.parametrize(("k_bits", "v_bits", "threshold", "gated"), BITS_CONFIGS)
+def test_model_regression_asymmetric(
+    model_id: str, k_bits: int, v_bits: int, threshold: float, gated: bool
+) -> None:
+    """Asymmetric quality matrix: 8 models x 2 configs (K4/V3, K4/V2)."""
+    _run_model_regression(model_id, k_bits, v_bits, threshold, gated=gated)

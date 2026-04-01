@@ -25,6 +25,8 @@ def _make_result(
     *,
     model: str = "test/model",
     bits: int = 4,
+    k_bits: int | None = None,
+    v_bits: int | None = None,
     per_layer_cosine: list[float] | None = None,
     min_cosine: float | None = 0.9995,
     threshold: float = COMPRESSION_QUALITY_THRESHOLD,
@@ -39,9 +41,13 @@ def _make_result(
         min_cosine = min(per_layer_cosine)
     if status is None:
         status = "PASS" if min_cosine >= threshold else "FAIL"
+    resolved_k = k_bits if k_bits is not None else bits
+    resolved_v = v_bits if v_bits is not None else bits
     result = {
         "model": model,
         "bits": bits,
+        "k_bits": resolved_k,
+        "v_bits": resolved_v,
         "status": status,
         "validation": validation,
         "threshold": threshold,
@@ -77,7 +83,11 @@ class TestVerifyArgparse:
             main(["--model", "allenai/Molmo2-4B", "--bits", "4"])
         assert exc_info.value.code == 0
         spy.assert_called_once_with(
-            "allenai/Molmo2-4B", 4, COMPRESSION_QUALITY_THRESHOLD
+            "allenai/Molmo2-4B",
+            4,
+            COMPRESSION_QUALITY_THRESHOLD,
+            k_bits=None,
+            v_bits=None,
         )
 
     def test_bits_flag_parsed(self, mocker) -> None:
@@ -88,7 +98,9 @@ class TestVerifyArgparse:
         with pytest.raises(SystemExit) as exc_info:
             main(["--model", "test/m", "--bits", "3"])
         assert exc_info.value.code == 0
-        spy.assert_called_once_with("test/m", 3, COMPRESSION_QUALITY_THRESHOLD)
+        spy.assert_called_once_with(
+            "test/m", 3, COMPRESSION_QUALITY_THRESHOLD, k_bits=None, v_bits=None
+        )
 
     def test_threshold_default(self, mocker) -> None:
         spy = mocker.patch(
@@ -107,7 +119,7 @@ class TestVerifyArgparse:
         )
         with pytest.raises(SystemExit):
             main(["--model", "test/m", "--bits", "4", "--threshold", "0.998"])
-        spy.assert_called_once_with("test/m", 4, 0.998)
+        spy.assert_called_once_with("test/m", 4, 0.998, k_bits=None, v_bits=None)
 
     def test_json_flag_default_false(self, mocker, capsys) -> None:
         mocker.patch(
@@ -134,6 +146,86 @@ class TestVerifyArgparse:
         assert parsed["model"] == "test/model"
 
 
+class TestVerifyAsymmetricArgparse:
+    """Validate --k-bits/--v-bits CLI argument parsing."""
+
+    def test_k_bits_v_bits_parsed(self, mocker) -> None:
+        """--k-bits and --v-bits should be passed to _run_verification."""
+        spy = mocker.patch(
+            "turboquant_vllm.verify._run_verification",
+            return_value=_make_result(k_bits=4, v_bits=3),
+        )
+        with pytest.raises(SystemExit) as exc_info:
+            main(["--model", "test/m", "--k-bits", "4", "--v-bits", "3"])
+        assert exc_info.value.code == 0
+        spy.assert_called_once_with(
+            "test/m", 4, COMPRESSION_QUALITY_THRESHOLD, k_bits=4, v_bits=3
+        )
+
+    def test_bits_with_k_bits_errors(self, mocker) -> None:
+        """--bits and --k-bits together should error (ambiguous)."""
+        mocker.patch(
+            "turboquant_vllm.verify._run_verification",
+            return_value=_make_result(),
+        )
+        with pytest.raises(SystemExit) as exc_info:
+            main(["--model", "test/m", "--bits", "4", "--k-bits", "3"])
+        assert exc_info.value.code != 0
+
+    def test_bits_with_v_bits_errors(self, mocker) -> None:
+        """--bits and --v-bits together should error (ambiguous)."""
+        mocker.patch(
+            "turboquant_vllm.verify._run_verification",
+            return_value=_make_result(),
+        )
+        with pytest.raises(SystemExit) as exc_info:
+            main(["--model", "test/m", "--bits", "4", "--v-bits", "3"])
+        assert exc_info.value.code != 0
+
+    def test_no_bits_no_kv_bits_errors(self, mocker) -> None:
+        """Omitting all bit-width args should error."""
+        mocker.patch(
+            "turboquant_vllm.verify._run_verification",
+            return_value=_make_result(),
+        )
+        with pytest.raises(SystemExit) as exc_info:
+            main(["--model", "test/m"])
+        assert exc_info.value.code != 0
+
+    def test_k_bits_only_without_v_bits_errors(self, mocker) -> None:
+        """--k-bits alone (without --v-bits) should error."""
+        mocker.patch(
+            "turboquant_vllm.verify._run_verification",
+            return_value=_make_result(),
+        )
+        with pytest.raises(SystemExit) as exc_info:
+            main(["--model", "test/m", "--k-bits", "4"])
+        assert exc_info.value.code != 0
+
+    def test_v_bits_only_without_k_bits_errors(self, mocker) -> None:
+        """--v-bits alone (without --k-bits) should error."""
+        mocker.patch(
+            "turboquant_vllm.verify._run_verification",
+            return_value=_make_result(),
+        )
+        with pytest.raises(SystemExit) as exc_info:
+            main(["--model", "test/m", "--v-bits", "3"])
+        assert exc_info.value.code != 0
+
+    def test_backward_compat_bits_only(self, mocker) -> None:
+        """--bits alone should still work (backward compat)."""
+        spy = mocker.patch(
+            "turboquant_vllm.verify._run_verification",
+            return_value=_make_result(),
+        )
+        with pytest.raises(SystemExit) as exc_info:
+            main(["--model", "test/m", "--bits", "4"])
+        assert exc_info.value.code == 0
+        _, args, kwargs = spy.mock_calls[0]
+        assert kwargs["k_bits"] is None
+        assert kwargs["v_bits"] is None
+
+
 class TestVerifyOutput:
     def test_json_has_all_required_fields(self, mocker, capsys) -> None:
         result = _make_result()
@@ -148,6 +240,8 @@ class TestVerifyOutput:
         required_fields = {
             "model",
             "bits",
+            "k_bits",
+            "v_bits",
             "status",
             "validation",
             "threshold",

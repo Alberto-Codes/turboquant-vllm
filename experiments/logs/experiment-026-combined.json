@@ -1,0 +1,6 @@
+[
+  {
+    "model": "allenai/Molmo2-4B",
+    "error": "CUDA out of memory. Tried to allocate 2.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 34.75 MiB is free. Process 4569 has 156.34 MiB memory in use. Process 86217 has 18.25 GiB memory in use. Including non-PyTorch memory, this process has 4.30 GiB memory in use. Of the allocated memory 3.09 GiB is allocated by PyTorch, and 775.91 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+  }
+]

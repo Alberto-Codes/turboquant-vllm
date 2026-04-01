@@ -189,7 +189,8 @@ class TestNibblePacking:
 
         stats = cc.compression_stats()
         assert stats["bits"] == 4
-        assert stats["nibble_packed"] is True
+        assert stats["k_nibble_packed"] is True
+        assert stats["v_nibble_packed"] is True
         assert stats["head_dim"] == DIM
         assert stats["compression_ratio"] > 3.5
 

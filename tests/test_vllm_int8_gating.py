@@ -51,15 +51,20 @@ def _make_impl(
     impl.scale = 1.0 / (HEAD_SIZE**0.5)
 
     impl._tq4_rotation = quantizer.rotation.clone()
-    impl._tq4_centroids = quantizer.codebook.centroids.clone()
-    impl._tq4_boundaries = quantizer.codebook.boundaries.clone()
+    impl._k_centroids = quantizer.codebook.centroids.clone()
+    impl._v_centroids = quantizer.codebook.centroids.clone()
+    impl._k_boundaries = quantizer.codebook.boundaries.clone()
+    impl._v_boundaries = quantizer.codebook.boundaries.clone()
     rot_t = quantizer.rotation.T.contiguous()
     impl._tq4_rot_T_even = rot_t[:, 0::2].contiguous()
     impl._tq4_rot_T_odd = rot_t[:, 1::2].contiguous()
     impl._cg_buffers_ready = False
 
     half_D = HEAD_SIZE // 2
-    impl._half_D = half_D
+    impl._k_idx_size = half_D
+    impl._v_idx_size = half_D
+    impl._k_bits = 4
+    impl._v_bits = 4
     impl._k_idx_end = NUM_KV_HEADS * half_D
     impl._k_norm_end = impl._k_idx_end + NUM_KV_HEADS * TQ4_NORM_BYTES
     impl._v_idx_end = impl._k_norm_end + NUM_KV_HEADS * half_D

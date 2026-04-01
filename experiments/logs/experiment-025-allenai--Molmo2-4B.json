@@ -1,0 +1,810 @@
+{
+  "experiment": "025-asymmetric-quality-matrix",
+  "model": "allenai/Molmo2-4B",
+  "model_type": "molmo2",
+  "head_dim": 128,
+  "num_kv_heads": 8,
+  "num_layers": 36,
+  "active_layers": 36,
+  "prefill_tokens": 112,
+  "prefill_text": "The transformer architecture relies on scaled dot-product attention to model relationships between tokens. Each attention layer maintains key and value projections that are stored in a KV cache during autoregressive decoding. Quantizing this cache reduces memory bandwidth and enables longer context windows on fixed hardware. The TurboQuant approach applies Lloyd-Max scalar quantization after rotating activations with a learned orthogonal matrix, achieving compression ratios above 3x while preserving cosine similarity above 0.99 on validated model families including Llama, Mistral, Qwen, Phi, Gemma, and Molmo.",
+  "load_s": 4.61,
+  "prefill_s": 0.04,
+  "configs": {
+    "K4V4": {
+      "k_bits": 4,
+      "v_bits": 4,
+      "ac3_gated": true,
+      "threshold": 0.99,
+      "passed": true,
+      "compress_s": 0.17,
+      "per_layer": [
+        {
+          "layer": 0,
+          "k_cos": 0.994313,
+          "v_cos": 0.995213,
+          "min_cos": 0.994313,
+          "skipped": false
+        },
+        {
+          "layer": 1,
+          "k_cos": 0.99583,
+          "v_cos": 0.995149,
+          "min_cos": 0.995149,
+          "skipped": false
+        },
+        {
+          "layer": 2,
+          "k_cos": 0.99513,
+          "v_cos": 0.995164,
+          "min_cos": 0.99513,
+          "skipped": false
+        },
+        {
+          "layer": 3,
+          "k_cos": 0.994959,
+          "v_cos": 0.99518,
+          "min_cos": 0.994959,
+          "skipped": false
+        },
+        {
+          "layer": 4,
+          "k_cos": 0.99533,
+          "v_cos": 0.995093,
+          "min_cos": 0.995093,
+          "skipped": false
+        },
+        {
+          "layer": 5,
+          "k_cos": 0.995221,
+          "v_cos": 0.995135,
+          "min_cos": 0.995135,
+          "skipped": false
+        },
+        {
+          "layer": 6,
+          "k_cos": 0.994603,
+          "v_cos": 0.99539,
+          "min_cos": 0.994603,
+          "skipped": false
+        },
+        {
+          "layer": 7,
+          "k_cos": 0.995163,
+          "v_cos": 0.995217,
+          "min_cos": 0.995163,
+          "skipped": false
+        },
+        {
+          "layer": 8,
+          "k_cos": 0.994863,
+          "v_cos": 0.995197,
+          "min_cos": 0.994863,
+          "skipped": false
+        },
+        {
+          "layer": 9,
+          "k_cos": 0.99527,
+          "v_cos": 0.995108,
+          "min_cos": 0.995108,
+          "skipped": false
+        },
+        {
+          "layer": 10,
+          "k_cos": 0.994907,
+          "v_cos": 0.995177,
+          "min_cos": 0.994907,
+          "skipped": false
+        },
+        {
+          "layer": 11,
+          "k_cos": 0.994674,
+          "v_cos": 0.99512,
+          "min_cos": 0.994674,
+          "skipped": false
+        },
+        {
+          "layer": 12,
+          "k_cos": 0.995203,
+          "v_cos": 0.995239,
+          "min_cos": 0.995203,
+          "skipped": false
+        },
+        {
+          "layer": 13,
+          "k_cos": 0.995088,
+          "v_cos": 0.995283,
+          "min_cos": 0.995088,
+          "skipped": false
+        },
+        {
+          "layer": 14,
+          "k_cos": 0.99537,
+          "v_cos": 0.994908,
+          "min_cos": 0.994908,
+          "skipped": false
+        },
+        {
+          "layer": 15,
+          "k_cos": 0.995095,
+          "v_cos": 0.994945,
+          "min_cos": 0.994945,
+          "skipped": false
+        },
+        {
+          "layer": 16,
+          "k_cos": 0.9954,
+          "v_cos": 0.99518,
+          "min_cos": 0.99518,
+          "skipped": false
+        },
+        {
+          "layer": 17,
+          "k_cos": 0.995314,
+          "v_cos": 0.995358,
+          "min_cos": 0.995314,
+          "skipped": false
+        },
+        {
+          "layer": 18,
+          "k_cos": 0.995136,
+          "v_cos": 0.995114,
+          "min_cos": 0.995114,
+          "skipped": false
+        },
+        {
+          "layer": 19,
+          "k_cos": 0.994944,
+          "v_cos": 0.995071,
+          "min_cos": 0.994944,
+          "skipped": false
+        },
+        {
+          "layer": 20,
+          "k_cos": 0.995246,
+          "v_cos": 0.995217,
+          "min_cos": 0.995217,
+          "skipped": false
+        },
+        {
+          "layer": 21,
+          "k_cos": 0.995385,
+          "v_cos": 0.995192,
+          "min_cos": 0.995192,
+          "skipped": false
+        },
+        {
+          "layer": 22,
+          "k_cos": 0.995033,
+          "v_cos": 0.995177,
+          "min_cos": 0.995033,
+          "skipped": false
+        },
+        {
+          "layer": 23,
+          "k_cos": 0.994613,
+          "v_cos": 0.99529,
+          "min_cos": 0.994613,
+          "skipped": false
+        },
+        {
+          "layer": 24,
+          "k_cos": 0.995391,
+          "v_cos": 0.99508,
+          "min_cos": 0.99508,
+          "skipped": false
+        },
+        {
+          "layer": 25,
+          "k_cos": 0.995233,
+          "v_cos": 0.995266,
+          "min_cos": 0.995233,
+          "skipped": false
+        },
+        {
+          "layer": 26,
+          "k_cos": 0.995163,
+          "v_cos": 0.995195,
+          "min_cos": 0.995163,
+          "skipped": false
+        },
+        {
+          "layer": 27,
+          "k_cos": 0.994875,
+          "v_cos": 0.995098,
+          "min_cos": 0.994875,
+          "skipped": false
+        },
+        {
+          "layer": 28,
+          "k_cos": 0.995241,
+          "v_cos": 0.995232,
+          "min_cos": 0.995232,
+          "skipped": false
+        },
+        {
+          "layer": 29,
+          "k_cos": 0.995397,
+          "v_cos": 0.995029,
+          "min_cos": 0.995029,
+          "skipped": false
+        },
+        {
+          "layer": 30,
+          "k_cos": 0.995113,
+          "v_cos": 0.995216,
+          "min_cos": 0.995113,
+          "skipped": false
+        },
+        {
+          "layer": 31,
+          "k_cos": 0.994947,
+          "v_cos": 0.995217,
+          "min_cos": 0.994947,
+          "skipped": false
+        },
+        {
+          "layer": 32,
+          "k_cos": 0.995277,
+          "v_cos": 0.995137,
+          "min_cos": 0.995137,
+          "skipped": false
+        },
+        {
+          "layer": 33,
+          "k_cos": 0.994847,
+          "v_cos": 0.995207,
+          "min_cos": 0.994847,
+          "skipped": false
+        },
+        {
+          "layer": 34,
+          "k_cos": 0.994874,
+          "v_cos": 0.99519,
+          "min_cos": 0.994874,
+          "skipped": false
+        },
+        {
+          "layer": 35,
+          "k_cos": 0.995821,
+          "v_cos": 0.995204,
+          "min_cos": 0.995204,
+          "skipped": false
+        }
+      ],
+      "min_k_cos": 0.994313,
+      "min_v_cos": 0.994908,
+      "min_cos": 0.994313
+    },
+    "K4V3": {
+      "k_bits": 4,
+      "v_bits": 3,
+      "ac3_gated": true,
+      "threshold": 0.99,
+      "passed": false,
+      "compress_s": 0.22,
+      "per_layer": [
+        {
+          "layer": 0,
+          "k_cos": 0.994313,
+          "v_cos": 0.98288,
+          "min_cos": 0.98288,
+          "skipped": false
+        },
+        {
+          "layer": 1,
+          "k_cos": 0.99583,
+          "v_cos": 0.982665,
+          "min_cos": 0.982665,
+          "skipped": false
+        },
+        {
+          "layer": 2,
+          "k_cos": 0.99513,
+          "v_cos": 0.982858,
+          "min_cos": 0.982858,
+          "skipped": false
+        },
+        {
+          "layer": 3,
+          "k_cos": 0.994959,
+          "v_cos": 0.982873,
+          "min_cos": 0.982873,
+          "skipped": false
+        },
+        {
+          "layer": 4,
+          "k_cos": 0.99533,
+          "v_cos": 0.982683,
+          "min_cos": 0.982683,
+          "skipped": false
+        },
+        {
+          "layer": 5,
+          "k_cos": 0.995221,
+          "v_cos": 0.982767,
+          "min_cos": 0.982767,
+          "skipped": false
+        },
+        {
+          "layer": 6,
+          "k_cos": 0.994603,
+          "v_cos": 0.98328,
+          "min_cos": 0.98328,
+          "skipped": false
+        },
+        {
+          "layer": 7,
+          "k_cos": 0.995163,
+          "v_cos": 0.982918,
+          "min_cos": 0.982918,
+          "skipped": false
+        },
+        {
+          "layer": 8,
+          "k_cos": 0.994863,
+          "v_cos": 0.982821,
+          "min_cos": 0.982821,
+          "skipped": false
+        },
+        {
+          "layer": 9,
+          "k_cos": 0.99527,
+          "v_cos": 0.982652,
+          "min_cos": 0.982652,
+          "skipped": false
+        },
+        {
+          "layer": 10,
+          "k_cos": 0.994907,
+          "v_cos": 0.982748,
+          "min_cos": 0.982748,
+          "skipped": false
+        },
+        {
+          "layer": 11,
+          "k_cos": 0.994674,
+          "v_cos": 0.982627,
+          "min_cos": 0.982627,
+          "skipped": false
+        },
+        {
+          "layer": 12,
+          "k_cos": 0.995203,
+          "v_cos": 0.98288,
+          "min_cos": 0.98288,
+          "skipped": false
+        },
+        {
+          "layer": 13,
+          "k_cos": 0.995088,
+          "v_cos": 0.982868,
+          "min_cos": 0.982868,
+          "skipped": false
+        },
+        {
+          "layer": 14,
+          "k_cos": 0.99537,
+          "v_cos": 0.982423,
+          "min_cos": 0.982423,
+          "skipped": false
+        },
+        {
+          "layer": 15,
+          "k_cos": 0.995095,
+          "v_cos": 0.982146,
+          "min_cos": 0.982146,
+          "skipped": false
+        },
+        {
+          "layer": 16,
+          "k_cos": 0.9954,
+          "v_cos": 0.982683,
+          "min_cos": 0.982683,
+          "skipped": false
+        },
+        {
+          "layer": 17,
+          "k_cos": 0.995314,
+          "v_cos": 0.983663,
+          "min_cos": 0.983663,
+          "skipped": false
+        },
+        {
+          "layer": 18,
+          "k_cos": 0.995136,
+          "v_cos": 0.982775,
+          "min_cos": 0.982775,
+          "skipped": false
+        },
+        {
+          "layer": 19,
+          "k_cos": 0.994944,
+          "v_cos": 0.982576,
+          "min_cos": 0.982576,
+          "skipped": false
+        },
+        {
+          "layer": 20,
+          "k_cos": 0.995246,
+          "v_cos": 0.982968,
+          "min_cos": 0.982968,
+          "skipped": false
+        },
+        {
+          "layer": 21,
+          "k_cos": 0.995385,
+          "v_cos": 0.982827,
+          "min_cos": 0.982827,
+          "skipped": false
+        },
+        {
+          "layer": 22,
+          "k_cos": 0.995033,
+          "v_cos": 0.982795,
+          "min_cos": 0.982795,
+          "skipped": false
+        },
+        {
+          "layer": 23,
+          "k_cos": 0.994613,
+          "v_cos": 0.982941,
+          "min_cos": 0.982941,
+          "skipped": false
+        },
+        {
+          "layer": 24,
+          "k_cos": 0.995391,
+          "v_cos": 0.982628,
+          "min_cos": 0.982628,
+          "skipped": false
+        },
+        {
+          "layer": 25,
+          "k_cos": 0.995233,
+          "v_cos": 0.982991,
+          "min_cos": 0.982991,
+          "skipped": false
+        },
+        {
+          "layer": 26,
+          "k_cos": 0.995163,
+          "v_cos": 0.982821,
+          "min_cos": 0.982821,
+          "skipped": false
+        },
+        {
+          "layer": 27,
+          "k_cos": 0.994875,
+          "v_cos": 0.982646,
+          "min_cos": 0.982646,
+          "skipped": false
+        },
+        {
+          "layer": 28,
+          "k_cos": 0.995241,
+          "v_cos": 0.982822,
+          "min_cos": 0.982822,
+          "skipped": false
+        },
+        {
+          "layer": 29,
+          "k_cos": 0.995397,
+          "v_cos": 0.982411,
+          "min_cos": 0.982411,
+          "skipped": false
+        },
+        {
+          "layer": 30,
+          "k_cos": 0.995113,
+          "v_cos": 0.982794,
+          "min_cos": 0.982794,
+          "skipped": false
+        },
+        {
+          "layer": 31,
+          "k_cos": 0.994947,
+          "v_cos": 0.982988,
+          "min_cos": 0.982988,
+          "skipped": false
+        },
+        {
+          "layer": 32,
+          "k_cos": 0.995277,
+          "v_cos": 0.982746,
+          "min_cos": 0.982746,
+          "skipped": false
+        },
+        {
+          "layer": 33,
+          "k_cos": 0.994847,
+          "v_cos": 0.98275,
+          "min_cos": 0.98275,
+          "skipped": false
+        },
+        {
+          "layer": 34,
+          "k_cos": 0.994874,
+          "v_cos": 0.982805,
+          "min_cos": 0.982805,
+          "skipped": false
+        },
+        {
+          "layer": 35,
+          "k_cos": 0.995821,
+          "v_cos": 0.982803,
+          "min_cos": 0.982803,
+          "skipped": false
+        }
+      ],
+      "min_k_cos": 0.994313,
+      "min_v_cos": 0.982146,
+      "min_cos": 0.982146
+    },
+    "K4V2": {
+      "k_bits": 4,
+      "v_bits": 2,
+      "ac3_gated": false,
+      "threshold": null,
+      "passed": null,
+      "compress_s": 0.14,
+      "per_layer": [
+        {
+          "layer": 0,
+          "k_cos": 0.994313,
+          "v_cos": 0.940418,
+          "min_cos": 0.940418,
+          "skipped": false
+        },
+        {
+          "layer": 1,
+          "k_cos": 0.99583,
+          "v_cos": 0.939718,
+          "min_cos": 0.939718,
+          "skipped": false
+        },
+        {
+          "layer": 2,
+          "k_cos": 0.99513,
+          "v_cos": 0.940547,
+          "min_cos": 0.940547,
+          "skipped": false
+        },
+        {
+          "layer": 3,
+          "k_cos": 0.994959,
+          "v_cos": 0.940434,
+          "min_cos": 0.940434,
+          "skipped": false
+        },
+        {
+          "layer": 4,
+          "k_cos": 0.99533,
+          "v_cos": 0.940187,
+          "min_cos": 0.940187,
+          "skipped": false
+        },
+        {
+          "layer": 5,
+          "k_cos": 0.995221,
+          "v_cos": 0.939838,
+          "min_cos": 0.939838,
+          "skipped": false
+        },
+        {
+          "layer": 6,
+          "k_cos": 0.994603,
+          "v_cos": 0.940823,
+          "min_cos": 0.940823,
+          "skipped": false
+        },
+        {
+          "layer": 7,
+          "k_cos": 0.995163,
+          "v_cos": 0.940417,
+          "min_cos": 0.940417,
+          "skipped": false
+        },
+        {
+          "layer": 8,
+          "k_cos": 0.994863,
+          "v_cos": 0.940025,
+          "min_cos": 0.940025,
+          "skipped": false
+        },
+        {
+          "layer": 9,
+          "k_cos": 0.99527,
+          "v_cos": 0.939968,
+          "min_cos": 0.939968,
+          "skipped": false
+        },
+        {
+          "layer": 10,
+          "k_cos": 0.994907,
+          "v_cos": 0.940123,
+          "min_cos": 0.940123,
+          "skipped": false
+        },
+        {
+          "layer": 11,
+          "k_cos": 0.994674,
+          "v_cos": 0.93994,
+          "min_cos": 0.93994,
+          "skipped": false
+        },
+        {
+          "layer": 12,
+          "k_cos": 0.995203,
+          "v_cos": 0.940457,
+          "min_cos": 0.940457,
+          "skipped": false
+        },
+        {
+          "layer": 13,
+          "k_cos": 0.995088,
+          "v_cos": 0.94037,
+          "min_cos": 0.94037,
+          "skipped": false
+        },
+        {
+          "layer": 14,
+          "k_cos": 0.99537,
+          "v_cos": 0.939311,
+          "min_cos": 0.939311,
+          "skipped": false
+        },
+        {
+          "layer": 15,
+          "k_cos": 0.995095,
+          "v_cos": 0.939585,
+          "min_cos": 0.939585,
+          "skipped": false
+        },
+        {
+          "layer": 16,
+          "k_cos": 0.9954,
+          "v_cos": 0.939627,
+          "min_cos": 0.939627,
+          "skipped": false
+        },
+        {
+          "layer": 17,
+          "k_cos": 0.995314,
+          "v_cos": 0.941867,
+          "min_cos": 0.941867,
+          "skipped": false
+        },
+        {
+          "layer": 18,
+          "k_cos": 0.995136,
+          "v_cos": 0.939441,
+          "min_cos": 0.939441,
+          "skipped": false
+        },
+        {
+          "layer": 19,
+          "k_cos": 0.994944,
+          "v_cos": 0.940027,
+          "min_cos": 0.940027,
+          "skipped": false
+        },
+        {
+          "layer": 20,
+          "k_cos": 0.995246,
+          "v_cos": 0.940339,
+          "min_cos": 0.940339,
+          "skipped": false
+        },
+        {
+          "layer": 21,
+          "k_cos": 0.995385,
+          "v_cos": 0.940533,
+          "min_cos": 0.940533,
+          "skipped": false
+        },
+        {
+          "layer": 22,
+          "k_cos": 0.995033,
+          "v_cos": 0.940596,
+          "min_cos": 0.940596,
+          "skipped": false
+        },
+        {
+          "layer": 23,
+          "k_cos": 0.994613,
+          "v_cos": 0.940493,
+          "min_cos": 0.940493,
+          "skipped": false
+        },
+        {
+          "layer": 24,
+          "k_cos": 0.995391,
+          "v_cos": 0.939902,
+          "min_cos": 0.939902,
+          "skipped": false
+        },
+        {
+          "layer": 25,
+          "k_cos": 0.995233,
+          "v_cos": 0.940507,
+          "min_cos": 0.940507,
+          "skipped": false
+        },
+        {
+          "layer": 26,
+          "k_cos": 0.995163,
+          "v_cos": 0.940227,
+          "min_cos": 0.940227,
+          "skipped": false
+        },
+        {
+          "layer": 27,
+          "k_cos": 0.994875,
+          "v_cos": 0.939826,
+          "min_cos": 0.939826,
+          "skipped": false
+        },
+        {
+          "layer": 28,
+          "k_cos": 0.995241,
+          "v_cos": 0.94025,
+          "min_cos": 0.94025,
+          "skipped": false
+        },
+        {
+          "layer": 29,
+          "k_cos": 0.995397,
+          "v_cos": 0.939728,
+          "min_cos": 0.939728,
+          "skipped": false
+        },
+        {
+          "layer": 30,
+          "k_cos": 0.995113,
+          "v_cos": 0.940109,
+          "min_cos": 0.940109,
+          "skipped": false
+        },
+        {
+          "layer": 31,
+          "k_cos": 0.994947,
+          "v_cos": 0.940472,
+          "min_cos": 0.940472,
+          "skipped": false
+        },
+        {
+          "layer": 32,
+          "k_cos": 0.995277,
+          "v_cos": 0.939891,
+          "min_cos": 0.939891,
+          "skipped": false
+        },
+        {
+          "layer": 33,
+          "k_cos": 0.994847,
+          "v_cos": 0.940088,
+          "min_cos": 0.940088,
+          "skipped": false
+        },
+        {
+          "layer": 34,
+          "k_cos": 0.994874,
+          "v_cos": 0.940068,
+          "min_cos": 0.940068,
+          "skipped": false
+        },
+        {
+          "layer": 35,
+          "k_cos": 0.995821,
+          "v_cos": 0.94017,
+          "min_cos": 0.94017,
+          "skipped": false
+        }
+      ],
+      "min_k_cos": 0.994313,
+      "min_v_cos": 0.939311,
+      "min_cos": 0.939311
+    }
+  }
+}
