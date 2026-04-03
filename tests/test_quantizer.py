@@ -175,3 +175,98 @@ class TestTurboQuantProd:
             query, indices, norms, qjl_signs, res_norms
         )
         assert abs(estimated.item()) < 0.01
+
+
+@pytest.mark.unit
+class TestDimMismatchGuard:
+    """Validate clear errors when tensor last dim != quantizer dim (GH-67)."""
+
+    def test_quantize_wrong_last_dim_raises_valueerror(self) -> None:
+        """Feeding shape[-1] != self.dim should raise ValueError, not RuntimeError."""
+        q = TurboQuantMSE(128, bits=4)
+        x = torch.randn(1, 2, 10, 256)  # last dim 256 != quantizer dim 128
+        with pytest.raises(ValueError, match="last dimension"):
+            q.quantize(x)
+
+    def test_dequantize_wrong_last_dim_raises_valueerror(self) -> None:
+        """Dequantize with indices whose last dim != self.dim should raise ValueError."""
+        q = TurboQuantMSE(128, bits=4)
+        indices = torch.zeros(1, 2, 10, 256, dtype=torch.long)
+        norms = torch.ones(1, 2, 10, 1)
+        with pytest.raises(ValueError, match="last dimension"):
+            q.dequantize(indices, norms)
+
+    def test_prod_quantize_wrong_dim_raises_valueerror(self) -> None:
+        """TurboQuantProd should surface ValueError from inner MSE quantizer."""
+        q = TurboQuantProd(128, bits=4)
+        x = torch.randn(1, 2, 10, 256)
+        with pytest.raises(ValueError, match="last dimension"):
+            q.quantize(x)
+
+    def test_estimate_inner_product_wrong_query_dim_raises_valueerror(self) -> None:
+        """Query with shape[-1] != self.dim should raise ValueError."""
+        q = TurboQuantProd(128, bits=4)
+        keys = torch.randn(1, 2, 10, 128)
+        indices, norms, signs, res_norms = q.quantize(keys)
+        bad_query = torch.randn(1, 2, 10, 256)  # wrong last dim
+        with pytest.raises(ValueError, match="last dimension"):
+            q.estimate_inner_product(bad_query, indices, norms, signs, res_norms)
+
+
+@pytest.mark.unit
+class TestGQAShapes:
+    """Validate quantizer handles GQA-expanded tensor shapes (GH-67).
+
+    GQA models may have different numbers of KV heads vs attention heads.
+    The quantizer must handle any leading dimensions as long as the last
+    dimension matches self.dim.
+    """
+
+    def test_quantize_gqa_expanded_shape(self) -> None:
+        """GQA-expanded tensor (batch, expanded_heads, seq, dim) should work."""
+        q = TurboQuantMSE(DIM, bits=4)
+        # Simulate GQA expansion: 2 KV heads expanded to 8 attention heads
+        x = torch.randn(1, 8, 32, DIM)
+        indices, norms = q.quantize(x)
+        assert indices.shape == (1, 8, 32, DIM)
+        assert norms.shape == (1, 8, 32, 1)
+
+    def test_quantize_unexpanded_kv_shape(self) -> None:
+        """Unexpanded KV tensor (batch, kv_heads, seq, dim) should work."""
+        q = TurboQuantMSE(DIM, bits=4)
+        x = torch.randn(1, 2, 32, DIM)
+        indices, norms = q.quantize(x)
+        assert indices.shape == (1, 2, 32, DIM)
+        assert norms.shape == (1, 2, 32, 1)
+
+    def test_roundtrip_gqa_expanded_quality(self) -> None:
+        """Round-trip through GQA-expanded shape preserves cosine quality."""
+        q = TurboQuantMSE(DIM, bits=4)
+        x = torch.randn(1, 8, 32, DIM)
+        indices, norms = q.quantize(x)
+        reconstructed = q.dequantize(indices, norms)
+        assert reconstructed.shape == x.shape
+        cos = torch.nn.functional.cosine_similarity(
+            x.flatten().float(), reconstructed.flatten().float(), dim=0
+        ).item()
+        assert cos > 0.80, f"Round-trip cosine {cos:.4f} below 0.80 threshold"
+
+    def test_quantize_head_dim_256_gqa(self) -> None:
+        """Head dim 256 with GQA-expanded heads (Gemma 4 E4B scenario)."""
+        q = TurboQuantMSE(256, bits=4)
+        x = torch.randn(1, 8, 16, 256)  # 8 expanded heads, head_dim=256
+        indices, norms = q.quantize(x)
+        assert indices.shape == (1, 8, 16, 256)
+        assert norms.shape == (1, 8, 16, 1)
+        reconstructed = q.dequantize(indices, norms)
+        assert reconstructed.shape == x.shape
+
+    def test_prod_quantize_gqa_expanded(self) -> None:
+        """TurboQuantProd handles GQA-expanded shapes (key compressor path)."""
+        q = TurboQuantProd(DIM, bits=4)
+        x = torch.randn(1, 8, 32, DIM)
+        indices, norms, signs, res_norms = q.quantize(x)
+        assert indices.shape == (1, 8, 32, DIM)
+        assert norms.shape == (1, 8, 32, 1)
+        assert signs.shape == (1, 8, 32, DIM)
+        assert res_norms.shape == (1, 8, 32, 1)
