@@ -121,7 +121,18 @@ class TurboQuantMSE:
         Returns:
             Tuple of (indices, norms) where indices is a long tensor of
             shape (..., dim) and norms is a float tensor of shape (..., 1).
+
+        Raises:
+            ValueError: If ``x.shape[-1] != self.dim``.
         """
+        if x.shape[-1] != self.dim:
+            msg = (
+                f"Input last dimension {x.shape[-1]} does not match "
+                f"quantizer dim {self.dim}. Ensure the compressor's "
+                f"head_dim matches the model's actual head dimension."
+            )
+            raise ValueError(msg)
+
         # Store original shape and flatten to 2D
         orig_shape = x.shape
         flat = x.reshape(-1, self.dim).float()
@@ -151,7 +162,18 @@ class TurboQuantMSE:
 
         Returns:
             Reconstructed float tensor of shape (..., dim).
+
+        Raises:
+            ValueError: If ``indices.shape[-1] != self.dim``.
         """
+        if indices.shape[-1] != self.dim:
+            msg = (
+                f"Indices last dimension {indices.shape[-1]} does not match "
+                f"quantizer dim {self.dim}. Check that the same quantizer "
+                f"instance is used for quantize and dequantize."
+            )
+            raise ValueError(msg)
+
         orig_shape = indices.shape
         flat_idx = indices.reshape(-1, self.dim)
         flat_norms = norms.reshape(-1, 1)
@@ -316,7 +338,18 @@ class TurboQuantProd:
         Returns:
             Inner product estimates, shape matching broadcast of query and key
             batch dimensions.
+
+        Raises:
+            ValueError: If ``query.shape[-1] != self.dim``.
         """
+        if query.shape[-1] != self.dim:
+            msg = (
+                f"Query last dimension {query.shape[-1]} does not match "
+                f"quantizer dim {self.dim}. Ensure the compressor's "
+                f"head_dim matches the model's actual head dimension."
+            )
+            raise ValueError(msg)
+
         # MSE component: <q, k_mse>
         k_mse = self.mse_quantizer.dequantize(indices, norms)
         mse_term = (query.float() * k_mse).sum(dim=-1, keepdim=True)
