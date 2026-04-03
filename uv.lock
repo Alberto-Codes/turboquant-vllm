@@ -4627,7 +4627,7 @@ requires-dist = [
     { name = "scipy", specifier = ">=1.10" },
     { name = "torch", specifier = ">=2.6" },
     { name = "torchvision", specifier = ">=0.21" },
-    { name = "transformers", specifier = ">=4.57,<5.0" },
+    { name = "transformers", specifier = ">=4.57" },
     { name = "vllm", marker = "extra == 'vllm'", specifier = ">=0.18" },
 ]
 provides-extras = ["bnb", "vllm", "docs"]

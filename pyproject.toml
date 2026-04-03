@@ -11,7 +11,7 @@ requires-python = ">=3.12"
 dependencies = [
     "torch>=2.6",
     "torchvision>=0.21",
-    "transformers>=4.57,<5.0",
+    "transformers>=4.57",
     "molmo-utils>=0.0.1",
     "scipy>=1.10",
     "accelerate>=0.25",

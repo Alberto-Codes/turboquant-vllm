@@ -582,7 +582,9 @@ class CompressedDynamicCache:
 
         Works with the ``DynamicCache.layers`` API (transformers >=4.57)
         where each layer is a ``DynamicLayer`` holding ``.keys`` and
-        ``.values`` tensors.
+        ``.values`` tensors.  Calls ``lazy_initialization`` with both
+        key and value states (transformers 5.x), falling back to
+        key-only (transformers 4.x) for backwards compatibility.
 
         Args:
             key_states: Key tensor, shape ``(batch, heads, seq_len, head_dim)``.
@@ -654,7 +656,10 @@ class CompressedDynamicCache:
         if self.fused_mode:
             layer = self.cache.layers[layer_idx]
             if not layer.is_initialized:
-                layer.lazy_initialization(key_states)
+                try:
+                    layer.lazy_initialization(key_states, value_states)
+                except TypeError:
+                    layer.lazy_initialization(key_states)
             # Store minimal placeholders — just the new tokens, not the
             # full cache. The fused attention function ignores these.
             layer.keys = key_states
@@ -696,7 +701,10 @@ class CompressedDynamicCache:
         # Store in the DynamicLayer for len(cache) / get_seq_length compat
         layer = self.cache.layers[layer_idx]
         if not layer.is_initialized:
-            layer.lazy_initialization(key_states)
+            try:
+                layer.lazy_initialization(key_states, value_states)
+            except TypeError:
+                layer.lazy_initialization(key_states)
         layer.keys = decompressed_k
         layer.values = decompressed_v
 

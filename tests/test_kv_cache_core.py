@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from typing import Any
+from unittest.mock import patch
+
 import pytest
 import torch
 
@@ -411,3 +414,130 @@ class TestCompressedDynamicCache:
 
         # Compressed storage should also exist
         assert len(cc._compressed_keys) == 2
+
+
+@pytest.mark.unit
+class TestLazyInitCompat:
+    """Validate lazy_initialization compatibility with transformers 4.x and 5.x."""
+
+    def test_lazy_init_two_args_accepted(self) -> None:
+        """When lazy_initialization accepts two args (transformers 5.x), both are passed."""
+        from transformers import DynamicCache
+
+        cache = DynamicCache()
+        _ = CompressedDynamicCache(cache, head_dim=DIM, bits=BITS)
+
+        keys = torch.randn(1, 4, 1, DIM)
+        values = torch.randn(1, 4, 1, DIM)
+
+        # Mock lazy_initialization to accept two args and record calls
+        calls: list[tuple[torch.Tensor, ...]] = []
+
+        def two_arg_lazy_init(
+            self_layer: Any, k: torch.Tensor, v: torch.Tensor
+        ) -> None:
+            calls.append((k, v))
+            self_layer.dtype, self_layer.device = k.dtype, k.device
+            self_layer.keys = torch.tensor([], dtype=k.dtype, device=k.device)
+            self_layer.values = torch.tensor([], dtype=k.dtype, device=k.device)
+            self_layer.is_initialized = True
+
+        with patch(
+            "transformers.cache_utils.DynamicLayer.lazy_initialization",
+            two_arg_lazy_init,
+        ):
+            cache.update(keys, values, layer_idx=0)
+
+        assert len(calls) == 1
+        assert calls[0][0].shape == keys.shape
+        assert calls[0][1].shape == values.shape
+
+    def test_lazy_init_one_arg_fallback(self) -> None:
+        """When lazy_initialization rejects two args (transformers 4.x), falls back to one."""
+        from transformers import DynamicCache
+
+        cache = DynamicCache()
+        _ = CompressedDynamicCache(cache, head_dim=DIM, bits=BITS)
+
+        keys = torch.randn(1, 4, 1, DIM)
+        values = torch.randn(1, 4, 1, DIM)
+
+        # Mock lazy_initialization to reject two args (transformers 4.x behavior)
+        calls: list[tuple[torch.Tensor, ...]] = []
+
+        def one_arg_lazy_init(self_layer: Any, k: torch.Tensor) -> None:
+            calls.append((k,))
+            self_layer.dtype, self_layer.device = k.dtype, k.device
+            self_layer.keys = torch.tensor([], dtype=k.dtype, device=k.device)
+            self_layer.values = torch.tensor([], dtype=k.dtype, device=k.device)
+            self_layer.is_initialized = True
+
+        with patch(
+            "transformers.cache_utils.DynamicLayer.lazy_initialization",
+            one_arg_lazy_init,
+        ):
+            cache.update(keys, values, layer_idx=0)
+
+        assert len(calls) == 1
+        assert calls[0][0].shape == keys.shape
+
+    def test_lazy_init_fused_mode_two_args(self) -> None:
+        """Fused mode path also passes both args when accepted."""
+        from transformers import DynamicCache
+
+        cache = DynamicCache()
+        cc = CompressedDynamicCache(cache, head_dim=DIM, bits=BITS)
+        cc.fused_mode = True
+
+        keys = torch.randn(1, 4, 1, DIM)
+        values = torch.randn(1, 4, 1, DIM)
+
+        calls: list[tuple[torch.Tensor, ...]] = []
+
+        def two_arg_lazy_init(
+            self_layer: Any, k: torch.Tensor, v: torch.Tensor
+        ) -> None:
+            calls.append((k, v))
+            self_layer.dtype, self_layer.device = k.dtype, k.device
+            self_layer.keys = torch.tensor([], dtype=k.dtype, device=k.device)
+            self_layer.values = torch.tensor([], dtype=k.dtype, device=k.device)
+            self_layer.is_initialized = True
+
+        with patch(
+            "transformers.cache_utils.DynamicLayer.lazy_initialization",
+            two_arg_lazy_init,
+        ):
+            cache.update(keys, values, layer_idx=0)
+
+        assert len(calls) == 1
+        assert calls[0][0].shape == keys.shape
+        assert calls[0][1].shape == values.shape
+
+    def test_lazy_init_fused_mode_one_arg_fallback(self) -> None:
+        """Fused mode path falls back to one arg when two are rejected."""
+        from transformers import DynamicCache
+
+        cache = DynamicCache()
+        cc = CompressedDynamicCache(cache, head_dim=DIM, bits=BITS)
+        cc.fused_mode = True
+
+        keys = torch.randn(1, 4, 1, DIM)
+        values = torch.randn(1, 4, 1, DIM)
+
+        calls: list[tuple[torch.Tensor, ...]] = []
+
+        def one_arg_lazy_init(self_layer: Any, k: torch.Tensor) -> None:
+            calls.append((k,))
+            self_layer.dtype, self_layer.device = k.dtype, k.device
+            self_layer.keys = torch.tensor([], dtype=k.dtype, device=k.device)
+            self_layer.values = torch.tensor([], dtype=k.dtype, device=k.device)
+            self_layer.is_initialized = True
+
+        with patch(
+            "transformers.cache_utils.DynamicLayer.lazy_initialization",
+            one_arg_lazy_init,
+        ):
+            cache.update(keys, values, layer_idx=0)
+
+        assert len(calls) == 1
+        assert calls[0][0].shape == keys.shape
