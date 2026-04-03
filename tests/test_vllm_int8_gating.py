@@ -262,7 +262,9 @@ class TestTwoKernelDispatch:
                 torch.zeros(1, dtype=torch.int32),
             ),
         )
-        mocker.patch("vllm.v1.attention.backends.fa_utils.flash_attn_varlen_func")
+        mocker.patch(
+            "vllm.v1.attention.backends.fa_utils.flash_attn_varlen_func", create=True
+        )
 
         attn_metadata = mocker.MagicMock()
         attn_metadata.num_actual_tokens = 32
@@ -310,7 +312,9 @@ class TestTwoKernelDispatch:
                 torch.zeros(1, dtype=torch.int32),
             ),
         )
-        mocker.patch("vllm.v1.attention.backends.fa_utils.flash_attn_varlen_func")
+        mocker.patch(
+            "vllm.v1.attention.backends.fa_utils.flash_attn_varlen_func", create=True
+        )
 
         attn_metadata = mocker.MagicMock()
         attn_metadata.num_actual_tokens = 64  # two sequences
