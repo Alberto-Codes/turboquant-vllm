@@ -1,8 +1,10 @@
 # Project Documentation Index
 
+> **Status (2026-04-04):** Reference implementation for HuggingFace transformers DynamicCache. For native vLLM TurboQuant, see [vllm-project/vllm#38479](https://github.com/vllm-project/vllm/pull/38479). This project complements that PR — HF transformers workflows here, production vLLM serving there.
+
 ## Project Overview
 
-- **Type:** Monolith (single Python library + vLLM plugin)
+- **Type:** Python library (HuggingFace transformers DynamicCache patch)
 - **Primary Language:** Python 3.12+
 - **Architecture:** Layered library with strict DAG dependency flow
 

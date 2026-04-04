@@ -1,5 +1,7 @@
 # Architecture — `turboquant_vllm`
 
+> **Note (2026-04-04):** Sections describing planned vLLM serving integration, fused Triton kernels, and production serving paths are **superseded by [vllm-project/vllm#38479](https://github.com/vllm-project/vllm/pull/38479)** which landed a production-grade native TurboQuant backend in vLLM (Triton kernels, CUDA graphs, norm correction, boundary layer protection). This project remains the reference implementation for HuggingFace transformers DynamicCache workflows.
+
 Implementation of Google's **TurboQuant** algorithm (ICLR 2026, arXiv 2504.19874) for compressing transformer KV caches to 3–4 bits per coordinate on consumer GPUs.
 
 ---

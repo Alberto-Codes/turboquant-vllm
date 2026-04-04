@@ -1,12 +1,14 @@
 # Project Overview — turboquant-vllm
 
+> **Status (2026-04-04):** Reference implementation for HuggingFace transformers DynamicCache. For native vLLM TurboQuant, see [vllm-project/vllm#38479](https://github.com/vllm-project/vllm/pull/38479) (active, validated by us on Molmo2 video workloads). This project complements that PR — we cover HF transformers workflows, they cover production vLLM serving.
+
 ## Summary
 
-TurboQuant KV cache compression as a drop-in vLLM plugin. Implements Google's **TurboQuant** algorithm ([arXiv 2504.19874](https://arxiv.org/abs/2504.19874), ICLR 2026) for compressing transformer KV caches to 3-4 bits per coordinate on consumer GPUs.
+TurboQuant KV cache compression via HuggingFace transformers DynamicCache monkey-patch. Implements Google's **TurboQuant** algorithm ([arXiv 2504.19874](https://arxiv.org/abs/2504.19874), ICLR 2026) for compressing transformer KV caches to 3-4 bits per coordinate on consumer GPUs.
 
 Achieves **3.76x KV cache compression with near-identical output quality** via TQ4 nibble packing + incremental dequantization, at 1.78x overhead. Validated on Molmo2-4B vision-language models processing 11K-token video clips on an RTX 4090.
 
-First open-source TurboQuant implementation — paper to working vLLM plugin in 72 hours.
+Reference implementation — paper to working HF transformers plugin in 72 hours. Surfaces TurboQuant to any `model.generate()` workflow without requiring vLLM.
 
 ---
 

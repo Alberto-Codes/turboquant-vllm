@@ -1,5 +1,7 @@
 # TurboQuant Consumer — Roadmap
 
+> **Note (2026-04-04):** Phase 3 goals targeting vLLM serving integration, fused Triton kernels, and CUDA graph compatibility are **superseded by [vllm-project/vllm#38479](https://github.com/vllm-project/vllm/pull/38479)**. That PR now provides production-grade native TurboQuant in vLLM (4 named presets, Triton kernels, norm correction, boundary layer protection). This roadmap remains as historical record of the path taken. Future roadmap for this project will focus on HuggingFace transformers workflows and adopting complementary techniques (norm correction, boundary protection) back from the vLLM PR.
+
 Implementation status and path forward for TurboQuant KV cache compression
 on consumer GPUs (RTX 4090, 24 GB VRAM) with Molmo2 vision-language models.
 
