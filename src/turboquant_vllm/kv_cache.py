@@ -687,6 +687,10 @@ class CompressedDynamicCache:
 
         Returns:
             Tuple of ``(keys, values)`` decompressed for attention use.
+
+        Raises:
+            RuntimeError: If ``fused_mode`` is True and the layer's
+                head_dim differs from the primary ``self.head_dim``.
         """
         if not self.enabled:
             return self._original_update(
@@ -720,6 +724,14 @@ class CompressedDynamicCache:
         # Use per-head_dim compressors for heterogeneous architectures
         # (Gemma 4: d=256 sliding, d=512 global).
         layer_dim = key_states.shape[-1]
+        if self.fused_mode and layer_dim != self.head_dim:
+            msg = (
+                "Fused TQ4 mode only supports the primary "
+                f"head_dim={self.head_dim}, but layer {layer_idx} has "
+                f"head_dim={layer_dim}. Disable fused mode for "
+                "heterogeneous architectures."
+            )
+            raise RuntimeError(msg)
         k_comp, v_comp = self._get_compressors(layer_dim)
         new_ck = self._compress_tensor(
             k_comp, key_states, nibble_packed=self._k_nibble_packed

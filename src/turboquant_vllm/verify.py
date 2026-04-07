@@ -62,19 +62,23 @@ COMPRESSION_QUALITY_THRESHOLD = (
 )
 
 
-def _detect_model_config(model: Any) -> dict[str, int]:
+def _detect_model_config(model: Any) -> dict[str, Any]:
     """Extract KV cache parameters from a model's config.
 
     Handles both VLMs (``text_config`` wrapper) and text-only models.
     Falls back to ``hidden_size // num_heads`` when ``head_dim`` is
     absent or ``None`` and ``num_attention_heads`` is positive.
 
+    For heterogeneous architectures (Gemma 4), also returns
+    ``global_head_dim``, ``global_kv_heads``, and ``layer_types``.
+
     Args:
         model: A loaded HuggingFace model.
 
     Returns:
-        Dict with head_dim, num_heads, num_kv_heads, num_layers,
-        and num_kv_shared_layers (0 when absent or None).
+        Dict with head_dim, global_head_dim, num_heads, num_kv_heads,
+        global_kv_heads, layer_types, num_layers, and
+        num_kv_shared_layers.
 
     Raises:
         ValueError: If ``head_dim`` is explicit but non-positive, or if
@@ -100,12 +104,18 @@ def _detect_model_config(model: Any) -> dict[str, int]:
     else:
         head_dim = hidden_size // num_heads
     num_kv_heads = getattr(text_config, "num_key_value_heads", num_heads)
+    global_head_dim = getattr(text_config, "global_head_dim", None)
+    global_kv_heads = getattr(text_config, "num_global_key_value_heads", None)
+    layer_types = getattr(text_config, "layer_types", None)
     num_layers = text_config.num_hidden_layers
     num_kv_shared_layers = getattr(text_config, "num_kv_shared_layers", 0) or 0
     return {
         "head_dim": head_dim,
+        "global_head_dim": global_head_dim,
         "num_heads": num_heads,
         "num_kv_heads": num_kv_heads,
+        "global_kv_heads": global_kv_heads,
+        "layer_types": layer_types,
         "num_layers": num_layers,
         "num_kv_shared_layers": num_kv_shared_layers,
     }
@@ -123,12 +133,16 @@ def _run_verification(
 
     Loads the model, runs a 128-token random Gaussian prefill through both
     uncompressed and compressed caches, and computes per-layer cosine
-    similarity. Caches are created with ``DynamicCache(config=text_config)``
-    for SWA-aware layer instantiation (Gemma models). Models with shared KV
-    cache layers (``num_kv_shared_layers``) iterate only over unique cache
-    layers. Reads ``HF_TOKEN`` from the environment and passes it to all
-    ``from_pretrained`` calls so that gated repositories work without
-    ``huggingface-cli login``.
+    similarity. For heterogeneous architectures (Gemma 4: d=256/512),
+    generates per-layer tensors with the correct head_dim from
+    ``layer_types``. Caches are created with
+    ``DynamicCache(config=text_config)`` for SWA-aware layer instantiation
+    (Gemma models). Models with shared KV cache layers
+    (``num_kv_shared_layers``) iterate only over unique cache layers.
+    Uses seeded generators to produce identical tensors for both caches
+    without retaining all per-layer tensors in memory. Reads ``HF_TOKEN``
+    from the environment and passes it to all ``from_pretrained`` calls
+    so that gated repositories work without ``huggingface-cli login``.
 
     Args:
         model_id: HuggingFace model identifier.
@@ -206,17 +220,37 @@ def _run_verification(
     device = next(model.parameters()).device
     text_config = getattr(config, "text_config", config)
 
-    # 128-token random Gaussian prefill
+    # 128-token random Gaussian prefill.
+    # Heterogeneous models (Gemma 4) have different head_dim/kv_heads per
+    # layer type, so we generate per-layer tensors when layer_types is set.
     seq_len = 128
-    input_shape = (1, num_kv_heads, seq_len, head_dim)
-    fake_keys = torch.randn(input_shape, dtype=torch.bfloat16, device=device)
-    fake_values = torch.randn(input_shape, dtype=torch.bfloat16, device=device)
+    global_head_dim = model_cfg["global_head_dim"]
+    global_kv_heads = model_cfg["global_kv_heads"]
+    layer_types = model_cfg["layer_types"]
+
+    def _make_fake(
+        layer_idx: int, *, generator: torch.Generator
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        ld = head_dim
+        lh = num_kv_heads
+        if layer_types and layer_idx < len(layer_types):
+            if "full" in layer_types[layer_idx]:
+                ld = global_head_dim or head_dim
+                lh = global_kv_heads or num_kv_heads
+        shape = (1, lh, seq_len, ld)
+        k = torch.randn(shape, dtype=torch.bfloat16, device=device, generator=generator)
+        v = torch.randn(shape, dtype=torch.bfloat16, device=device, generator=generator)
+        return k, v
 
     # Uncompressed reference cache — use text_config so DynamicCache sees
-    # layer_types and num_kv_shared_layers for models like Gemma 4
+    # layer_types and num_kv_shared_layers for models like Gemma 4.
+    # Use a seeded generator so tensors can be regenerated identically
+    # for the compressed cache without retaining all of them in memory.
+    rng = torch.Generator(device=device).manual_seed(42)
     ref_cache = DynamicCache(config=text_config)
     for layer_idx in range(num_cache_layers):
-        ref_cache.update(fake_keys, fake_values, layer_idx)
+        fk, fv = _make_fake(layer_idx, generator=rng)
+        ref_cache.update(fk, fv, layer_idx)
 
     # Resolve per-component bits
     resolved_k = k_bits if k_bits is not None else bits
@@ -232,8 +266,10 @@ def _run_verification(
         v_bits=v_bits,
         model_config=text_config,
     ):
+        rng_comp = torch.Generator(device=device).manual_seed(42)
         for layer_idx in range(num_cache_layers):
-            compressed_cache.update(fake_keys, fake_values, layer_idx)
+            fk, fv = _make_fake(layer_idx, generator=rng_comp)
+            compressed_cache.update(fk, fv, layer_idx)
 
         # Compute per-layer cosine similarity
         per_layer_cosine: list[float] = []
