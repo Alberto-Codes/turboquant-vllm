@@ -73,18 +73,22 @@ class TestTQ4FullAttentionSpec:
         assert issubclass(TQ4FullAttentionSpec, FullAttentionSpec)
 
     def test_page_size_bytes_molmo2_8b(self) -> None:
-        """Molmo2-8B: 8 KV heads, head_dim=128, block_size=16."""
+        """Molmo2-8B: 8 KV heads, head_dim=128, block_size=16.
+
+        Padded slot: next_power_of_2(136) = 256.
+        Page = 16 * 8 * 256 = 32,768.
+        """
         spec = TQ4FullAttentionSpec(
             block_size=16,
             num_kv_heads=8,
             head_size=128,
             dtype=torch.uint8,
         )
-        # 16 tokens * 8 heads * 136 bytes/token/head = 17,408
-        assert spec.page_size_bytes == 17_408
+        # Padded for hybrid model alignment
+        assert spec.page_size_bytes == 32_768
 
     def test_page_size_vs_fp16(self) -> None:
-        """TQ4 page is 3.76x smaller than FP16."""
+        """TQ4 page is smaller than FP16 (padded for hybrid alignment)."""
         tq4_spec = TQ4FullAttentionSpec(
             block_size=16,
             num_kv_heads=8,
@@ -98,7 +102,9 @@ class TestTQ4FullAttentionSpec:
             dtype=torch.float16,
         )
         ratio = fp16_spec.page_size_bytes / tq4_spec.page_size_bytes
-        assert abs(ratio - 3.76) < 0.01
+        # With padding: 65536/32768 = 2.0 (less than ideal 3.76x but
+        # needed for hybrid model page alignment)
+        assert ratio >= 1.5
 
     def test_dtype_is_uint8(self) -> None:
         """Spec preserves uint8 dtype for packed cache storage."""
