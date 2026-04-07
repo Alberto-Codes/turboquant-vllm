@@ -46,17 +46,24 @@ class _LlamaLikeConfig:
 
 
 class TestSWABypass:
-    """Validate that sliding window layers bypass compression."""
+    """Validate sliding window layer compression behavior.
 
-    def test_swa_layer_bypasses_compression(self, device: torch.device) -> None:
-        """SWA layers delegate to original update without compression."""
+    The is_sliding SWA bypass was removed — it was dead code due to
+    DynamicCache lazy initialization (cache starts with 0 layers).
+    SWA layers now compress normally. Full attention layers in mixed
+    models are bypassed via _full_attn_bypass (config-based).
+    """
+
+    def test_swa_layer_compresses_without_model_config(
+        self, device: torch.device
+    ) -> None:
+        """SWA layers compress when no model_config is provided."""
         from transformers import DynamicCache
         from transformers.cache_utils import DynamicLayer, DynamicSlidingWindowLayer
 
         cache = DynamicCache()
         cdc = CompressedDynamicCache(cache, head_dim=DIM, bits=BITS)
 
-        # Pre-populate cache layers: global then SWA
         cache.layers.clear()
         cache.layers.extend(
             [DynamicLayer(), DynamicSlidingWindowLayer(sliding_window=4096)]
@@ -65,14 +72,10 @@ class TestSWABypass:
         key = torch.randn(1, 4, 1, DIM, device=device)
         val = torch.randn(1, 4, 1, DIM, device=device)
 
-        # Layer 1 (SWA) — should bypass compression
-        k_out, v_out = cache.update(key, val, layer_idx=1)
-
-        # SWA bypass: no compressed data stored for layer 1
-        assert len(cdc._compressed_keys) <= 1
-        # Output should be unmodified (passthrough)
-        torch.testing.assert_close(k_out[:, :, -1:, :], key)
-        torch.testing.assert_close(v_out[:, :, -1:, :], val)
+        # Layer 1 (SWA) — compresses normally (no model_config = no bypass)
+        cache.update(key, val, layer_idx=1)
+        assert len(cdc._compressed_keys) >= 2
+        assert cdc._compressed_keys[1] is not None
 
     def test_global_layer_still_compresses_with_swa_present(
         self, device: torch.device
@@ -124,15 +127,16 @@ class TestSWABypass:
             for idx in range(4):
                 cache.update(key.clone(), val.clone(), layer_idx=idx)
 
-        # List padded to 3: [ck_0, None, ck_2]. Layer 3 (SWA) is
-        # beyond the last global layer so no padding is triggered.
-        assert len(cdc._compressed_keys) == 3
-        assert cdc._compressed_keys[0] is not None
-        assert cdc._compressed_keys[1] is None
-        assert cdc._compressed_keys[2] is not None
-        # Global layers have 2 tokens each (from 2 decode steps)
-        assert cdc._compressed_keys[0].indices.shape[-2] == 2
-        assert cdc._compressed_keys[2].indices.shape[-2] == 2
+        # All 4 layers compressed (SWA bypass removed, no model_config).
+        assert len(cdc._compressed_keys) == 4
+        assert all(ck is not None for ck in cdc._compressed_keys)
+        # Each layer has 2 tokens (from 2 decode steps)
+        ck0 = cdc._compressed_keys[0]
+        ck2 = cdc._compressed_keys[2]
+        assert ck0 is not None
+        assert ck2 is not None
+        assert ck0.indices.shape[-2] == 2
+        assert ck2.indices.shape[-2] == 2
 
     def test_lazy_layer_never_triggers_bypass(self, device: torch.device) -> None:
         """Layers beyond current list (lazy creation) should compress, not bypass."""
@@ -150,8 +154,8 @@ class TestSWABypass:
         # Should have compressed (not bypassed)
         assert len(cdc._compressed_keys) == 1
 
-    def test_get_seq_length_swa_layer_delegates(self, device: torch.device) -> None:
-        """get_seq_length on SWA layer returns uncompressed count, not 0."""
+    def test_get_seq_length_swa_layer_compressed(self, device: torch.device) -> None:
+        """get_seq_length on SWA layer returns compressed count (SWA bypass removed)."""
         from transformers import DynamicCache
         from transformers.cache_utils import DynamicLayer, DynamicSlidingWindowLayer
 
@@ -175,8 +179,8 @@ class TestSWABypass:
         # Global layer also reports 1
         assert cache.get_seq_length(0) == 1
 
-    def test_get_compressed_swa_layer_raises(self, device: torch.device) -> None:
-        """get_compressed on SWA layer raises ValueError."""
+    def test_get_compressed_swa_layer_works(self, device: torch.device) -> None:
+        """get_compressed on SWA layer returns data (SWA bypass removed)."""
         from transformers import DynamicCache
         from transformers.cache_utils import DynamicLayer, DynamicSlidingWindowLayer
 
@@ -194,13 +198,11 @@ class TestSWABypass:
         cache.update(key.clone(), val.clone(), layer_idx=0)
         cache.update(key.clone(), val.clone(), layer_idx=1)
 
-        # Global layer works
+        # Both layers compressed (SWA bypass removed)
         k_p, k_n, v_p, v_n = cdc.get_compressed(0)
         assert k_p is not None
-
-        # SWA layer raises (may hit bounds check or None check)
-        with pytest.raises(ValueError, match="no compressed data"):
-            cdc.get_compressed(1)
+        k_p1, k_n1, v_p1, v_n1 = cdc.get_compressed(1)
+        assert k_p1 is not None
 
     def test_vram_bytes_excludes_swa_layers(self, device: torch.device) -> None:
         """VRAM calculation skips None entries from SWA-bypassed layers."""
@@ -250,8 +252,8 @@ class TestSWABypass:
             cache.update(key.clone(), val.clone(), layer_idx=idx)
 
         stats = cdc.compression_stats()
-        # Only global layers (0, 2) count
-        assert stats["num_layers"] == 2
+        # All 4 layers compressed (SWA bypass removed)
+        assert stats["num_layers"] == 4
 
 
 # ---------------------------------------------------------------------------
@@ -338,3 +340,100 @@ class TestSWAWarning:
             swa_warnings = [x for x in w if "sliding window" in str(x.message)]
             assert len(swa_warnings) == 0
         assert cdc.enabled
+
+
+class TestFullAttentionBypass:
+    """Full attention layer bypass for sliding window model quality."""
+
+    def test_swa_compresses_full_attn_bypassed(self, device: torch.device) -> None:
+        """SWA layers compress, full attn layers bypass via config."""
+        from transformers import DynamicCache
+        from transformers.cache_utils import DynamicLayer, DynamicSlidingWindowLayer
+
+        cache = DynamicCache()
+        cdc = CompressedDynamicCache(
+            cache, head_dim=DIM, bits=BITS, model_config=_GemmaLikeConfig()
+        )
+
+        # Gemma pattern: [sliding, full, sliding, full]
+        cache.layers.clear()
+        cache.layers.extend(
+            [
+                DynamicSlidingWindowLayer(sliding_window=4096),
+                DynamicLayer(),
+                DynamicSlidingWindowLayer(sliding_window=4096),
+                DynamicLayer(),
+            ]
+        )
+
+        key = torch.randn(1, 4, 1, DIM, device=device)
+        val = torch.randn(1, 4, 1, DIM, device=device)
+
+        for idx in range(4):
+            cache.update(key.clone(), val.clone(), layer_idx=idx)
+
+        # _GemmaLikeConfig: layer_types = [sliding, full] * 3
+        # full_attn_bypass = {1, 3, 5}
+        # SWA layers (0, 2) compress. Full attn layers (1, 3) bypass.
+        assert len(cdc._compressed_keys) >= 3
+        assert cdc._compressed_keys[0] is not None  # SWA: compressed
+        assert cdc._compressed_keys[1] is None  # full attn: bypassed
+        assert cdc._compressed_keys[2] is not None  # SWA: compressed
+
+    def test_full_attn_bypass_indices_from_config(self) -> None:
+        """_full_attn_bypass set is populated from layer_types."""
+        from transformers import DynamicCache
+
+        cache = DynamicCache()
+        cdc = CompressedDynamicCache(
+            cache, head_dim=DIM, bits=BITS, model_config=_GemmaLikeConfig()
+        )
+        # _GemmaLikeConfig: ["sliding", "full"] * 3 → full at 1, 3, 5
+        assert cdc._full_attn_bypass == {1, 3, 5}
+
+    def test_no_bypass_without_model_config(self) -> None:
+        """Without model_config, no full attention bypass occurs."""
+        from transformers import DynamicCache
+
+        cache = DynamicCache()
+        cdc = CompressedDynamicCache(cache, head_dim=DIM, bits=BITS)
+        assert cdc._full_attn_bypass == set()
+
+    def test_full_attn_values_are_lossless(self, device: torch.device) -> None:
+        """Bypassed full attention layers preserve exact values."""
+        from transformers import DynamicCache
+        from transformers.cache_utils import DynamicLayer
+
+        cache = DynamicCache()
+        CompressedDynamicCache(
+            cache, head_dim=DIM, bits=BITS, model_config=_GemmaLikeConfig()
+        )
+        cache.layers.clear()
+        cache.layers.extend([DynamicLayer(), DynamicLayer()])
+
+        key = torch.randn(1, 4, 1, DIM, device=device)
+        val = torch.randn(1, 4, 1, DIM, device=device)
+
+        # Layer 1 is full_attention → bypassed → lossless
+        k_out, v_out = cache.update(key.clone(), val.clone(), layer_idx=1)
+        assert torch.equal(k_out, key)
+        assert torch.equal(v_out, val)
+
+    def test_get_seq_length_bypassed_full_attn(self, device: torch.device) -> None:
+        """Bypassed full attn layers report correct seq length, not 0."""
+        from transformers import DynamicCache
+        from transformers.cache_utils import DynamicLayer
+
+        cache = DynamicCache()
+        CompressedDynamicCache(
+            cache, head_dim=DIM, bits=BITS, model_config=_GemmaLikeConfig()
+        )
+        cache.layers.clear()
+        cache.layers.extend([DynamicLayer(), DynamicLayer()])
+
+        key = torch.randn(1, 4, 1, DIM, device=device)
+        val = torch.randn(1, 4, 1, DIM, device=device)
+
+        # Layer 1 is full_attention → bypassed
+        cache.update(key.clone(), val.clone(), layer_idx=1)
+        assert cache.get_seq_length(1) == 1
