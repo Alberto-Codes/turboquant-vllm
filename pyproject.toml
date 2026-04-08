@@ -187,6 +187,7 @@ show_missing = true
 ignore_vulnerabilities = [
     "GHSA-5239-wwwm-4pmq",  # Pygments 2.19.1 — ReDoS in AdlLexer. No fix available.
     "GHSA-w8v5-vhqr-4h9v",  # diskcache 5.6.3 — transitive via vllm. No fix available.
+    "GHSA-69w3-r845-3855",  # transformers 4.57.6 — pinned by vllm<5. Fix is 5.0.0rc3.
 ]
 allow_unused_ignores = false
 

@@ -352,7 +352,10 @@ class CompressedDynamicCache:
         Sets up per-head_dim compressors (lazily created via
         ``_get_compressors()``), internal storage for compressed
         representations, and incremental decompressed buffers.
-        ``fused_mode`` starts disabled.
+        ``fused_mode`` starts disabled. When ``model_config`` has
+        mixed sliding/full attention ``layer_types``, full attention
+        layers are bypassed (with list padding) to preserve retrieval
+        quality while allowing ``get_seq_length`` to delegate correctly.
 
         Keys and values can use different bit-widths via ``k_bits`` and
         ``v_bits``.  When both are ``None``, ``bits`` applies to both
@@ -442,11 +445,25 @@ class CompressedDynamicCache:
                 stacklevel=2,
             )
 
+        # Sliding window quality: in models with mixed sliding/full
+        # attention (Gemma 3/4), full attention layers are the sole
+        # retrieval path for tokens beyond the window. TQ quantization
+        # error on these critical layers destroys NIAH at 2K+ (33% vs
+        # 100% baseline). Bypass compression on full attention layers
+        # to preserve retrieval quality. SWA layers may also be bypassed
+        # by is_sliding when cache layers are pre-populated (e.g. tests),
+        # but in production (lazy init) SWA layers compress normally.
+        layer_types = getattr(model_config, "layer_types", None)
+        self._full_attn_bypass: set[int] = set()
+        if layer_types and any("sliding" in lt for lt in layer_types):
+            self._full_attn_bypass = {
+                i for i, lt in enumerate(layer_types) if "full" in lt
+            }
+
         # SWA detection: warn when config has mixed attention layers but
         # cache was created without config (no SWA layer metadata).
         # Checks layer_types (not sliding_window alone) to avoid false
         # positives on Mistral-style uniform SWA configs.
-        layer_types = getattr(model_config, "layer_types", None)
         if (
             model_config is not None
             and layer_types
@@ -672,8 +689,12 @@ class CompressedDynamicCache:
         In ``fused_mode``, skips decompression entirely — the fused TQ4
         kernel reads compressed data via ``get_compressed()``.
 
-        Sliding window attention layers (``is_sliding=True``) bypass
-        compression entirely, delegating to the original cache update.
+        Full attention layers in mixed sliding/full models bypass
+        compression via ``_full_attn_bypass`` (detected from config),
+        with compressed list padding so ``get_seq_length`` delegates
+        correctly. SWA layers compress normally — large models tolerate
+        TQ on local-context layers. Small models (<26B) may degrade
+        NIAH at 2K+ context.
 
         Works with the ``DynamicCache.layers`` API (transformers >=4.57)
         where each layer is a ``DynamicLayer`` holding ``.keys`` and
@@ -697,12 +718,22 @@ class CompressedDynamicCache:
                 key_states, value_states, layer_idx, cache_kwargs
             )
 
-        # SWA bypass: sliding window layers are not compressed (D8b).
-        # DynamicSlidingWindowLayer.is_sliding is True; DynamicLayer is False.
-        # Guard prevents IndexError for lazy layers not yet in the list.
-        if layer_idx < len(self.cache.layers) and getattr(
-            self.cache.layers[layer_idx], "is_sliding", False
-        ):
+        # Full attention bypass: in sliding window models, full attention
+        # layers are the sole retrieval path for tokens beyond the window.
+        # Keep them at full precision to preserve NIAH quality.
+        # SWA layers compress normally — large models (26B+) tolerate TQ
+        # on local-context layers; small models (4B) may degrade at 2K+.
+        #
+        # Note: the previous is_sliding SWA bypass was dead code — it
+        # checked cache.layers[idx].is_sliding but DynamicCache starts
+        # empty (lazy init), so the guard never fired. Removed in favor
+        # of this config-based approach which works reliably.
+        if layer_idx in self._full_attn_bypass:
+            # Pad compressed lists so get_seq_length delegates correctly
+            # instead of reporting 0 for this layer.
+            while len(self._compressed_keys) <= layer_idx:
+                self._compressed_keys.append(None)
+                self._compressed_values.append(None)
             return self._original_update(
                 key_states, value_states, layer_idx, cache_kwargs
             )
@@ -814,7 +845,7 @@ class CompressedDynamicCache:
     def _compressed_get_seq_length(self, layer_idx: int = 0) -> int:
         """Return cached sequence length from compressed storage.
 
-        SWA-bypassed layers delegate to the original uncompressed cache.
+        Full-attention-bypassed layers delegate to the original cache.
 
         Args:
             layer_idx: Layer to query (default 0).
@@ -824,11 +855,8 @@ class CompressedDynamicCache:
         """
         if not self.enabled:
             return self._original_get_seq_length(layer_idx)
-        # SWA-bypassed layers: delegate to uncompressed cache whether
-        # the layer is within padded range (None entry) or beyond it.
-        if layer_idx < len(self.cache.layers) and getattr(
-            self.cache.layers[layer_idx], "is_sliding", False
-        ):
+        # Bypassed layers (full attn in SW models): delegate to uncompressed.
+        if layer_idx in self._full_attn_bypass:
             return self._original_get_seq_length(layer_idx)
         if layer_idx >= len(self._compressed_keys):
             return 0
