@@ -1,6 +1,8 @@
 # vLLM Plugin
 
-turboquant-vllm registers as a custom attention backend via vLLM's plugin system. No code changes are needed — just install and pass a CLI flag.
+This page documents the optional out-of-tree vLLM plugin bridge in `turboquant-vllm`. It is useful when you specifically want the repo's CUSTOM-backend path, but it is not the primary long-term direction of the project.
+
+For native in-tree vLLM TurboQuant, prefer the upstream path as it matures. Use `turboquant-vllm` primarily for HuggingFace workflows, verification, and architecture research.
 
 ## Install
 
@@ -38,7 +40,7 @@ On each attention step, the backend:
 
 ## Configuration
 
-The plugin uses sensible defaults. No additional configuration is needed beyond `--attention-backend CUSTOM`.
+The plugin uses sensible defaults. No additional configuration is needed beyond `--attention-backend CUSTOM`, but treat this as a bridge path rather than the default recommendation for new users.
 
 | vLLM Flag | Recommended | Notes |
 |-----------|-------------|-------|

@@ -6,34 +6,40 @@
 
 # turboquant-vllm
 
-TurboQuant KV cache compression as a drop-in vLLM plugin. **3.76x KV cache compression with asymmetric K/V support, validated across 8 models.**
+Reference implementation for TurboQuant KV cache compression in HuggingFace `DynamicCache`, with verification tooling for model compatibility and an optional vLLM plugin bridge. **3.76x KV cache compression with asymmetric K/V support, validated across 8 models.**
 
 > Implements Google's [TurboQuant](https://arxiv.org/abs/2504.19874) (ICLR 2026) — the first KV cache quantization method with provably near-optimal distortion rates.
 
+> Native vLLM TurboQuant is converging upstream in [vllm-project/vllm#38479](https://github.com/vllm-project/vllm/pull/38479). This repo is the HuggingFace/reference path: research workflows, architecture validation, and incubation of upstreamable ideas.
+
+## When to Use This Repo
+
+Use `turboquant-vllm` when you want to:
+
+- compress KV cache in HuggingFace `transformers` via `DynamicCache`
+- validate whether TurboQuant will work on a model before deeper integration
+- experiment on multimodal, heterogeneous, sliding-window, or shared-KV architectures
+- prototype ideas that may later move upstream into native vLLM
+
+Use upstream native vLLM TurboQuant when you want production-oriented vLLM serving on a supported path.
+
 ## Install
+
+```bash
+pip install turboquant-vllm
+```
+
+Optional vLLM plugin extras:
 
 ```bash
 pip install turboquant-vllm[vllm]
 ```
 
-Or with [uv](https://docs.astral.sh/uv/):
+Or with [uv](https://docs.astral.sh/uv/) (choose one command based on your workflow):
 
 ```bash
-uv add turboquant-vllm --extra vllm
-```
-
-## Quick Start (vLLM)
-
-The TQ4 attention backend registers automatically via vLLM's plugin system:
-
-```bash
-vllm serve meta-llama/Llama-3.1-8B-Instruct --attention-backend CUSTOM
-```
-
-No code changes required. The plugin compresses KV cache pages to 68 bytes/token/head (vs 256 bytes FP16). For asymmetric K/V compression:
-
-```bash
-TQ4_K_BITS=4 TQ4_V_BITS=3 vllm serve meta-llama/Llama-3.1-8B-Instruct --attention-backend CUSTOM
+uv add turboquant-vllm                 # HuggingFace/reference workflow
+uv add turboquant-vllm --extra vllm    # Include optional vLLM plugin extras
 ```
 
 ## Quick Start (HuggingFace)
@@ -48,6 +54,22 @@ compressed = CompressedDynamicCache(cache, head_dim=128, k_bits=4, v_bits=3)
 # Pass cache (not the wrapper) to model.generate()
 # Compression happens transparently on every cache.update()
 ```
+
+## Optional vLLM Plugin Bridge
+
+If you specifically need the out-of-tree vLLM plugin path from this repo:
+
+```bash
+vllm serve meta-llama/Llama-3.1-8B-Instruct --attention-backend CUSTOM
+```
+
+For asymmetric K/V compression:
+
+```bash
+TQ4_K_BITS=4 TQ4_V_BITS=3 vllm serve meta-llama/Llama-3.1-8B-Instruct --attention-backend CUSTOM
+```
+
+This path is still supported, but it is no longer the primary project direction. For native vLLM TurboQuant, prefer the upstream in-tree path as it matures.
 
 ## Compression Quality
 

@@ -1,6 +1,8 @@
 # Container Deployment
 
-turboquant-vllm ships a `Containerfile` that bakes the plugin into the official vLLM image. Build once, deploy anywhere — no runtime pip installs.
+This page covers containerizing the optional vLLM plugin bridge from `turboquant-vllm`. Use it when you specifically need the repo's out-of-tree CUSTOM backend in a containerized environment.
+
+For the primary project workflow, prefer the HuggingFace/reference path. For native vLLM TurboQuant serving, prefer the upstream in-tree path as it matures.
 
 ## Build the Image
 

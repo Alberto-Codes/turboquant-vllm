@@ -1,6 +1,6 @@
 # HuggingFace Integration
 
-Use turboquant-vllm directly with HuggingFace's `DynamicCache` for research, benchmarking, or non-vLLM inference.
+This is the primary workflow for `turboquant-vllm`: use HuggingFace's `DynamicCache` path for research, benchmarking, model validation, and architecture experimentation.
 
 ## Install
 

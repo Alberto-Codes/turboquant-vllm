@@ -1,12 +1,18 @@
 # Project Documentation Index
 
-> **Status (2026-04-04):** Reference implementation for HuggingFace transformers DynamicCache. For native vLLM TurboQuant, see [vllm-project/vllm#38479](https://github.com/vllm-project/vllm/pull/38479). This project complements that PR — HF transformers workflows here, production vLLM serving there.
+> **Status (2026-04-04):** Reference implementation for HuggingFace transformers DynamicCache. For native vLLM TurboQuant, see [vllm-project/vllm#38479](https://github.com/vllm-project/vllm/pull/38479). This project complements that PR — HF transformers workflows, verification, and architecture research live here; production-oriented native vLLM serving belongs upstream.
 
 ## Project Overview
 
-- **Type:** Python library (HuggingFace transformers DynamicCache patch)
+- **Type:** Python library for HuggingFace DynamicCache compression, verification, and architecture research
 - **Primary Language:** Python 3.12+
 - **Architecture:** Layered library with strict DAG dependency flow
+
+## Choose the Right Path
+
+- **Use `turboquant-vllm`** when you want HuggingFace cache compression, model validation, multimodal experiments, or architecture/policy research
+- **Use upstream native vLLM TurboQuant** when you want the in-tree serving path in vLLM
+- **Use the plugin path here** only when you specifically need the out-of-tree bridge (`--attention-backend CUSTOM`)
 
 ## Quick Reference
 
@@ -14,9 +20,10 @@
 - **Tech Stack:** PyTorch + Triton + HuggingFace transformers + scipy
 - **Build System:** uv (uv_build backend)
 - **Entry Point:** `src/turboquant_vllm/__init__.py` (8 public exports)
-- **CLI:** `python -m turboquant_vllm.benchmark`
-- **vLLM Plugin:** Auto-registered via `vllm.general_plugins` entry point
-- **vLLM Usage:** `vllm serve <model> --attention-backend CUSTOM`
+- **Verification CLI:** `python -m turboquant_vllm.verify`
+- **Benchmark CLI:** `python -m turboquant_vllm.benchmark`
+- **Optional vLLM Plugin:** Auto-registered via `vllm.general_plugins` entry point
+- **Optional vLLM Usage:** `vllm serve <model> --attention-backend CUSTOM`
 - **Architecture Pattern:** Layered library (lloyd_max -> quantizer -> compressors -> kv_cache)
 
 ## Generated Documentation
@@ -52,11 +59,11 @@
 ## Getting Started
 
 ```bash
-# Install from PyPI
-pip install turboquant-vllm[vllm]
+# Install from PyPI for HuggingFace/reference workflows
+pip install turboquant-vllm
 
-# Use with vLLM (no code changes)
-vllm serve allenai/Molmo2-4B --attention-backend CUSTOM
+# Verify whether a model is a good TQ candidate
+python -m turboquant_vllm.verify --model allenai/Molmo2-4B --bits 4
 
 # Or use with HuggingFace directly
 from turboquant_vllm import CompressedDynamicCache
@@ -64,4 +71,11 @@ from transformers import DynamicCache
 
 cache = DynamicCache()
 compressed = CompressedDynamicCache(cache, head_dim=128, bits=4)
+```
+
+Optional plugin bridge for vLLM:
+
+```bash
+pip install turboquant-vllm[vllm]
+vllm serve allenai/Molmo2-4B --attention-backend CUSTOM
 ```

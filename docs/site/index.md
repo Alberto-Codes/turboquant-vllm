@@ -1,34 +1,41 @@
 # turboquant-vllm
 
-TurboQuant KV cache compression as a drop-in vLLM plugin. **3.76x compression, near-identical output quality, one CLI flag to enable.**
+Reference implementation for TurboQuant KV cache compression in HuggingFace `DynamicCache`, with verification tooling for model compatibility and an optional vLLM plugin bridge. **3.76x compression, near-identical output quality, and a clear split between reference workflows here vs native vLLM upstream.**
 
-> First open-source [TurboQuant](https://arxiv.org/abs/2504.19874) implementation (ICLR 2026) — paper to working vLLM plugin in 72 hours.
+> Implements Google's [TurboQuant](https://arxiv.org/abs/2504.19874) (ICLR 2026), the first KV cache quantization method with provably near-optimal distortion rates.
+
+> Native vLLM TurboQuant is converging upstream in [vllm-project/vllm#38479](https://github.com/vllm-project/vllm/pull/38479). This repo is the HuggingFace/reference path: research workflows, verification, and architecture validation.
+
+## Choose the Right Path
+
+- Use `turboquant-vllm` for HuggingFace cache compression, model validation, multimodal experiments, and architecture research.
+- Use upstream native vLLM TurboQuant when you want the in-tree serving path in vLLM.
+- Use the plugin path here only when you specifically need the out-of-tree bridge (`--attention-backend CUSTOM`).
 
 ## Install
 
 === "pip"
 
     ```bash
-    pip install turboquant-vllm[vllm]
+    pip install turboquant-vllm
     ```
 
 === "uv"
 
     ```bash
-    uv add turboquant-vllm --extra vllm
+    uv add turboquant-vllm
     ```
+
+Optional vLLM plugin extras:
+
+```bash
+pip install turboquant-vllm[vllm]
+uv add turboquant-vllm --extra vllm
+```
 
 ## Quick Start
 
-### vLLM (zero code changes)
-
-```bash
-vllm serve allenai/Molmo2-8B --attention-backend CUSTOM
-```
-
-The TQ4 attention backend registers automatically via vLLM's plugin system. KV cache pages are compressed to 68 bytes/token/head (vs 256 bytes FP16).
-
-### HuggingFace
+### HuggingFace (primary workflow)
 
 ```python
 from transformers import DynamicCache
@@ -40,6 +47,20 @@ compressed = CompressedDynamicCache(cache, head_dim=128, bits=4)
 # Pass cache (not the wrapper) to model.generate()
 # Compression happens transparently on every cache.update()
 ```
+
+### Verify a model before deeper integration
+
+```bash
+python -m turboquant_vllm.verify --model allenai/Molmo2-4B --bits 4
+```
+
+### Optional vLLM plugin bridge
+
+```bash
+vllm serve allenai/Molmo2-8B --attention-backend CUSTOM
+```
+
+The TQ4 attention backend registers automatically via vLLM's plugin system. KV cache pages are compressed to 68 bytes/token/head (vs 256 bytes FP16).
 
 ## Benchmark Results
 
